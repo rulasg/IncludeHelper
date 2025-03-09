@@ -20,16 +20,6 @@ Foreach($import in @($include + $Private + $Public))
         Write-Error -Message "Failed to import function $($import.fullname): $_"
     }
 }
-{
-    Try
-    {
-        . $import.fullname
-    }
-    Catch
-    {
-        Write-Error -Message "Failed to import function $($import.fullname): $_"
-    }
-}
 
 # Here I might...
 # Read in or create an initial config file and variable
