@@ -1,7 +1,10 @@
 function Test_GetModuleFolder{
 
-    $local = $PSScriptRoot
-    $moduleRootPath = $local | Split-Path -Parent | Split-Path -Parent
+    # Not calling Get-ModuleFolder before loading the module to avoid confiusion. Smae function name from different ps1, test include or main include.
+    $moduleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
+    
+    # Load include file to test
+    . $(Get-Ps1FullPath -Name "ps1.helper.ps1" -FolderName "Include")
 
     $result = Get-ModuleFolder -FolderName "Public"
 

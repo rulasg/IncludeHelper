@@ -34,8 +34,9 @@ function Get-ModuleFolder{
         [string]$FolderName
     )
 
-    $local = $PSScriptRoot
-    $moduleRootPath = $local | Split-Path -Parent | Split-Path -Parent
+    # Define module roots
+    $testRootPath = $PSScriptRoot | Split-Path -Parent
+    $moduleRootPath = $testRootPath | Split-Path -Parent
 
     switch ($FolderName){
         'Public'{
@@ -48,19 +49,19 @@ function Get-ModuleFolder{
             $moduleFolder = $moduleRootPath | Join-Path -ChildPath "include"
         }
         'TestInclude'{
-            $moduleFolder = $moduleRootPath | Join-Path -ChildPath "Test\include"
+            $moduleFolder = $testRootPath | Join-Path -ChildPath "include"
         }
         'TestPrivate'{
-            $moduleFolder = $moduleRootPath | Join-Path -ChildPath "Test\private"
+            $moduleFolder = $testRootPath | Join-Path -ChildPath "private"
         }
         'TestPublic'{
-            $moduleFolder = $moduleRootPath | Join-Path -ChildPath "Test\public"
+            $moduleFolder = $testRootPath | Join-Path -ChildPath "public"
         }
         'Root'{
             $moduleFolder = $moduleRootPath
         }
         'TestRoot'{
-            $moduleFolder = $moduleRootPath | Join-Path -ChildPath "Test"
+            $moduleFolder = $testRootPath 
         }
     }
     return $moduleFolder
