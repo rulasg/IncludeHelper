@@ -1,4 +1,3 @@
-
 function Test_GetModuleFolder{
 
     $local = $PSScriptRoot
@@ -27,4 +26,12 @@ function Test_GetModuleFolder{
     $result = Get-ModuleFolder -FolderName "TestPublic"
 
     Assert-AreEqual -Expected ($moduleRootPath | Join-Path -ChildPath "Test\public") -Presented $result
+
+    $result = Get-ModuleFolder -FolderName "Root"
+
+    Assert-AreEqual -Expected $moduleRootPath -Presented $result
+
+    $result = Get-ModuleFolder -FolderName "TestRoot"
+
+    Assert-AreEqual -Expected ($moduleRootPath | Join-Path -ChildPath "Test") -Presented $result
 }

@@ -1,10 +1,9 @@
-
 function Get-Ps1FullPath{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory,Position = 0)][string]$Name,
         [Parameter(Position = 1)]
-        [ValidateSet('Public', 'Private', 'Include', 'TestInclude','TestPrivate', 'TestPublic')]
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot')]
         [string]$FolderName
     )
 
@@ -31,7 +30,7 @@ function Get-ModuleFolder{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory,Position = 1)]
-        [ValidateSet('Public', 'Private', 'Include', 'TestInclude','TestPrivate', 'TestPublic')]
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot')]
         [string]$FolderName
     )
 
@@ -56,6 +55,12 @@ function Get-ModuleFolder{
         }
         'TestPublic'{
             $moduleFolder = $moduleRootPath | Join-Path -ChildPath "Test\public"
+        }
+        'Root'{
+            $moduleFolder = $moduleRootPath
+        }
+        'TestRoot'{
+            $moduleFolder = $moduleRootPath | Join-Path -ChildPath "Test"
         }
     }
     return $moduleFolder
