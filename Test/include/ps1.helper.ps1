@@ -1,12 +1,30 @@
 
-function Import-Ps1Public{
+function Get-Ps1FullPath{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory,Position = 0)][string]$Name,
-        [Parameter(Mandatory,Position = 1)]
+        [Parameter(Position = 1)]
         [ValidateSet('Public', 'Private', 'Include', 'TestInclude','TestPrivate', 'TestPublic')]
         [string]$FolderName
     )
+
+   # If folderName is not empty
+    if($FolderName -ne $null){
+        $folder = Get-ModuleFolder -FolderName $FolderName
+        $path = $folder | Join-Path -ChildPath $Name
+    } else {
+        $path = $Name
+    }
+
+    # Check if file exists
+    if(-Not (Test-Path $path)){
+        throw "File $path not found"
+    }
+
+    # Get Path item
+    $item = Get-item -Path $path
+
+    return $item
 }
 
 function Get-ModuleFolder{
