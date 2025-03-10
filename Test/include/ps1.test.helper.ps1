@@ -3,7 +3,7 @@ function Get-Ps1FullPath{
     param(
         [Parameter(Mandatory,Position = 0)][string]$Name,
         [Parameter(Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer')]
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows')]
         [string]$FolderName
     )
 
@@ -30,7 +30,7 @@ function Get-ModuleFolder{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory,Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer')][string]$FolderName,
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows')][string]$FolderName,
         [Parameter(Position = 0)][string]$ModuleRootPath
     )
 
@@ -72,6 +72,9 @@ function Get-ModuleFolder{
         }
         'DevContainer'{
             $moduleFolder = $ModuleRootPath | Join-Path -ChildPath ".devcontainer"
+        }
+        'WorkFlows'{
+            $moduleFolder = $ModuleRootPath | Join-Path -ChildPath ".github/workflows"
         }
     }
     return $moduleFolder
