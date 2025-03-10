@@ -39,7 +39,7 @@ function Get-IncludeFile{
     }
 
     return $ret
-} Export-ModuleMember -Function Get-Includefiles
+} Export-ModuleMember -Function Get-IncludeFile
 
 <#
 .SYNOPSIS
