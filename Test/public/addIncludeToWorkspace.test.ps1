@@ -30,6 +30,32 @@ function Test_AddIncludeToWorkspace{
     Assert-ItemExist -path $path
 }
 
+function Test_AddIncludeToWorkspace_PipeParameters{
+    
+    Import-Module -Name TestingHelper
+    New-ModuleV3 -Name TestModule
+    
+    # Test for Include
+    $destinationModulePath = "TestModule"
+    
+    $includesToAdd = @(
+        [PSCustomObject]@{ Name = "config.ps1"; FolderName = "Include" },
+        [PSCustomObject]@{ Name = "config.mock.ps1"; FolderName = "TestInclude" }
+    )
+
+    #Act
+    $includesToAdd | Add-IncludeToWorkspace -DestinationModulePath $destinationModulePath
+
+    #Assert
+    $folderNamePath = get-Modulefolder -FolderName "Include" -ModuleRootPath $destinationModulePath
+    $path = $folderNamePath | Join-Path -ChildPath "config.ps1"
+    Assert-ItemExist -path $path
+    $folderNamePath = get-Modulefolder -FolderName "TestInclude" -ModuleRootPath $destinationModulePath
+    $path = $folderNamePath | Join-Path -ChildPath "config.mock.ps1"
+    Assert-ItemExist -path $path
+
+}
+
 function Test_CopyIncludeToWorkspace{
 
     Import-Module -Name TestingHelper
