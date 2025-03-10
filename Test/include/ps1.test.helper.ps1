@@ -29,24 +29,27 @@ function Get-Ps1FullPath{
 function Get-ModuleFolder{
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory,Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot')]
-        [string]$FolderName
+        [Parameter(Mandatory,Position = 1)][ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot')][string]$FolderName,
+        [Parameter(Position = 0)][string]$ModuleRootPath
     )
 
-    # Define module roots
-    $testRootPath = $PSScriptRoot | Split-Path -Parent
-    $moduleRootPath = $testRootPath | Split-Path -Parent
+    #checkif $ModuleRootPath is null,  whitespace or empty
+    if([string]::IsNullOrWhiteSpace($ModuleRootPath)){
+        $ModuleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
+    }
+
+    # TestRootPath
+    $testRootPath = $ModuleRootPath | Join-Path -ChildPath "Test"
 
     switch ($FolderName){
         'Public'{
-            $moduleFolder = $moduleRootPath | Join-Path -ChildPath "public"
+            $moduleFolder = $ModuleRootPath | Join-Path -ChildPath "public"
         }
         'Private'{
-            $moduleFolder = $moduleRootPath | Join-Path -ChildPath "private"
+            $moduleFolder = $ModuleRootPath | Join-Path -ChildPath "private"
         }
         'Include'{
-            $moduleFolder = $moduleRootPath | Join-Path -ChildPath "include"
+            $moduleFolder = $ModuleRootPath | Join-Path -ChildPath "include"
         }
         'TestInclude'{
             $moduleFolder = $testRootPath | Join-Path -ChildPath "include"
@@ -58,7 +61,7 @@ function Get-ModuleFolder{
             $moduleFolder = $testRootPath | Join-Path -ChildPath "public"
         }
         'Root'{
-            $moduleFolder = $moduleRootPath
+            $moduleFolder = $ModuleRootPath
         }
         'TestRoot'{
             $moduleFolder = $testRootPath 
