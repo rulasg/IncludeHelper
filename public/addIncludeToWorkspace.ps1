@@ -12,7 +12,7 @@ It supports ShouldProcess for safety and allows specifying the destination modul
 The name of the include to add. This parameter is mandatory and accepts a string.
 
 .PARAMETER FolderName
-The name of the folder to add. This parameter is mandatory and accepts a string from a predefined set of values: 'Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot'.
+The name of the folder to add. This parameter is mandatory and accepts a string from a predefined set of values: 'Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot','Tools'.
 
 .PARAMETER DestinationModulePath
 The path to the destination module. This parameter is optional and defaults to the current directory (".").
@@ -27,7 +27,7 @@ function Add-IncludeToWorkspace {
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$Name,
-        [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)][ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot')][string]$FolderName,
+        [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)][ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools')][string]$FolderName,
         [Parameter()][string]$DestinationModulePath = "."
     )
 
