@@ -49,7 +49,7 @@ This function opens a specified include file in the default application based on
 .PARAMETER Name
 The name of the include file to open. This parameter is mandatory and accepts a string.
 .PARAMETER FolderName
-The name of the folder where the include file is located. This parameter is mandatory and accepts a string from a predefined set of values: 'Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot'.
+The name of the folder where the include file is located. This parameter is mandatory and accepts a string from a predefined set of values: 'Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot','Tools'.
 .EXAMPLE
 Open-IncludeFile -Name "MyInclude.ps1" -FolderName "Include"
 Open-IncludeFile -Name "TestInclude.txt" -FolderName "TestInclude"
@@ -58,7 +58,7 @@ function Open-IncludeFile{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$Name,
-        [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)][ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot')][string]$FolderName
+        [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)][ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools')][string]$FolderName
     )
 
     process{
