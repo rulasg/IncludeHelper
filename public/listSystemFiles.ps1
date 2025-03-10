@@ -63,6 +63,11 @@ function Get-IncludeSystemFiles{
     $includeItems += [PSCustomObject]@{ FolderName = 'WorkFlows' ; Name = 'powershell.yml' }
     $includeItems += [PSCustomObject]@{ FolderName = 'WorkFlows' ; Name = 'test_with_TestingHelper.yml' }
 
+    # Filter items
+    if($Filter -ne '*'){
+        $includeItems = $includeItems | Where-Object { $_.Name -like "*$Filter*" }
+    }
+
     return $includeItems
 }
 Export-ModuleMember -Function Get-IncludeSystemFiles

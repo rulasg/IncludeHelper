@@ -23,3 +23,25 @@ function Test_GetIncludeFile{
 
 }
 
+function Test_GetIncludeSystemFiles {
+    # Test for IncludeSystemFiles
+    $name = "deploy.ps1"
+    $folderName = "Root"
+
+    # Act
+    $result = Get-IncludeSystemFiles
+
+    Assert-Count -Expected 14 -Presented $result
+
+    # Assert
+    $item = $result | Where-Object {$_.Name -eq $name}
+    Assert-Count -Expected 1 -Presented $Item
+    Assert-AreEqual -Expected $folderName -Presented $item.FolderName
+
+    # Filtered
+    $result = Get-IncludeSystemFiles -Filter "testing"
+    Assert-Count -Expected 1 -Presented $result
+    $item = $result | Where-Object {$_.Name -eq "test_with_TestingHelper.yml"}
+    Assert-AreEqual -Expected "WorkFlows" -Presented $item.FolderName
+}
+
