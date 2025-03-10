@@ -20,10 +20,10 @@ function Test_AddIncludeToWorkspace{
     $name = "invokeCommand.mock.ps1"
     $folderName = "TestInclude"
     $destinationModulePath = "TestModule"
-    
+
     #Act
     Add-IncludeToWorkspace -Name $name -FolderName $folderName -DestinationModulePath $destinationModulePath
-    
+
     #Assert
     $folderNamePath = get-Modulefolder -FolderName $folderName -ModuleRootPath $destinationModulePath
     $path = $folderNamePath | Join-Path -ChildPath $name
