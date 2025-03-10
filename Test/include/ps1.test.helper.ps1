@@ -3,7 +3,7 @@ function Get-Ps1FullPath{
     param(
         [Parameter(Mandatory,Position = 0)][string]$Name,
         [Parameter(Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools')]
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer')]
         [string]$FolderName
     )
 
@@ -29,7 +29,8 @@ function Get-Ps1FullPath{
 function Get-ModuleFolder{
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory,Position = 1)][ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools')][string]$FolderName,
+        [Parameter(Mandatory,Position = 1)]
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer')][string]$FolderName,
         [Parameter(Position = 0)][string]$ModuleRootPath
     )
 
@@ -68,6 +69,9 @@ function Get-ModuleFolder{
         }
         'Tools'{
             $moduleFolder = $ModuleRootPath | Join-Path -ChildPath "tools"
+        }
+        'DevContainer'{
+            $moduleFolder = $ModuleRootPath | Join-Path -ChildPath ".devcontainer"
         }
     }
     return $moduleFolder
