@@ -37,4 +37,10 @@ function Test_GetModuleFolder{
     $result = Get-ModuleFolder -FolderName "TestRoot"
 
     Assert-AreEqual -Expected ($moduleRootPath | Join-Path -ChildPath "Test") -Presented $result
+
+    $result = Get-ModuleFolder -FolderName "Tools"
+    Assert-AreEqual -Expected ($moduleRootPath | Join-Path -ChildPath "tools") -Presented $result
+
+    $result = Get-ModuleFolder -FolderName "DevContainer"
+    Assert-AreEqual -Expected ($moduleRootPath | Join-Path -ChildPath ".devcontainer") -Presented $result
 }
