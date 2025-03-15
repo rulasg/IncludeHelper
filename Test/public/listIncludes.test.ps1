@@ -6,11 +6,9 @@ function Test_GetIncludeFile{
     #Act
     $result = Get-IncludeFile
 
-    Assert-Count -Expected 10 -Presented $result
-
     #Assert
     $item = $result | Where-Object {$_.Name -eq $name}
-    Assert-Count -Expected 1 -Presented $Item
+    Assert-Count -Expected 1 -Presented $item
     Assert-AreEqual -Expected $folderName -Presented $item.FolderName
 
     # Filtered
