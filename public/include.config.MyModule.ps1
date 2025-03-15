@@ -1,15 +1,25 @@
+# CONFIG - PUBLIC
+#
+# This script defines aliases and functions for configuration management specific to "MyModule".
+# It is intended to be included in public-facing scripts.
 
-# This file is part of the CONFIG Mock Include.
-
+# Define unique aliases for "MyModule"
 $CONFIG_INVOKE_GET_ROOT_PATH_ALIAS = "MyModuleGetConfigRootPath"
 $CONFIG_INVOKE_GET_ROOT_PATH_CMD = "Invoke-MyModuleGetConfigRootPath"
 
+# Set the alias for the root path command
 Set-MyInvokeCommandAlias -Alias $CONFIG_INVOKE_GET_ROOT_PATH_ALIAS -Command $CONFIG_INVOKE_GET_ROOT_PATH_CMD
 
-function Invoke-MyModuleGetConfigRootPath{
+# Define the function to get the configuration root path
+function Invoke-MyModuleGetConfigRootPath {
+    [CmdletBinding()]
+    param()
+
     $configRoot = GetConfigRootPath
     return $configRoot
-} Export-ModuleMember -Function Invoke-MyModuleGetConfigRootPath
+}
+
+Export-ModuleMember -Function Invoke-MyModuleGetConfigRootPath
 
 # Extra functions not needed by INCLUDE CONFIG
 
