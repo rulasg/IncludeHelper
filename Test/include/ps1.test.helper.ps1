@@ -30,11 +30,10 @@ function Get-Ps1FullPath{
 function Get-ModuleFolder{
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory,Position = 1)]
+        [Parameter(Mandatory,Position = 0)]
         [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub')]
         [string]$FolderName,
-
-        [Parameter(Position = 0)][string]$ModuleRootPath
+        [Parameter(Position = 1)][string]$ModuleRootPath
     )
 
     #checkif $ModuleRootPath is null,  whitespace or empty

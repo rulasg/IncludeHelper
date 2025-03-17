@@ -31,6 +31,7 @@ function Get-ModuleFolder{
     param(
         [Parameter(Mandatory,Position = 1)]
         [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub')]
+        [string]$FolderName,
         [Parameter(Position = 0)][string]$ModuleRootPath
     )
 
