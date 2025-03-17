@@ -12,7 +12,6 @@ Set-MyInvokeCommandAlias -Alias "GetModule" -Command 'Get-Module -Name {name}'
 Set-MyInvokeCommandAlias -Alias "GetModuleListAvailable" -Command 'Get-Module -Name {name} -ListAvailable'
 Set-MyInvokeCommandAlias -Alias "ImportModule" -Command 'Import-Module -Name {name} -Scope Global -Verbose:$false -PassThru'
 
-
 function Invoke-GetMyModuleRootPath{
 [CmdletBinding()]
 param()
