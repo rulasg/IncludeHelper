@@ -29,7 +29,7 @@ function Test_GetIncludeSystemFiles {
     # Act
     $result = Get-IncludeSystemFiles
 
-    Assert-Count -Expected 14 -Presented $result
+    Assert-Count -Expected 16 -Presented $result
 
     # Assert
     $item = $result | Where-Object {$_.Name -eq $name}
