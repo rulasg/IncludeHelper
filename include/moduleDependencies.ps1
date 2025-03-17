@@ -48,7 +48,7 @@ function Import-Dependency{
     process {
         #1. Check if the module is already imported and reloads it from it's own module
 
-        $module = Get-Module -Name $Name
+        $module = Invoke-MyCommand -Command 'GetModule' -Parameters @{ name = $Name }
         if ($module) {
             $module = Import-MyModule -Name $module.Path
             if($module){
@@ -59,7 +59,7 @@ function Import-Dependency{
             }
         }
 
-        #3. import from side by side path
+        #2. import from side by side path
         $meModuleRootPath = Invoke-MyCommand -Command 'GetMyModuleRootPath'
         $modulePath = $meModuleRootPath | split-path -Parent | Join-Path -ChildPath $Name
 
@@ -75,8 +75,8 @@ function Import-Dependency{
             }
         }
 
-        #2. imports from powerselll module manger
-        $moduleAvailable = Get-Module -Name $Name -ListAvailable
+        #3. imports from powerselll module manger
+        $moduleAvailable = Invoke-MyCommand -Command 'GetModuleListAvailable' -Parameters @{ name = $Name }
         if ($moduleAvailable) {
             $module = Import-MyModule -Name $moduleAvailable.Path
             if($module){
@@ -87,15 +87,36 @@ function Import-Dependency{
             }
         }
 
-        #4. clones from public GitHub Repository, side by side, and imports it
+        # 4. Install the module from PowerShell Gallery
+        $module = Invoke-MyCommand -Command 'GetModuleListAvailable' -Parameters @{ name = $Name }
+        if(-Not $module){
+            # find moduule in PowerShell Gallery
+            $moduleAvailable = Invoke-MyCommand -Command 'FindModule' -Parameters @{ name = $Name}
+            if ($moduleAvailable) {
+                # this does not return any module
+                Invoke-MyCommand -Command 'InstallModule' -Parameters @{ name = $Name }
+                #Check if the module is available now
+                $module = Invoke-MyCommand -Command 'GetModuleListAvailable' -Parameters @{ name = $Name }
+                if($module){
+                    "Module [$Name] installed from PowerShell Gallery" | Write-Verbose
+                    return $module
+                } else {
+                    "Failed to install module [$Name] from PowerShell Gallery" | Write-Verbose
+                }
+            }
+        }
+
+        #5. clones from public GitHub Repository, side by side, and imports it
         #  1. Default module path is https://github.com/rulasg/moduleName
         #  2. If the module is not found, it will be cloned from the GitHub repository
 
-        $url = "https://github.com/{owner}/{name}"
+        $url = "https://github.com/rulasg/$name"
         $testUrl = Invoke-MyCommand -Command 'TestGitHubRepo' -Parameters @{ url = $url } -ErrorAction SilentlyContinue
         
         if ($testUrl -eq $true) {
-            $modulePath = $PSScriptRoot | split-path -Parent | Join-Path -ChildPath $Name
+            # Clone side by side this module
+            $local = Invoke-MyCommand -Command 'GetMyModuleRootPath'
+            $modulePath = $local | split-path -Parent | Join-Path -ChildPath $Name
 
             $null = Invoke-MyCommand -Command 'CloneRepo' -Parameters @{ url = $url; folder = $modulePath }
 
@@ -131,11 +152,13 @@ function Import-MyModule{
     )
 
     process {
-        $module = Import-Module -Name $Name -Scope Global -Verbose:$false -PassThru
+        # $module = Import-Module -Name $Name -Scope Global -Verbose:$false -PassThru
+        $module = Invoke-MyCommand -Command 'ImportModule' -Parameters @{ name = $Name}
 
-        $result = Get-Module -Name $module.Name
+        # $result = Get-Module -Name $module.Name
+        $result = Invoke-MyCommand -Command 'GetModule' -Parameters @{ name = $module.Name }
         
         return $result
 
     }
-} Export-ModuleMember -Function Import-MyModule
+} 
