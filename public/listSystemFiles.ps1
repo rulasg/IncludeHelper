@@ -63,6 +63,10 @@ function Get-IncludeSystemFiles{
     $includeItems += [PSCustomObject]@{ FolderName = 'WorkFlows' ; Name = 'powershell.yml' }
     $includeItems += [PSCustomObject]@{ FolderName = 'WorkFlows' ; Name = 'test_with_TestingHelper.yml' }
 
+    # GitHub
+    $includeItems += [PSCustomObject]@{ FolderName = 'GitHub' ; Name = 'copilot-commit-message-instructions.md' }
+    $includeItems += [PSCustomObject]@{ FolderName = 'GitHub' ; Name = 'copilot-instructions.md' }
+
     # Filter items
     if($Filter -ne '*'){
         $includeItems = $includeItems | Where-Object { $_.Name -like "*$Filter*" }
