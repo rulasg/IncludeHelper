@@ -6,6 +6,11 @@
 Set-MyInvokeCommandAlias -Alias "CloneRepo" -Command 'git clone {url} {folder}'
 Set-MyInvokeCommandAlias -Alias "TestGitHubRepo" -Command 'Invoke-WebRequest -Uri "{url}" -Method Head -ErrorAction SilentlyContinue | ForEach-Object { $_.StatusCode -eq 200 }'
 Set-MyInvokeCommandAlias -Alias "GetMyModuleRootPath" -Command 'Invoke-GetMyModuleRootPath'
+Set-MyInvokeCommandAlias -Alias "FindModule" -Command 'Find-Module -Name {name} -AllowPrerelease -ErrorAction SilentlyContinue'
+Set-MyInvokeCommandAlias -Alias "InstallModule" -Command 'Install-Module -Name {name} -AllowPrerelease -Force'
+Set-MyInvokeCommandAlias -Alias "GetModule" -Command 'Get-Module -Name {name}'
+Set-MyInvokeCommandAlias -Alias "GetModuleListAvailable" -Command 'Get-Module -Name {name} -ListAvailable'
+Set-MyInvokeCommandAlias -Alias "ImportModule" -Command 'Import-Module -Name {name} -Scope Global -Verbose:$false -PassThru'
 
 
 function Invoke-GetMyModuleRootPath{
