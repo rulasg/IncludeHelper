@@ -1,3 +1,4 @@
+
 function Test_MockCallToObject{
 
     Reset-InvokeCommandMock
@@ -15,7 +16,7 @@ function Test_MockCallToObject{
     Assert-AreEqual -Expected 42 -Presented $result.Value
 }
 
-function Test_MockCallToObject_ResetObject{
+function Test_MockCallToObject_ResetMockObject{
 
     Reset-InvokeCommandMock
 
@@ -34,4 +35,22 @@ function Test_MockCallToObject_ResetObject{
     Reset-InvokeCommandMock
     $variables = Get-Variable -scope Global -Name "$($MODULE_INVOKATION_TAG_MOCK)_*"
     Assert-Count -Expected 0 -Presented $variables
+ }
+
+function Test_MockCallExpression{
+
+    Reset-InvokeCommandMock
+
+    $expression = @'
+    echo "new string from mock 2"
+    echo "more things to say"
+'@
+
+    MockCallExpression -Command "aliasComand" -Expression $expression
+
+    $result = Invoke-MyCommand -Command 'aliasComand'
+
+    Assert-Count -Presented $result -Expected 2
+    Assert-Contains -Presented $result -Expected 'new string from mock 2'
+    Assert-Contains -Presented $result -Expected 'more things to say'
 }

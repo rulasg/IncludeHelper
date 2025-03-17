@@ -159,6 +159,21 @@ function MockCallThrow{
     Set-InvokeCommandMock -Alias $command -Command $mockCommand
 }
 
+function MockCallExpression{
+    param(
+        [Parameter(Position=0)][string] $command,
+        [Parameter(Position=1)][string] $expression
+    )
+
+    $mockCommand = @'
+    Invoke-Expression -Command '{expression}'
+'@
+    $mockCommand = $mockCommand -replace "{expression}", $expression
+
+    Set-InvokeCommandMock -Alias $command -Command $expression
+}
+
+
 function Save-InvokeAsMockFile{
     param(
         [Parameter(Mandatory=$true)] [string]$Command,
