@@ -40,7 +40,7 @@
 # } Export-ModuleMember -Function Invoke-GetMyModuleRootPath
 
 function Import-Dependency{
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess,ConfirmImpact = 'High')]
     param(
         [Parameter(Mandatory,ValueFromPipeline)][string]$Name
     )
@@ -94,14 +94,19 @@ function Import-Dependency{
             $moduleAvailable = Invoke-MyCommand -Command 'FindModule' -Parameters @{ name = $Name}
             if ($moduleAvailable) {
                 # this does not return any module
-                Invoke-MyCommand -Command 'InstallModule' -Parameters @{ name = $Name }
-                #Check if the module is available now
-                $module = Invoke-MyCommand -Command 'GetModuleListAvailable' -Parameters @{ name = $Name }
-                if($module){
-                    "Module [$Name] installed from PowerShell Gallery" | Write-Verbose
-                    return $module
+                if ($PSCmdlet.ShouldProcess("Installing module $name", "Do you want to install [$Name] from PowerShell Gallery?")) {
+                    Invoke-MyCommand -Command 'InstallModule' -Parameters @{ name = $Name }
+                    #Check if the module is available now
+                    $module = Invoke-MyCommand -Command 'GetModuleListAvailable' -Parameters @{ name = $Name }
+                    if($module){
+                        "Module [$Name] installed from PowerShell Gallery" | Write-Verbose
+                        return $module
+                    } else {
+                        "Failed to install module [$Name] from PowerShell Gallery" | Write-Verbose
+                    }
                 } else {
-                    "Failed to install module [$Name] from PowerShell Gallery" | Write-Verbose
+                    "Module [$Name] not imported. Skipped installed from PowerShell Gallery" | Write-Warning
+                    return $null
                 }
             }
         }
@@ -118,7 +123,12 @@ function Import-Dependency{
             $local = Invoke-MyCommand -Command 'GetMyModuleRootPath'
             $modulePath = $local | split-path -Parent | Join-Path -ChildPath $Name
 
-            $null = Invoke-MyCommand -Command 'CloneRepo' -Parameters @{ url = $url; folder = $modulePath }
+            if ($PSCmdlet.ShouldProcess("Cloning module $name", "Do you want to cline [$url] to [$modulePath]?")) {
+                $null = Invoke-MyCommand -Command 'CloneRepo' -Parameters @{ url = $url; folder = $modulePath }
+            } else {
+                "Module [$Name] not cloned. Skipped clone from GitHub repository" | Write-Warning
+                return $null
+            }
 
             # check if result is success
             if(Test-Path -Path $modulePath){
@@ -161,4 +171,20 @@ function Import-MyModule{
         return $result
 
     }
-} 
+}
+
+function Confirm-ActionExample {
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
+    param(
+        [Parameter(Mandatory)][string]$ActionName
+    )
+
+    process {
+        if ($PSCmdlet.ShouldProcess("Performing action: $ActionName", "Do you want to proceed?")) {
+            Write-Host "Action [$ActionName] confirmed and executed."
+            # ...perform the action here...
+        } else {
+            Write-Warning "Action [$ActionName] was not confirmed. Skipping execution."
+        }
+    }
+}

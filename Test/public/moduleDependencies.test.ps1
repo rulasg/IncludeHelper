@@ -13,7 +13,7 @@ function Test_ImportDepepency_Already_loaded{
     Mock_ImportModule -Name $name -Folder $modulesFolder
     
     #Act
-    $result = Import-Dependency -Name $name -Verbose 4>&1 # pipe verbose stream to standard output
+    $result = Import-Dependency -Name $name -Verbose -Confirm:$false 4>&1 # pipe verbose stream to standard output
 
     #Assert verbose message
     Assert-IsNotNull -Object $result
@@ -41,7 +41,7 @@ function Test_ImportDepepency_SideBySide{
     Mock_ImportModule -Name $name -Folder $modulesFolder
 
     # Act
-    $result = Import-Dependency -Name $name -Verbose 4>&1  # pipe verbose stream to standard output
+    $result = Import-Dependency -Name $name -Verbose -Confirm:$false 4>&1  # pipe verbose stream to standard output
 
     #Assert verbose message
     Assert-IsNotNull -Object $result
@@ -73,7 +73,7 @@ function Test_ImportDepepency_Import_From_Module_Manager{
 
 
     #Act
-    $result = Import-Dependency -Name $name -Verbose 4>&1 # pipe verbose stream to standard output
+    $result = Import-Dependency -Name $name -Verbose -Confirm:$false 4>&1 # pipe verbose stream to standard output
 
     #Assert verbose message
     Assert-Contains -Presented $result -Expected "Module [$Name] imported from Powershell Module Manager"
@@ -111,7 +111,7 @@ function Test_ImportDepepency_Install_From_Gallery{
     MockCallExpression -Command "Install-Module -Name $name -AllowPrerelease -Force" -Expression $expression
 
     #Act
-    $result = Import-Dependency -Name $name -Verbose 4>&1 # pipe verbose stream to standard output
+    $result = Import-Dependency -Name $name -Verbose -Confirm:$false 4>&1 # pipe verbose stream to standard output
 
     #Assert verbose message
     Assert-IsNotNull -Object $result
@@ -142,7 +142,7 @@ function Test_ImportDependency_Clone_From_GitHub{
     Mock_ImportModule -Name $name -Folder $modulesFolder
 
 
-    $result = Import-Dependency -Name $name -Verbose 4>&1 # pipe verbose stream to standard output
+    $result = Import-Dependency -Name $name -Verbose -Confirm:$false 4>&1 # pipe verbose stream to standard output
 
     #Assert verbose message
     Assert-IsNotNull -Object $result
