@@ -2,8 +2,9 @@ function Get-Ps1FullPath{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory,Position = 0)][string]$Name,
+
         [Parameter(Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows')]
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub')]
         [string]$FolderName
     )
 
@@ -30,7 +31,9 @@ function Get-ModuleFolder{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory,Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows')][string]$FolderName,
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub')]
+        [string]$FolderName,
+
         [Parameter(Position = 0)][string]$ModuleRootPath
     )
 
@@ -75,6 +78,9 @@ function Get-ModuleFolder{
         }
         'WorkFlows'{
             $moduleFolder = $ModuleRootPath | Join-Path -ChildPath ".github/workflows"
+        }
+        'GitHub'{
+            $moduleFolder = $ModuleRootPath | Join-Path -ChildPath ".github"
         }
     }
     return $moduleFolder

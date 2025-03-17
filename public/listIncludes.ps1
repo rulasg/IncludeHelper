@@ -58,7 +58,9 @@ function Open-IncludeFile{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$Name,
-        [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)][ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools')][string]$FolderName
+        [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)]
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub')]
+        [string]$FolderName
     )
 
     process{
