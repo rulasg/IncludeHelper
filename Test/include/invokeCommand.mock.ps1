@@ -12,6 +12,12 @@
 # $MODULE_INVOKATION_TAG_MOCK = "SfHelperModule-Mock"
 # $MOCK_PATH = $PSScriptRoot | Split-Path -Parent | Join-Path -ChildPath 'private' -AdditionalChildPath 'mocks'
 
+# Managing dependencies
+$MODULE_INVOKATION_TAG = "ProjectHelperModule"
+$MODULE_INVOKATION_TAG_MOCK = "ProjectHelperModule_Mock"
+$ROOT = $PSScriptRoot | Split-Path -Parent
+$MOCK_PATH = $ROOT | Join-Path -ChildPath 'private' -AdditionalChildPath 'mocks'
+
 
 function Set-InvokeCommandMock{
     [CmdletBinding()]
@@ -32,6 +38,10 @@ function Reset-InvokeCommandMock{
 
     # Disable all dependecies of the library
     Disable-InvokeCommandAlias -Tag $MODULE_INVOKATION_TAG
+
+    # Clear Enviroment variables used
+    Get-Variable -scope Global -Name "$($MODULE_INVOKATION_TAG_MOCK)_*"  | Remove-Variable -Force -Scope Global
+
 } Export-ModuleMember -Function Reset-InvokeCommandMock
 
 function Enable-InvokeCommandAliasModule{
@@ -110,6 +120,22 @@ function MockCallToString{
     $outputstring = $outputstring -replace "{output}", $OutString
 
     Set-InvokeCommandMock -Alias $command -Command $outputstring
+}
+
+
+function MockCallToObject{
+    param(
+        [Parameter(Position=0)][string] $command,
+        [Parameter(Position=1)][object] $OutObject
+    )
+
+    $random = [System.Guid]::NewGuid().ToString()
+    $varName = "$MODULE_INVOKATION_TAG_MOCK" + "_$random"
+
+    Set-Variable -Name $varName -Value $OutObject -Scope Global
+
+    Set-InvokeCommandMock -Alias $command -Command "(Get-Variable -Name $varName -Scope Global).Value"
+
 }
 
 function MockCallToNull{
