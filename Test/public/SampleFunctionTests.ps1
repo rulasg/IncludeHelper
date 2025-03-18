@@ -25,5 +25,3 @@ function Test_GetPrivateString {
     Assert-AreEqual -Expected ("Private string [{0}]" -f $samplestring) -presented $result -Comment "Sample test failed"
     
 }
-
-Export-ModuleMember -Function Test_*
