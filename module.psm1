@@ -3,26 +3,11 @@ Write-Information -Message ("Loading {0} ..." -f ($PSCommandPath | Split-Path -L
 #Module path is where resides the RootModule file. This file. :)
 $MODULE_PATH = $PSScriptRoot
 
-#Get public and private function definition files.
-$include = @( Get-ChildItem -Path $MODULE_PATH\include\*.ps1 -ErrorAction SilentlyContinue )
-$Private = @( Get-ChildItem -Path $MODULE_PATH\private\*.ps1 -Recurse -ErrorAction SilentlyContinue )
-$Public  = @( Get-ChildItem -Path $MODULE_PATH\public\*.ps1 -Recurse -ErrorAction SilentlyContinue )
-
-#Dot source the files
-Foreach($import in @($include + $Private + $Public))
-{
-    Try
-    {
-        . $import.fullname
-    }
-    Catch
-    {
-        Write-Error -Message "Failed to import function $($import.fullname): $_"
+# Load ps1 files on code folders in order
+"start","include","private","public" | ForEach-Object {
+    
+    Get-ChildItem -Path $MODULE_PATH\$_\*.ps1 -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
+        try { . $_.fullname }
+        catch { Write-Error -Message "Failed to import function $($import.fullname): $_" }
     }
 }
-
-# Here I might...
-# Read in or create an initial config file and variable
-# Export Public functions ($Public.BaseName) for WIP modules
-# Set variables visible to the module and its functions only
-
