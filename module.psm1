@@ -6,7 +6,7 @@ $MODULE_PATH = $PSScriptRoot
 # Load ps1 files on code folders in order
 "start","include","private","public" | ForEach-Object {
 
-    Get-ChildItem -Path $MODULE_PATH\$_\*.ps1 -Recurse | ForEach-Object {
+    Get-ChildItem -Path $MODULE_PATH\$_\*.ps1 -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
         try { . $_.fullname }
         catch { Write-Error -Message "Failed to import function $($import.fullname): $_" }
     }
