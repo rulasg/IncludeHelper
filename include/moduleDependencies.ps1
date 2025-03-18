@@ -182,19 +182,3 @@ function Import-MyModule{
 
     }
 }
-
-function Confirm-ActionExample {
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
-    param(
-        [Parameter(Mandatory)][string]$ActionName
-    )
-
-    process {
-        if ($PSCmdlet.ShouldProcess("Performing action: $ActionName", "Do you want to proceed?")) {
-            Write-Host "Action [$ActionName] confirmed and executed."
-            # ...perform the action here...
-        } else {
-            Write-Warning "Action [$ActionName] was not confirmed. Skipping execution."
-        }
-    }
-}
