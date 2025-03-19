@@ -6,48 +6,49 @@
 # It includes functions to import modules from various sources such as:
 # - PowerShell Module Manager
 # - Side-by-side paths
+# - PowerShell Gallery
 # - Public GitHub repositories
 #
 # Usage:
 # Call `Import-Dependency -Name <ModuleName>` with the module name to import it from the appropriate source.
 #
-# TODO: Create a related public ps1
-# 1. Define aliases for commands like "CloneRepo" and "TestGitHubRepo".
-# 2. Include these definitions in a separate file, possibly named `include.dependency.ps1`, in the public folder.
-# 3. Include function to it too
-#
-# Sample code:
-# # MODULE DEPENDENCIES - PUBLIC
-# #
-# # This script defines aliases and functions for module dependency management.
-# # It is intended to be included in public-facing scripts.
-#
-# Set-MyInvokeCommandAlias -Alias "CloneRepo"              -Command 'git clone {url} {folder}'
-# Set-MyInvokeCommandAlias -Alias "TestGitHubRepo"         -Command 'Invoke-WebRequest -Uri "{url}" -Method Head -ErrorAction SilentlyContinue | ForEach-Object { $_.StatusCode -eq 200 }'
-# Set-MyInvokeCommandAlias -Alias "FindModule"             -Command 'Find-Module -Name {name} -AllowPrerelease -ErrorAction SilentlyContinue'
-# Set-MyInvokeCommandAlias -Alias "InstallModule"          -Command 'Install-Module -Name {name} -AllowPrerelease -Force'
-# Set-MyInvokeCommandAlias -Alias "GetModule"              -Command 'Get-Module -Name {name}'
-# Set-MyInvokeCommandAlias -Alias "GetModuleListAvailable" -Command 'Get-Module -Name {name} -ListAvailable'
-# Set-MyInvokeCommandAlias -Alias "ImportModule"           -Command 'Import-Module -Name {name} -Scope Global -Verbose:$false -PassThru'
+# TODO: Set unique value of variable $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME to the name of the INVOKE that will be used to get the module root path.
+# $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME = "Invoke-GetMyModuleRootPath"
 
-# # TODO: rename Invoke-GetMyModuleRootPath to something unique for your module
-# Set-MyInvokeCommandAlias -Alias "GetMyModuleRootPath"    -Command 'Invoke-GetMyModuleRootPath'
-# function Invoke-GetMyModuleRootPath{
-# [CmdletBinding()]
-# param()
+# Check if variables are not set
+if (-not $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME) {
+    throw 'The variable $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME` is not set. Please set it before initializing this include.'
+}
 
-# # We will asume that this include file will be on a public,private or include folder.
-# $root = $PSScriptRoot | split-path -Parent
+# SET MY INVOKE COMMAND ALIAS
+Set-MyInvokeCommandAlias -Alias "GetMyModuleRootPath"    -Command $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
+Set-MyInvokeCommandAlias -Alias "CloneRepo"              -Command 'git clone {url} {folder}'
+Set-MyInvokeCommandAlias -Alias "TestGitHubRepo"         -Command 'Invoke-WebRequest -Uri "{url}" -Method Head -ErrorAction SilentlyContinue | ForEach-Object { $_.StatusCode -eq 200 }'
+Set-MyInvokeCommandAlias -Alias "FindModule"             -Command 'Find-Module -Name {name} -AllowPrerelease -ErrorAction SilentlyContinue'
+Set-MyInvokeCommandAlias -Alias "InstallModule"          -Command 'Install-Module -Name {name} -AllowPrerelease -Force'
+Set-MyInvokeCommandAlias -Alias "GetModule"              -Command 'Get-Module -Name {name}'
+Set-MyInvokeCommandAlias -Alias "GetModuleListAvailable" -Command 'Get-Module -Name {name} -ListAvailable'
+Set-MyInvokeCommandAlias -Alias "ImportModule"           -Command 'Import-Module -Name {name} -Scope Global -Verbose:$false -PassThru'
 
-# # confirm that in root folder we have a psd1 file
-# $psd1 = Get-ChildItem -Path $root -Filter *.psd1 -Recurse -ErrorAction SilentlyContinue
+# This function will be renamed to avoid collision with other modules
+function Invoke-MODULE_NAME_RootPath{
+    [CmdletBinding()]
+    param()
 
-# if(-Not $psd1){
-#     throw "Wrong root folder. Not PSD1 file found in [$root]. Modify Invoke-GetMyModuleRootPath to adjust location"
-# } 
+    # We will asume that this include file will be on a public,private or include folder.
+    $root = $PSScriptRoot | split-path -Parent
 
-# return $root
-# } Export-ModuleMember -Function Invoke-GetMyModuleRootPath
+    # confirm that in root folder we have a psd1 file
+    $psd1 = Get-ChildItem -Path $root -Filter *.psd1 -Recurse -ErrorAction SilentlyContinue
+
+    if(-Not $psd1){
+        throw "Wrong root folder. Not PSD1 file found in [$root]. Modify Invoke-GetMyModuleRootPath to adjust location"
+    } 
+
+    return $root
+} 
+Rename-Item -path Function:Invoke-MODULE_NAME_RootPath -NewName $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
+Export-ModuleMember -Function $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
 
 function Import-Dependency{
     [CmdletBinding(SupportsShouldProcess,ConfirmImpact = 'High')]
