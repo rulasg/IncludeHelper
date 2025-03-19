@@ -1,5 +1,3 @@
-
-
 <#
 .SYNOPSIS
 Adds an include folder to the workspace.
@@ -28,7 +26,7 @@ function Add-IncludeToWorkspace {
     param (
         [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$Name,
         [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub')]
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')]
         [string]$FolderName,
         [Parameter()][string]$DestinationModulePath = "."
     )

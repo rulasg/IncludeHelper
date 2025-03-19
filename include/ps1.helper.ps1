@@ -3,7 +3,7 @@ function Get-Ps1FullPath{
     param(
         [Parameter(Mandatory,Position = 0)][string]$Name,
         [Parameter(Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub')]
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')]
         [string]$FolderName
     )
 
@@ -30,7 +30,7 @@ function Get-ModuleFolder{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory,Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub')]
+        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')]
         [string]$FolderName,
         [Parameter(Position = 0)][string]$ModuleRootPath
     )
@@ -79,6 +79,18 @@ function Get-ModuleFolder{
         }
         'GitHub'{
             $moduleFolder = $ModuleRootPath | Join-Path -ChildPath ".github"
+        }
+        'Helper'{
+            $moduleFolder = $ModuleRootPath | Join-Path -ChildPath "helper"
+        }
+        'Config'{
+            $moduleFolder = $ModuleRootPath | Join-Path -ChildPath "config"
+        }
+        'TestHelper'{
+            $moduleFolder = $testRootPath | Join-Path -ChildPath "helper"
+        }
+        'TestConfig'{
+            $moduleFolder = $testRootPath | Join-Path -ChildPath "config"
         }
         default{
             throw "Folder [$FolderName] is unknown"

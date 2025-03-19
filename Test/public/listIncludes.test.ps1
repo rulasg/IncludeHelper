@@ -3,22 +3,28 @@ function Test_GetIncludeFile{
     $name = "getHashCode.ps1"
     $folderName = "Include"
 
-    #Act
+    $includelist = Get-ModuleFolder -FolderName $folderName | Get-ChildItem
+    $includelist += Get-ModuleFolder -FolderName "TestInclude" | Get-ChildItem
+
+    #Act all includes
     $result = Get-IncludeFile
 
-    #Assert
+    # Total number
+    Assert-Count -Expected $includelist.Count -Presented $result
+    # Assert random file
     $item = $result | Where-Object {$_.Name -eq $name}
     Assert-Count -Expected 1 -Presented $item
     Assert-AreEqual -Expected $folderName -Presented $item.FolderName
 
-    # Filtered
+    # Act filtered
     $result = Get-IncludeFile -Filter "config"
-    Assert-Count -Expected 2 -Presented $result
+    $includesListFiltered = $includelist | Where-Object {$_.Name -like "*config*"}
+    Assert-Count -Expected $includesListFiltered.Count -Presented $result
+    # Assert random files
     $item = $result | Where-Object {$_.Name -eq "config.ps1"}
     Assert-AreEqual -Expected $folderName -Presented $item.FolderName
     $item = $result | Where-Object {$_.Name -eq "config.mock.ps1"}
     Assert-AreEqual -Expected "TestInclude" -Presented $item.FolderName
-
 }
 
 function Test_GetIncludeSystemFiles {
