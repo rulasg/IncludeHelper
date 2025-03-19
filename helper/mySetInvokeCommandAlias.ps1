@@ -7,7 +7,6 @@
 # Sample:
 # $MODULE_INVOKATION_TAG = "SfHelperModule"
 
-
 function Set-MyInvokeCommandAlias{
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -15,9 +14,9 @@ function Set-MyInvokeCommandAlias{
         [Parameter(Mandatory,Position=1)][string]$Command
     )
 
-    # throw if MODULE_INVOKATION_TAG is not set
-    if (-not $MODULE_INVOKATION_TAG) {
-        throw "MODULE_INVOKATION_TAG is not set. Please set it before calling Set-MyInvokeCommandAlias."
+    # throw if MODULE_INVOKATION_TAG is not set or is "MyModuleModule"
+    if (-not $MODULE_INVOKATION_TAG -or $MODULE_INVOKATION_TAG -eq "MyModuleModule") {
+        throw "MODULE_INVOKATION_TAG is not set or has an invalid value ('MyModuleModule'). Please set it to a unique value before calling Set-MyInvokeCommandAlias."
     }
 
     if ($PSCmdlet.ShouldProcess("InvokeCommandAliasList", ("Add Command Alias [{0}] = [{1}]" -f $Alias, $Command))) {
