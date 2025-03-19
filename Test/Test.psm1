@@ -4,7 +4,7 @@ Write-Information -Message ("Loading {0} ..." -f ($PSScriptRoot | Split-Path -Le
 $MODULE_PATH = $PSScriptRoot
 
 # Load ps1 files on code folders in order
-"start","include","private","public" | ForEach-Object {
+"config","helper","include","private","public" | ForEach-Object {
 
     Get-ChildItem -Path $MODULE_PATH\$_\*.ps1 -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
         try { . $_.fullname }

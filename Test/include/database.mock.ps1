@@ -11,10 +11,11 @@
 # Sample file
 # # DATABASE MOCK VARIABLES
 # # This file is required for DATABASE MOCK to work
-# $DB_INVOKE_GET_ROOT_PATH_CMD = "Invoke-MyModuleGetDbRootPath"
 # $DB_INVOKE_GET_ROOT_PATH_ALIAS = "MyModuleGetDbRootPath"
 #
-# $MOCK_DATABASE_PATH = "test_database_path"
+
+$DB_INVOKE_GET_ROOT_PATH_CMD = "Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
+$MOCK_DATABASE_PATH = "test_database_path"
 
 function Mock_Database([switch]$ResetDatabase){
 

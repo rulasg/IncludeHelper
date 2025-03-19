@@ -39,6 +39,42 @@ if(-Not (Test-Path $DATABASE_ROOT)){
     New-Item -Path $DATABASE_ROOT -ItemType Directory
 }
 
+Set-MyInvokeCommandAlias -Alias $DB_INVOKE_GET_ROOT_PATH_ALIAS -Command "Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
+
+if(-not (Test-Path -Path function:"Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS")){
+
+    # PUBLIC FUNCTION
+    function Invoke-MyModuleGetDbRootPath{
+        [CmdletBinding()]
+        param()
+        
+        $databaseRoot = GetDatabaseRootPath
+        return $databaseRoot
+        
+    }
+    Rename-Item -path Function:Invoke-MyModuleGetDbRootPath -NewName "Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
+    Export-ModuleMember -Function "Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
+}
+
+# Extra functions not needed by INCLUDE DATABASE V2
+
+if(-not (Test-Path -Path function:"Reset-$DB_INVOKE_GET_ROOT_PATH_ALIAS")){
+    function Reset-MyModuleDatabaseStore{
+        [CmdletBinding()]
+        param()
+        
+        $databaseRoot = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_ALIAS
+        
+        Remove-Item -Path $databaseRoot -Recurse -Force -ErrorAction SilentlyContinue
+        
+        New-Item -Path $databaseRoot -ItemType Directory
+        
+    }
+    Rename-Item -path Function:Reset-MyModuleDatabaseStore -NewName "Reset-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
+    Export-ModuleMember -Function "Reset-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
+}
+
+# PRIVATE FUNCTIONS
 function GetDatabaseRootPath {
     [CmdletBinding()]
     param()
