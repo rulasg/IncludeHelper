@@ -70,8 +70,8 @@ if(-not (Test-Path -Path function:"Reset-$DB_INVOKE_GET_ROOT_PATH_ALIAS")){
         New-Item -Path $databaseRoot -ItemType Directory
         
     }
-    Rename-Item -path Function:Reset-MyModuleDatabaseStore -NewName "Reset-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
-    Export-ModuleMember -Function "Reset-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
+    Rename-Item -path Function:Reset-MyModuleDatabaseStore -NewName "Reset-$($moduleName)DatabaseStore"
+    Export-ModuleMember -Function "Reset-$($moduleName)DatabaseStore"
 }
 
 # PRIVATE FUNCTIONS
@@ -157,4 +157,3 @@ function Test-DatabaseKey{
 
     return $true
 }
-
