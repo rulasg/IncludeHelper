@@ -3,6 +3,7 @@ function Get-IncludeSystemFiles{
     param(
         #add filter pattern
         [Parameter(Mandatory = $false, Position = 0)] [string]$Filter = '*'
+
     )
 
     $includeItems =@()
@@ -10,7 +11,7 @@ function Get-IncludeSystemFiles{
     # Root
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'deploy.ps1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'LICENSE' }
-    $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'module.psm1' }
+    $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = '{modulename}.psm1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'release.ps1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'sync.ps1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'test.ps1' }
@@ -22,38 +23,6 @@ function Get-IncludeSystemFiles{
     # TestRoot
     $includeItems += [PSCustomObject]@{ FolderName = 'TestRoot' ; Name = 'Test.psd1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'TestRoot' ; Name = 'Test.psm1' }
-
-    # # TestInclude
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestInclude' ; Name = 'config.mock.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestInclude' ; Name = 'database.mock.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestInclude' ; Name = 'invokeCommand.mock.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestInclude' ; Name = 'module.helper.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestInclude' ; Name = 'ps1.test.helper.ps1' }
-
-    # # TestPublic
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestPublic' ; Name = 'include.config.test.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestPublic' ; Name = 'include.databasev2.test.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestPublic' ; Name = 'include.getHashCode.test.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestPublic' ; Name = 'include.module.helper.test.ps1' }
-
-    # # TestPrivate
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestPrivate' ; Name = 'include.config.mock.MyModule.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestPrivate' ; Name = 'include.database.mock.MyModule.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'TestPrivate' ; Name = 'include.invokeCommand.MyModule.ps1' }
-
-    # # Include
-    # $includeItems += [PSCustomObject]@{ FolderName = 'Include' ; Name = 'config.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'Include' ; Name = 'databaseV2.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'Include' ; Name = 'getHashCode.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'Include' ; Name = 'mySetInvokeCommandAlias.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'Include' ; Name = 'ps1.helper.ps1' }
-
-    # # Public
-    # $includeItems += [PSCustomObject]@{ FolderName = 'Public' ; Name = 'include.config.MyModule.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = 'Public' ; Name = 'include.databasev2.MyModule.ps1' }
-
-    # # Private
-    # $includeItems += [PSCustomObject]@{ FolderName = 'Private' ; Name = 'include.mySetInvokeCommandAlias.MyModule.ps1' }
 
     # DevContainer
     $includeItems += [PSCustomObject]@{ FolderName = 'DevContainer' ; Name = 'devcontainer.json' }
@@ -75,3 +44,25 @@ function Get-IncludeSystemFiles{
     return $includeItems
 }
 Export-ModuleMember -Function Get-IncludeSystemFiles
+
+function Expand-FileNameTransformation{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,ValueFromPipeline,Position=0)][string]$FileName,
+        [Parameter(Mandatory,ValueFromPipeline,Position=1)][string]$DestinationModulePath
+    )
+
+    begin{
+        $moduleName = (Get-ChildItem -Path $DestinationModulePath -Filter *.psd1 | Select-Object -First 1).BaseName
+        if(-Not $moduleName){
+            # This should nevere happen as we should call with a proper DestinationModulePath
+            throw "Module name not found for FileName Transformation"
+        }
+    }
+    process{
+        #ModuleName transformation
+        $ret = $FileName -replace '{modulename}', $moduleName
+
+        return $ret
+    }
+}

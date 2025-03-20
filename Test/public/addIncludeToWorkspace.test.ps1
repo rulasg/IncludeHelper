@@ -30,6 +30,23 @@ function Test_AddIncludeToWorkspace{
     Assert-ItemExist -path $path
 }
 
+function Test_AddIncludeToWorkspace_WithFileTransformation{
+    
+    Import-Module -Name TestingHelper
+    New-ModuleV3 -Name TestModule
+
+    $fileInfo = Get-IncludeSystemFiles -Filter '{modulename}' | Select-Object -First 1
+    $destinationName = $fileInfo.Name -replace '{modulename}', 'TestModule'
+    $destinationPath = Get-ModuleFolder -FolderName $fileInfo.FolderName -ModuleRootPath "TestModule"
+    $destinationFilePath = $destinationPath | Join-Path -ChildPath $destinationName
+
+    # Act
+    $fileInfo | Add-IncludeToWorkspace -DestinationModulePath "TestModule"
+
+    # Assert
+    Assert-ItemExist -path $destinationFilePath
+}
+
 function Test_AddIncludeToWorkspace_PipeParameters{
     
     Import-Module -Name TestingHelper
