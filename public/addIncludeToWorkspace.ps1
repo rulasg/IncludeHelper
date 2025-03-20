@@ -33,18 +33,24 @@ function Add-IncludeToWorkspace {
 
     process{
 
-        # Expand file name trasnformation
-        # Replace name {variables} with their value based on destination module
-        $Name = Expand-FileNameTransformation -FileName $Name -DestinationModulePath $DestinationModulePath
+        # Source toot module path
+        $sourceModulePath = Get-ModuleFolder -FolderName 'Root'
 
-        $sourceIncludeModuleFolder = Get-ModuleFolder -FolderName $FolderName
-        "Source folder is $sourceIncludeModuleFolder" | Write-Verbose
+        # File paths
+        $sourcePath = Get-ModuleFolder -FolderName $FolderName
+        "Source folder is $sourcePath" | Write-Verbose
         $destinationpath = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $DestinationModulePath
         "Destination folder is $destinationpath" | Write-Verbose
-        
-        $sourceFile = $sourceIncludeModuleFolder | Join-Path -ChildPath $Name
+
+        # Expand file name trasnformation
+        # Replace name {variables} with their value based on destination module
+        $destinationName = Expand-FileNameTransformation -FileName $Name -DestinationModulePath $DestinationModulePath
+        $souceName = Expand-FileNameTransformation -FileName $Name -DestinationModulePath $sourceModulePath
+
+        # File Full paths
+        $sourceFile = $sourcePath | Join-Path -ChildPath $souceName
         "Source file is $sourceFile" | Write-Verbose
-        $destinationFile = $destinationpath | Join-Path -ChildPath $Name
+        $destinationFile = $destinationpath | Join-Path -ChildPath $destinationName
         "Destination file is $destinationFile" | Write-Verbose
         
         # Check if there is a .psd1 file in the DestinationModulePath
