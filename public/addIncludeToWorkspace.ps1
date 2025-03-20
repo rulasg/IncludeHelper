@@ -33,6 +33,10 @@ function Add-IncludeToWorkspace {
 
     process{
 
+        # Expand file name trasnformation
+        # Replace name {variables} with their value based on destination module
+        $Name = Expand-FileNameTransformation -FileName $Name -DestinationModulePath $DestinationModulePath
+
         $sourceIncludeModuleFolder = Get-ModuleFolder -FolderName $FolderName
         "Source folder is $sourceIncludeModuleFolder" | Write-Verbose
         $destinationpath = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $DestinationModulePath
