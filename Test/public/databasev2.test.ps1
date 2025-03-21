@@ -5,8 +5,7 @@ function Test_Database{
     Mock_Database -ResetDatabase
 
     # Load include files needed to test databaser
-    . $(Get-Ps1FullPath -Name "mySetInvokeCommandAlias.config.ps1" -FolderName "helper")
-    . $(Get-Ps1FullPath -Name "mySetInvokeCommandAlias.ps1" -FolderName "helper")
+    . $(Get-Ps1FullPath -Name "invokeCommand.helper.ps1" -FolderName "helper")
     . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include")
 
     # Get Default Database Root Path
@@ -54,8 +53,7 @@ function Test_Database_MultyKey{
     Mock_Database -ResetDatabase
 
     # Load include files needed to test databaser
-    . $(Get-Ps1FullPath -Name "mySetInvokeCommandAlias.config.ps1" -FolderName "helper")
-    . $(Get-Ps1FullPath -Name "mySetInvokeCommandAlias.ps1" -FolderName "helper")
+    . $(Get-Ps1FullPath -Name "invokeCommand.helper.ps1" -FolderName "helper")
     . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include")
 
     # Add several keys

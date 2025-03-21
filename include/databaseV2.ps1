@@ -17,17 +17,10 @@ $MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Obje
 $DATABASE_ROOT = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "databaseCache"
 
 $DB_INVOKE_GET_ROOT_PATH_ALIAS = "$($MODULE_NAME)GetDbRootPath"
-$DB_INVOKE_GET_ROOT_PATH_CMD = "Invoke-$($DB_INVOKE_GET_ROOT_PATH_ALIAS)"
 
-# Create the database root if it does not exist
-if(-Not (Test-Path $DATABASE_ROOT)){
-    New-Item -Path $DATABASE_ROOT -ItemType Directory
-}
-
-Set-MyInvokeCommandAlias -Alias $DB_INVOKE_GET_ROOT_PATH_ALIAS -Command $DB_INVOKE_GET_ROOT_PATH_CMD
-
-if(-not (Test-Path -Path function:$DB_INVOKE_GET_ROOT_PATH_CMD)){
-
+$function = "Invoke-$($MODULE_NAME)GetDbRootPath"
+if(-not (Test-Path -Path function:$function)){
+    
     # PUBLIC FUNCTION
     function Invoke-MyModuleGetDbRootPath{
         [CmdletBinding()]
@@ -37,13 +30,14 @@ if(-not (Test-Path -Path function:$DB_INVOKE_GET_ROOT_PATH_CMD)){
         return $databaseRoot
         
     }
-    Rename-Item -path Function:Invoke-MyModuleGetDbRootPath -NewName $DB_INVOKE_GET_ROOT_PATH_CMD
-    Export-ModuleMember -Function $DB_INVOKE_GET_ROOT_PATH_CMD
+    Rename-Item -path Function:Invoke-MyModuleGetDbRootPath -NewName $function
+    Export-ModuleMember -Function $function
+    Set-MyInvokeCommandAlias -Alias $DB_INVOKE_GET_ROOT_PATH_ALIAS -Command $function
 }
 
 # Extra functions not needed by INCLUDE DATABASE V2
-
-if(-not (Test-Path -Path function:"Reset-$DB_INVOKE_GET_ROOT_PATH_ALIAS")){
+$function = "Reset-$($MODULE_NAME)DatabaseStore"
+if(-not (Test-Path -Path function:$function)){
     function Reset-MyModuleDatabaseStore{
         [CmdletBinding()]
         param()
@@ -55,8 +49,9 @@ if(-not (Test-Path -Path function:"Reset-$DB_INVOKE_GET_ROOT_PATH_ALIAS")){
         New-Item -Path $databaseRoot -ItemType Directory
         
     }
-    Rename-Item -path Function:Reset-MyModuleDatabaseStore -NewName "Reset-$($MODULE_NAME)DatabaseStore"
-    Export-ModuleMember -Function "Reset-$($MODULE_NAME)DatabaseStore"
+    
+    Rename-Item -path Function:Reset-MyModuleDatabaseStore -NewName $function
+    Export-ModuleMember -Function $function
 }
 
 # PRIVATE FUNCTIONS
@@ -73,11 +68,6 @@ function GetDatabaseFile{
     param(
         [Parameter(Position = 0)][string]$Key
     )
-
-    # throw if DB_INVOKE_GET_ROOT_PATH_ALIAS is not set
-    if (-not $DB_INVOKE_GET_ROOT_PATH_ALIAS) {
-        throw "DB_INVOKE_GET_ROOT_PATH_ALIAS is not set. Please set it before calling GetDatabaseFile."
-    }
 
     $databaseRoot = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_ALIAS
 
