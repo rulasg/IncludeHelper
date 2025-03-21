@@ -12,12 +12,14 @@
 # $MODULE_INVOKATION_TAG_MOCK = "SfHelperModule-Mock"
 # $MOCK_PATH = $PSScriptRoot | Split-Path -Parent | Join-Path -ChildPath 'private' -AdditionalChildPath 'mocks'
 
-# Managing dependencies
-$MODULE_INVOKATION_TAG = "ProjectHelperModule"
-$MODULE_INVOKATION_TAG_MOCK = "ProjectHelperModule_Mock"
-$ROOT = $PSScriptRoot | Split-Path -Parent
-$MOCK_PATH = $ROOT | Join-Path -ChildPath 'private' -AdditionalChildPath 'mocks'
+$moduleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
+$MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
 
+$testRootPath = $PSScriptRoot | Split-Path -Parent 
+$MOCK_PATH = $testRootPath | Join-Path -ChildPath 'private' -AdditionalChildPath 'mocks'
+
+$MODULE_INVOKATION_TAG = "$($MODULE_NAME)Module"
+$MODULE_INVOKATION_TAG_MOCK = "$($MODULE_INVOKATION_TAG)_Mock"
 
 function Set-InvokeCommandMock{
     [CmdletBinding()]
