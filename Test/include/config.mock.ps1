@@ -14,13 +14,17 @@
 # $CONFIG_INVOKE_GET_ROOT_PATH_CMD = "Invoke-SfGetConfigRootPath" 
 # $MOCK_CONFIG_PATH = "test_config_path"
 
+$moduleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
+$MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
+
+$MOCK_CONFIG_PATH = "test_config_path"
+$CONFIG_INVOKE_GET_ROOT_PATH_CMD = "Invoke-$($MODULE_NAME)GetConfigRootPath"
+
 function Mock_Config{
     param(
         [Parameter(Position=0)][string] $key = "config",
         [Parameter(Position=1)][object] $Config
     )
-
-    $MOCK_CONFIG_PATH = "test_config_path"
 
     # Remove mock config path if exists
     if(Test-Path $MOCK_CONFIG_PATH){
