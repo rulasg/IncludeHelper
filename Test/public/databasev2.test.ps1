@@ -11,7 +11,7 @@ function Test_Database{
 
     # Get Default Database Root Path
     $result = GetDatabaseRootPath
-    $expected = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $moduleName, "databaseCache"
+    $expected = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "databaseCache"
     Assert-AreEqual -Expected $expected -Presented $result
 
     # Get actual store path

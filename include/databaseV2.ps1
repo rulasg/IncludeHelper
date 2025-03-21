@@ -11,37 +11,22 @@
 # to use the store path, mocked or not, to create the final store file name.
 # All functions of this ps1 will depend on `GetDatabaseFile` for functionality.
 #
-# TODO : Create a related public ps1
-# 1. define $DB_INVOKE_GET_ROOT_PATH_ALIAS. Make it unique.
-# 2. define $DB_INVOKE_GET_ROOT_PATH_CMD. Point to the invoke function that calls GetConfigRootPath to get the store path
-#
-# Sample code (replace "MyModule" with a unique module prefix):
-#   $DB_INVOKE_GET_ROOT_PATH_ALIAS = "SfGetDbRootPath"
-#   $DB_INVOKE_GET_ROOT_PATH_CMD = "Invoke-SfGetDbRootPath"
-#
-#   Set-MyInvokeCommandAlias -Alias $DB_INVOKE_GET_ROOT_PATH_ALIAS -Command $DB_INVOKE_GET_ROOT_PATH_CMD
-#  
-#   function Invoke-SfGetDbRootPath{
-#       [CmdletBinding()]
-#       param()
-#  
-#       $databaseRoot = GetDatabaseRootPath
-#       return $databaseRoot
-#  
-#   } Export-ModuleMember -Function Invoke-SfGetDbRootPath
 
 $moduleRootPath = $PSScriptRoot | Split-Path -Parent
-$moduleName = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
-$DATABASE_ROOT = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $moduleName, "databaseCache"
+$MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
+$DATABASE_ROOT = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "databaseCache"
+
+$DB_INVOKE_GET_ROOT_PATH_ALIAS = "$($MODULE_NAME)GetDbRootPath"
+$DB_INVOKE_GET_ROOT_PATH_CMD = "Invoke-$($DB_INVOKE_GET_ROOT_PATH_ALIAS)"
 
 # Create the database root if it does not exist
 if(-Not (Test-Path $DATABASE_ROOT)){
     New-Item -Path $DATABASE_ROOT -ItemType Directory
 }
 
-Set-MyInvokeCommandAlias -Alias $DB_INVOKE_GET_ROOT_PATH_ALIAS -Command "Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
+Set-MyInvokeCommandAlias -Alias $DB_INVOKE_GET_ROOT_PATH_ALIAS -Command $DB_INVOKE_GET_ROOT_PATH_CMD
 
-if(-not (Test-Path -Path function:"Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS")){
+if(-not (Test-Path -Path function:$DB_INVOKE_GET_ROOT_PATH_CMD)){
 
     # PUBLIC FUNCTION
     function Invoke-MyModuleGetDbRootPath{
@@ -52,8 +37,8 @@ if(-not (Test-Path -Path function:"Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS")){
         return $databaseRoot
         
     }
-    Rename-Item -path Function:Invoke-MyModuleGetDbRootPath -NewName "Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
-    Export-ModuleMember -Function "Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
+    Rename-Item -path Function:Invoke-MyModuleGetDbRootPath -NewName $DB_INVOKE_GET_ROOT_PATH_CMD
+    Export-ModuleMember -Function $DB_INVOKE_GET_ROOT_PATH_CMD
 }
 
 # Extra functions not needed by INCLUDE DATABASE V2
@@ -70,8 +55,8 @@ if(-not (Test-Path -Path function:"Reset-$DB_INVOKE_GET_ROOT_PATH_ALIAS")){
         New-Item -Path $databaseRoot -ItemType Directory
         
     }
-    Rename-Item -path Function:Reset-MyModuleDatabaseStore -NewName "Reset-$($moduleName)DatabaseStore"
-    Export-ModuleMember -Function "Reset-$($moduleName)DatabaseStore"
+    Rename-Item -path Function:Reset-MyModuleDatabaseStore -NewName "Reset-$($MODULE_NAME)DatabaseStore"
+    Export-ModuleMember -Function "Reset-$($MODULE_NAME)DatabaseStore"
 }
 
 # PRIVATE FUNCTIONS
