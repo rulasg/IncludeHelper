@@ -16,7 +16,7 @@ function Test_Database{
     # Get actual store path
     $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
     Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
-    $items = Get-ChildItem -Path $result
+    $items = Get-ChildItem -Path $StorePath
     Assert-Count -Expected 0 -Presented $items
 
     # GetDatabaseFile
