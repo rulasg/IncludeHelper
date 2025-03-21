@@ -12,13 +12,9 @@
 # Usage:
 # Call `Import-Dependency -Name <ModuleName>` with the module name to import it from the appropriate source.
 #
-# TODO: Set unique value of variable $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME to the name of the INVOKE that will be used to get the module root path.
-# $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME = "Invoke-GetMyModuleRootPath"
 
-# Check if variables are not set
-if (-not $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME) {
-    throw 'The variable $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME` is not set. Please set it before initializing this include.'
-}
+$MODULE_NAME = (Get-ChildItem -Path $PSScriptRoot -Filter *.psd1 | Select-Object -First 1).BaseName
+$DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME = "Invoke-$($MODULE_NAME)RootPath"
 
 # SET MY INVOKE COMMAND ALIAS
 Set-MyInvokeCommandAlias -Alias "GetMyModuleRootPath"    -Command $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
@@ -34,17 +30,17 @@ Set-MyInvokeCommandAlias -Alias "ImportModule"           -Command 'Import-Module
 function Invoke-MODULE_NAME_RootPath{
     [CmdletBinding()]
     param()
-
+    
     # We will asume that this include file will be on a public,private or include folder.
     $root = $PSScriptRoot | split-path -Parent
-
+    
     # confirm that in root folder we have a psd1 file
     $psd1 = Get-ChildItem -Path $root -Filter *.psd1 -Recurse -ErrorAction SilentlyContinue
-
+    
     if(-Not $psd1){
         throw "Wrong root folder. Not PSD1 file found in [$root]. Modify Invoke-GetMyModuleRootPath to adjust location"
     } 
-
+    
     return $root
 } 
 Rename-Item -path Function:Invoke-MODULE_NAME_RootPath -NewName $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME

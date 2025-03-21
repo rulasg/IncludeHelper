@@ -5,19 +5,18 @@ function Test_Database{
     Mock_Database -ResetDatabase
 
     # Load include files needed to test databaser
-    . $(Get-Ps1FullPath -Name "mySetInvokeCommandAlias.config.ps1" -FolderName "helper")
-    . $(Get-Ps1FullPath -Name "mySetInvokeCommandAlias.ps1" -FolderName "helper")
+    . $(Get-Ps1FullPath -Name "invokeCommand.helper.ps1" -FolderName "helper")
     . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include")
 
     # Get Default Database Root Path
     $result = GetDatabaseRootPath
-    $expected = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $moduleName, "databaseCache"
+    $expected = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "databaseCache"
     Assert-AreEqual -Expected $expected -Presented $result
 
     # Get actual store path
-    $StorePath = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_CMD
+    $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
     Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
-    $items = Get-ChildItem -Path $result
+    $items = Get-ChildItem -Path $StorePath
     Assert-Count -Expected 0 -Presented $items
 
     # GetDatabaseFile
@@ -54,8 +53,7 @@ function Test_Database_MultyKey{
     Mock_Database -ResetDatabase
 
     # Load include files needed to test databaser
-    . $(Get-Ps1FullPath -Name "mySetInvokeCommandAlias.config.ps1" -FolderName "helper")
-    . $(Get-Ps1FullPath -Name "mySetInvokeCommandAlias.ps1" -FolderName "helper")
+    . $(Get-Ps1FullPath -Name "invokeCommand.helper.ps1" -FolderName "helper")
     . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include")
 
     # Add several keys
@@ -66,7 +64,7 @@ function Test_Database_MultyKey{
     Save-DatabaseKey -Key "test5" -Value "dummy content 5"
 
     # Check the number of files in store
-    $StorePath = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_CMD
+    $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
     $items = Get-ChildItem -Path $StorePath
     Assert-Count -Expected 5 -Presented $items
 

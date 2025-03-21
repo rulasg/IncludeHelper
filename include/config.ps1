@@ -11,27 +11,11 @@
 # to use the store path, mocked or not, to create the final store file name.
 # All functions of this ps1 will depend on `GetConfigFile` for functionality.
 #
-# TODO : Create a related public ps1 
-#
-# Create a related public ps1 
-# 1. define $CONFIG_INVOKE_GET_ROOT_PATH_ALIAS. Make it unique.
-# 2. define $CONFIG_INVOKE_GET_ROOT_PATH_CMD. Point to the invoke function that calls GetConfigRootPath to get the store path
-#
-# Sample code (replace "MyModule" with a unique module prefix):
-#   $CONFIG_INVOKE_GET_ROOT_PATH_ALIAS = "MyModuleGetConfigRootPath"
-#   $CONFIG_INVOKE_GET_ROOT_PATH_CMD = "Invoke-MyModuleGetConfigRootPath"
-#  
-#   Set-MyInvokeCommandAlias -Alias $CONFIG_INVOKE_GET_ROOT_PATH_ALIAS -Command $CONFIG_INVOKE_GET_ROOT_PATH_CMD
-#  
-#   function Invoke-MyModuleGetConfigRootPath{
-#       $configRoot = GetConfigRootPath
-#       return $configRoot
-#   } Export-ModuleMember -Function Invoke-MyModuleGetConfigRootPath
 
 
 $moduleRootPath = $PSScriptRoot | Split-Path -Parent
-$moduleName = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
-$CONFIG_ROOT = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $moduleName, "config"
+$MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
+$CONFIG_ROOT = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "config"
 
 # Create the config root if it does not exist
 if(-Not (Test-Path $CONFIG_ROOT)){
@@ -109,6 +93,111 @@ function Save-Configuration {
 
     return $true
 }
+
+############
+
+
+# Define unique aliases for "MyModule"
+$CONFIG_INVOKE_GET_ROOT_PATH_ALIAS = "$($MODULE_NAME)GetConfigRootPath"
+$CONFIG_INVOKE_GET_ROOT_PATH_CMD = "Invoke-$($MODULE_NAME)GetConfigRootPath"
+
+# Set the alias for the root path command
+Set-MyInvokeCommandAlias -Alias $CONFIG_INVOKE_GET_ROOT_PATH_ALIAS -Command $CONFIG_INVOKE_GET_ROOT_PATH_CMD
+
+# Define the function to get the configuration root path
+function Invoke-MyModuleGetConfigRootPath {
+    [CmdletBinding()]
+    param()
+
+    $configRoot = GetConfigRootPath
+    return $configRoot
+}
+$function = "Invoke-MyModuleGetConfigRootPath"
+$NewName = $function -Replace "MyModule", $MODULE_NAME
+Rename-Item -path Function:$Function -NewName $NewName
+Export-ModuleMember -Function $NewName
+
+# Extra functions not needed by INCLUDE CONFIG
+
+function Get-MyModuleConfig{
+    [CmdletBinding()]
+    param()
+
+    $config = Get-Configuration
+
+    return $config
+} 
+$function = "Get-MyModuleConfig"
+$NewName = $function -Replace "MyModule", $MODULE_NAME
+Rename-Item -path Function:$Function -NewName $NewName
+Export-ModuleMember -Function $NewName
+
+function Save-MyModuleConfig{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, ValueFromPipeline, Position = 0)][Object]$Config
+    )
+
+    return Save-Configuration -Config $Config
+} $function = "Save-MyModuleConfig"
+$NewName = $function -Replace "MyModule", $MODULE_NAME
+Rename-Item -path Function:$Function -NewName $NewName
+Export-ModuleMember -Function $NewName
+
+function Open-MyModuleConfig{
+    [CmdletBinding()]
+    param()
+
+    $path = GetConfigFile -Key "config"
+
+    code $path
+
+} $function = "Open-MyModuleConfig"
+$NewName = $function -Replace "MyModule", $MODULE_NAME
+Rename-Item -path Function:$Function -NewName $NewName
+Export-ModuleMember -Function $NewName
+
+function Add-MyModuleConfigAttribute{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,Position=0)][ValidateSet("Account", "User", "Opportunity")][string]$objectType,
+
+        [Parameter(Mandatory, ValueFromPipeline, Position = 1)][string]$Attribute
+
+    )
+
+    begin{
+        $config = Get-Configuration
+        $configAttribute = ($objectType + "_attributes").ToLower()
+
+        if(-Not $config){
+            $config = @{}
+        }
+    
+        if(-Not $config.$configAttribute){
+            $config.$configAttribute = @()
+        }
+    }
+
+    process{
+        $config.$configAttribute += $Attribute
+    }
+    
+    End{
+        $ret = Save-Configuration -Config $config
+        if(-Not $ret){
+            throw "Error saving configuration"
+        }
+
+        $config = Get-Configuration
+        Write-Output $config.$configAttribute
+        
+    }
+
+} $function = "Add-MyModuleConfigAttribute"
+$NewName = $function -Replace "MyModule", $MODULE_NAME
+Rename-Item -path Function:$Function -NewName $NewName
+Export-ModuleMember -Function $NewName
 
 
 

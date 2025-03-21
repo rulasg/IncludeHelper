@@ -3,26 +3,19 @@
 # This file is used to mock the database path and the database file
 # for the tests. It creates a mock database path and a mock database file
 # and sets the database path to the mock database path.
-# We need to define variables for this include to work
-# $MOCK_DATABASE_PATH : The path used as the mock database folder
-# $DB_INVOKE_GET_ROOT_PATH_CMD : Invoke command that is needed to be mocked
-# $DB_INVOKE_GET_ROOT_PATH_ALIAS : Invoke function to retreive the root path of the database
-#
-# Sample file
-# # DATABASE MOCK VARIABLES
-# # This file is required for DATABASE MOCK to work
-# $DB_INVOKE_GET_ROOT_PATH_ALIAS = "MyModuleGetDbRootPath"
-#
 
-$DB_INVOKE_GET_ROOT_PATH_CMD = "Invoke-$DB_INVOKE_GET_ROOT_PATH_ALIAS"
+
+$moduleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
+$MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
+$DB_INVOKE_GET_ROOT_PATH_CMD = "Invoke-$($MODULE_NAME)GetDbRootPath"
 $MOCK_DATABASE_PATH = "test_database_path"
 
 function Mock_Database([switch]$ResetDatabase){
 
-    MockCallToString $DB_INVOKE_GET_ROOT_PATH_CMD -OutString "test_database_path"
+    MockCallToString $DB_INVOKE_GET_ROOT_PATH_CMD -OutString $MOCK_DATABASE_PATH
 
     $dbstore = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_CMD
-    Assert-AreEqual -Expected "test_database_path" -Presented $dbstore
+    Assert-AreEqual -Expected $MOCK_DATABASE_PATH -Presented $dbstore
 
     if($ResetDatabase){
         Reset-DatabaseStore
@@ -39,7 +32,7 @@ function Reset-DatabaseStore{
     [CmdletBinding()]
     param()
 
-        $databaseRoot = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_ALIAS
+        $databaseRoot = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_CMD
     
         Remove-Item -Path $databaseRoot -Recurse -Force -ErrorAction SilentlyContinue
 
