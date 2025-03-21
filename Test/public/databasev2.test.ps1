@@ -14,7 +14,7 @@ function Test_Database{
     Assert-AreEqual -Expected $expected -Presented $result
 
     # Get actual store path
-    $StorePath = Invoke-MyCommand -Command "Invoke-InvcludeGetDbRootPath"
+    $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
     Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
     $items = Get-ChildItem -Path $result
     Assert-Count -Expected 0 -Presented $items
@@ -64,7 +64,7 @@ function Test_Database_MultyKey{
     Save-DatabaseKey -Key "test5" -Value "dummy content 5"
 
     # Check the number of files in store
-    $StorePath = Invoke-MyCommand -Command "Invoke-InvcludeGetDbRootPath"
+    $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
     $items = Get-ChildItem -Path $StorePath
     Assert-Count -Expected 5 -Presented $items
 
