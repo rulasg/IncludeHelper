@@ -7,7 +7,7 @@
 # Sample:
 # $MODULE_INVOKATION_TAG = "SfHelperModule"
 
-$moduleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
+$moduleRootPath = $PSScriptRoot | Split-Path -Parent
 $MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
 $MODULE_INVOKATION_TAG = "$($MODULE_NAME)Module"
 
