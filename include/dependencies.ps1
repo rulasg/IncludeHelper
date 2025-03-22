@@ -13,7 +13,8 @@
 # Call `Import-Dependency -Name <ModuleName>` with the module name to import it from the appropriate source.
 #
 
-$MODULE_NAME = (Get-ChildItem -Path $PSScriptRoot -Filter *.psd1 | Select-Object -First 1).BaseName
+$MODULE_ROOT_PATH = $PSScriptRoot | split-path -Parent
+$MODULE_NAME = (Get-ChildItem -Path $MODULE_ROOT_PATH -Filter *.psd1 | Select-Object -First 1).BaseName
 $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME = "Invoke-$($MODULE_NAME)RootPath"
 
 # SET MY INVOKE COMMAND ALIAS
