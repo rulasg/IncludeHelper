@@ -73,31 +73,132 @@ function Test_AddIncludeToWorkspace_PipeParameters{
 
 }
 
-function Test_CopyIncludeToWorkspace{
+function Test_AddIncludeToWorkspace_WithoutSource_WithoutDestination{
+    
+    Reset-InvokeCommandMock
 
     Import-Module -Name TestingHelper
     New-ModuleV3 -Name TestModule
 
-    # Test for Include
-    $name = "sync.Helper.ps1"
-    $folderPath = "tools"
-    $destinationModulePath = "TestModule"
+    $fileInfo = Get-IncludeSystemFiles -Filter '{modulename}' | Select-Object -First 1
+    $destinationName = $fileInfo.Name -replace '{modulename}', 'TestModule'
+    $destinationPath = Get-ModuleFolder -FolderName $fileInfo.FolderName -ModuleRootPath "TestModule"
+    $destinationFilePath = $destinationPath | Join-Path -ChildPath $destinationName
+    Remove-Item -Path $destinationFilePath -ErrorAction SilentlyContinue
 
-    #Act
-    Copy-IncludeToWorkspace -Name $name -FolderPath $folderPath -DestinationModulePath $destinationModulePath
+    
+    # Act
+    Assert-itemNotExist -path $destinationFilePath
+    
+    Set-Location -Path ./TestModule
+    $fileInfo | Add-IncludeToWorkspace
+    Set-Location -Path ../
 
-    #Assert
-    Assert-ItemExist -path $( $destinationModulePath | Join-Path -ChildPath $folderPath -AdditionalChildPath $name)
+    # Assert
+    Assert-ItemExist -path $destinationFilePath
+}
 
-    ## Test for TestInclude
-    $name = "devcontainer.json"
-    $folderPath = ".devcontainer"
-    $destinationModulePath = "TestModule"
+function Test_AddIncludeToWorkspace_FromSourceToDestination{
 
-    #Act
-    Copy-IncludeToWorkspace -Name $name -FolderPath $folderPath -DestinationModulePath $destinationModulePath
+    Reset-InvokeCommandMock
 
-    #Assert
-    Assert-ItemExist -path $( $destinationModulePath | Join-Path -ChildPath $folderPath -AdditionalChildPath $name)
+    $TargetModuleName = "TargetModule"
+    $SourceModuleName = "SourceModule"
+
+    New-ModuleV3 -Name $TargetModuleName
+    New-ModuleV3 -Name $SourceModuleName
+
+    $TInclude = Get-ModuleFolder -FolderName Include -ModuleRootPath $TargetModuleName
+    $SInclude = Get-ModuleFolder -FolderName Include -ModuleRootPath $SourceModuleName
+
+    New-TestingFile -Name MyInclude1.ps1 -Path $SInclude
+    New-TestingFile -Name MyInclude2.ps1 -Path $TInclude
+
+    # Act
+    $includes = Get-IncludeFile -ModuleRootPath $SourceModuleName -Filter *2
+    $includes | Add-IncludeToWorkspace -SourceModulePath $SourceModuleName -DestinationModulePath $TargetModuleName
+
+    # Assert
+    Assert-ItemExist -Path "$TInclude\MyInclude2.ps1"
+    Assert-ItemNotExist -Path "$TInclude\MyInclude1.ps1"
+
+    # Act
+    $includes = Get-IncludeFile -ModuleRootPath $SourceModuleName
+    $includes | Add-IncludeToWorkspace -SourceModulePath $SourceModuleName -DestinationModulePath $TargetModuleName
+    
+        # Assert
+    Assert-ItemExist -Path "$TInclude\MyInclude1.ps1"
+    Assert-ItemExist -Path "$TInclude\MyInclude2.ps1"
+}
+
+# With soruce not destination
+function Test_AddIncludeToWorkspace_FromSourceToDestination_WithoutDestination{
+    
+    Reset-InvokeCommandMock
+
+    $FileName1 = "MyInclude1.ps1"
+    $FileName2 = "MyInclude2.ps1"
+
+    $DestinationModuleName = "DestinationModule"
+    $SourceModuleName = "SourceModule" 
+
+    $DestinationModulePath =  New-ModuleV3 -Name $DestinationModuleName
+    $SourceModulePath =  New-ModuleV3 -Name $SourceModuleName
+
+    $TInclude = Get-ModuleFolder -FolderName Include -ModuleRootPath $DestinationModulePath
+    $SInclude = Get-ModuleFolder -FolderName Include -ModuleRootPath $SourceModulePath
+
+    New-TestingFile -Name $FileName1 -Path $SInclude
+    New-TestingFile -Name $FileName2 -Path $SInclude
+
+    Set-Location -Path $DestinationModulePath
+
+    # Act
+    $includes = Get-IncludeFile -ModuleRootPath $SourceModulePath
+    Assert-Count -Expected 2 -Presented $includes
+    $includes | Add-IncludeToWorkspace -SourceModulePath $SourceModulePath
+    
+    # Assert
+    Assert-ItemExist -Path "$TInclude\MyInclude1.ps1"
+    Assert-ItemExist -Path "$TInclude\MyInclude2.ps1"
+}
+
+$moduleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
+$targetPS1 = $moduleRootPath | Join-Path -ChildPath "public\addIncludeToWorkspace.ps1"
+. $targetPS1
+
+function Test_ResolveSourceDestinationPath{
+
+    $DestinationModuleName = "TargetModule"
+    $SourceModuleName = "SourceModule"
+    $LocalModuleName = "LocalModule"
+
+    $IncludeHelperModulePath = (Get-Module -name Includehelper).Path | Split-Path -parent
+
+    New-ModuleV3 -Name $DestinationModuleName ; $DestinationModulePath = $DestinationModuleName | Convert-Path
+    New-ModuleV3 -Name $SourceModuleName ; $SourceModulePath = $SourceModuleName | Convert-Path
+    New-ModuleV3 -Name $LocalModuleName ; $LocalModulePath = $LocalModuleName | Convert-Path
+
+    $LocalModuleName | Set-Location
+
+    # Act Null / Null
+    $resultsource,$resultdestination = Resolve-SourceDestinationPath
+    Assert-AreEqualPath -Presented $resultsource -Expected $IncludeHelperModulePath
+    Assert-AreEqualPath -Presented $resultdestination -Expected $LocalModulePath
+
+    # Act Source / Null
+    $resultsource,$resultdestination = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath
+    Assert-AreEqualPath -Presented $resultsource -Expected $SourceModulePath
+    Assert-AreEqualPath -Presented $resultdestination -Expected $LocalModulePath
+
+    # Act Null / Destination
+    $resultsource,$resultdestination = Resolve-SourceDestinationPath -DestinationModulePath $DestinationModulePath
+    Assert-AreEqualPath -Presented $resultsource -Expected $IncludeHelperModulePath
+    Assert-AreEqualPath -Presented $resultdestination -Expected $DestinationModulePath
+
+    # Act Sorce / Destination
+    $resultsource,$resultdestination = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
+    Assert-AreEqualPath -Presented $resultsource -Expected $SourceModulePath
+    Assert-AreEqualPath -Presented $resultdestination -Expected $DestinationModulePath
 
 }
