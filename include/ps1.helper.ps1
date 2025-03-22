@@ -1,5 +1,5 @@
 # PS1 HELPER
-
+#
 # Helper functions to manage the PS1 module files.
 #
 # THIS INCLUDE FILE REQURED module.helper.ps1
