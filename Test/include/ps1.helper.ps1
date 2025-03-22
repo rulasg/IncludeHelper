@@ -1,16 +1,22 @@
+$VALID_FOLDER_NAMES = @('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')
+
+class ValidFolderNames : System.Management.Automation.IValidateSetValuesGenerator {
+    [String[]] GetValidValues() {
+	  return $script:VALID_FOLDER_NAMES
+    }
+}
+
 function Get-Ps1FullPath{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory,Position = 0)][string]$Name,
-
-        [Parameter(Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')]
-        [string]$FolderName
+        [Parameter(Position = 1)][ValidateSet([ValidFolderNames])][string]$FolderName,
+        [Parameter(Position = 0)][string]$ModuleRootPath
     )
 
    # If folderName is not empty
     if($FolderName -ne $null){
-        $folder = Get-ModuleFolder -FolderName $FolderName
+        $folder = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $ModuleRootPath
         $path = $folder | Join-Path -ChildPath $Name
     } else {
         $path = $Name
@@ -27,19 +33,33 @@ function Get-Ps1FullPath{
     return $item
 }
 
+# function Test-ModuleFolderName{
+#     [CmdletBinding()]
+#     param(
+#         [Parameter(Mandatory,Position = 0)]
+#         [ValidateSet([ValidFolderNames])]
+#         [string]$FolderName
+#     )
+
+#     return $true
+# }
+
 function Get-ModuleFolder{
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory,Position = 0)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')]
+        [Parameter(Mandatory,Position = 1)]
+        [ValidateSet([ValidFolderNames])]
         [string]$FolderName,
-        [Parameter(Position = 1)][string]$ModuleRootPath
+        [Parameter(Position = 0)][string]$ModuleRootPath
     )
 
-    #checkif $ModuleRootPath is null,  whitespace or empty
+    # if ModuleRootPath is not provided, default to local module path
     if([string]::IsNullOrWhiteSpace($ModuleRootPath)){
-        $ModuleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
+        $ModuleRootPath = $MODULE_ROOT_PATH
     }
+
+    # Convert to full path
+    $ModuleRootPath = Convert-Path -Path $ModuleRootPath
 
     # TestRootPath
     $testRootPath = $ModuleRootPath | Join-Path -ChildPath "Test"
@@ -67,7 +87,7 @@ function Get-ModuleFolder{
             $moduleFolder = $ModuleRootPath
         }
         'TestRoot'{
-            $moduleFolder = $testRootPath 
+            $moduleFolder = $testRootPath
         }
         'Tools'{
             $moduleFolder = $ModuleRootPath | Join-Path -ChildPath "tools"
@@ -93,6 +113,9 @@ function Get-ModuleFolder{
         'TestConfig'{
             $moduleFolder = $testRootPath | Join-Path -ChildPath "config"
         }
+        default{
+            throw "Folder [$FolderName] is unknown"
+        }
     }
     return $moduleFolder
-}
+} Export-ModuleMember -Function Get-ModuleFolder
