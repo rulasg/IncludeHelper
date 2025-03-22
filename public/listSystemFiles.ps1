@@ -44,25 +44,3 @@ function Get-IncludeSystemFiles{
     return $includeItems
 }
 Export-ModuleMember -Function Get-IncludeSystemFiles
-
-function Expand-FileNameTransformation{
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory,ValueFromPipeline,Position=0)][string]$FileName,
-        [Parameter(Mandatory,ValueFromPipeline,Position=1)][string]$DestinationModulePath
-    )
-
-    begin{
-        $moduleName = (Get-ChildItem -Path $DestinationModulePath -Filter *.psd1 | Select-Object -First 1).BaseName
-        if(-Not $moduleName){
-            # This should nevere happen as we should call with a proper DestinationModulePath
-            throw "Module not found for Transformation at $DestinationModulePath"
-        }
-    }
-    process{
-        #ModuleName transformation
-        $ret = $FileName -replace '{modulename}', $moduleName
-
-        return $ret
-    }
-}

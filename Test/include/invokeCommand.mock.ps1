@@ -2,20 +2,13 @@
 # INVOKE COMMAND MOCK
 #
 # This includes help commands to mock invokes in a test module
-# You need to set the following variables
-# $MODULE_INVOKATION_TAG : name of the module that you are testing. This needs to match with the Tag used in the module you are testing.
-# $MODULE_INVOKATION_TAG_MOCK : Tag for the mock functions on the testing moodule you are loading this include in
-# MOCK_PATH : path to the mocks folder. This is where the mock files will be saved and loaded from.
 #
-# Sample:
-# $MODULE_INVOKATION_TAG = "SfHelperModule"
-# $MODULE_INVOKATION_TAG_MOCK = "SfHelperModule-Mock"
-# $MOCK_PATH = $PSScriptRoot | Split-Path -Parent | Join-Path -ChildPath 'private' -AdditionalChildPath 'mocks'
+# THIS INCLUDE REQURED module.helper.ps1
+if(-not $MODULE_NAME){ throw "Missing MODULE_NAME varaible initialization. Check for module.helerp.ps1 file." }
+if(-not $MODULE_ROOT_PATH){ throw "Missing MODULE_ROOT_PATH varaible initialization. Check for module.helerp.ps1 file." }
 
-$moduleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
-$MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
 
-$testRootPath = $PSScriptRoot | Split-Path -Parent 
+$testRootPath = $MODULE_ROOT_PATH | Join-Path -ChildPath 'Test'
 $MOCK_PATH = $testRootPath | Join-Path -ChildPath 'private' -AdditionalChildPath 'mocks'
 
 $MODULE_INVOKATION_TAG = "$($MODULE_NAME)Module"

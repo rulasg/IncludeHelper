@@ -3,10 +3,10 @@
 # This file is used to mock the database path and the database file
 # for the tests. It creates a mock database path and a mock database file
 # and sets the database path to the mock database path.
+#
+# THIS INCLUDE REQURED module.helper.ps1
+if(-not $MODULE_NAME){ throw "Missing MODULE_NAME varaible initialization. Check for module.helerp.ps1 file." }
 
-
-$moduleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
-$MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
 $DB_INVOKE_GET_ROOT_PATH_CMD = "Invoke-$($MODULE_NAME)GetDbRootPath"
 $MOCK_DATABASE_PATH = "test_database_path"
 

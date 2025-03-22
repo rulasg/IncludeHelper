@@ -12,6 +12,9 @@ The name of the include to add. This parameter is mandatory and accepts a string
 .PARAMETER FolderName
 The name of the folder to add. This parameter is mandatory and accepts a string from a predefined set of values: 'Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot','Tools'.
 
+.PARAMETER SourceModulePath
+The path to the source module. This parameter is optional and defaults to the IncludeHelper module.
+
 .PARAMETER DestinationModulePath
 The path to the destination module. This parameter is optional and defaults to the current directory (".").
 
@@ -26,18 +29,21 @@ function Add-IncludeToWorkspace {
     param (
         [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$Name,
         [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')]
+        # [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')]
+        # [ValidateSet([ValidFolderNames])]
         [string]$FolderName,
-        [Parameter()][string]$DestinationModulePath = "."
+        [Parameter()][string]$SourceModulePath,
+        [Parameter()][string]$DestinationModulePath
     )
 
     process{
 
-        # Source toot module path
-        $sourceModulePath = Get-ModuleFolder -FolderName 'Root'
+        # Resolve source and destination module paths
+        $SourceModulePath, $DestinationModulePath = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
 
         # File paths
-        $sourcePath = Get-ModuleFolder -FolderName $FolderName
+        # If source empty defaults to IncludeHelper
+        $sourcePath = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $sourceModulePath
         "Source folder is $sourcePath" | Write-Verbose
         $destinationpath = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $DestinationModulePath
         "Destination folder is $destinationpath" | Write-Verbose
@@ -76,48 +82,57 @@ function Add-IncludeToWorkspace {
 
 } Export-ModuleMember -Function Add-IncludeToWorkspace
 
-function Copy-IncludeToWorkSpace{
-    [CmdletBinding(SupportsShouldProcess)]
+function Resolve-SourceDestinationPath{
+    [CmdletBinding()]
     param(
-        # Add relative path to the include file
-        [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$FolderPath,
-        [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$Name,
-        [Parameter()][string]$DestinationModulePath = "."
+        [Parameter(Position=0)][string]$SourceModulePath,
+        [Parameter(Position=1)][string]$DestinationModulePath
     )
-    
-    process{
+        # This function copies include files from one module to another
+        # We have two wellknown modules: 
+        #   1. Local Running module: this is the module where this function is running
+        #   2. Local Path model : the module present where the location is set. aka '.'
+        # We have two parameters:
+        #   1. SourceModulePath: this is the module where the include file is copied from
+        #   2. DestinationModulePath: this is the module where the include file is copied to
+        # If SourceModulePath is not provided, default to IncludeHelper
+        # If DestinationModulePath is not provided, default to current directory
 
-        $includeRoot = Get-ModuleFolder -FolderName 'Root'
+        # If SourceModulePath is not provided, default to IncludeHelper
+        if([string]::IsNullOrWhiteSpace($SourceModulePath)){
+            $SourceModulePath = Get-ModuleFolder -FolderName 'Root' # IncludeHelper Root
+        }
 
-        $sourceIncludeModuleFolder = $includeRoot | Join-Path -ChildPath $FolderPath
-        "Source folder is $sourceIncludeModuleFolder" | Write-Verbose
-        $destinationpath = $DestinationModulePath | Join-Path -ChildPath $FolderPath
-        "Destination folder is $destinationpath" | Write-Verbose
-        
-        $sourceFile = $sourceIncludeModuleFolder | Join-Path -ChildPath $Name
-        "Source file is $sourceFile" | Write-Verbose
-        $destinationFile = $destinationpath | Join-Path -ChildPath $Name
-        "Destination file is $destinationFile" | Write-Verbose
-        
-        # Check if there is a .psd1 file in the DestinationModulePath
-        $psd1File = Get-ChildItem -Path $DestinationModulePath -Filter *.psd1 -ErrorAction SilentlyContinue
-        if (-Not $psd1File) {
-            throw "Destination Path $DestinationModulePath does not seem to be a PowershellMddule."
+        # If DestinationModulePath is not provided, default to current directory
+        if([string]::IsNullOrWhiteSpace($DestinationModulePath)){
+            $DestinationModulePath = Get-ModuleFolder -FolderName 'Root' -ModuleRootPath '.'
         }
         
-        # create destination folder if it does not exist
-        if(-Not (Test-Path $destinationpath)){
-            $null = New-Item -Path $destinationpath -ItemType Directory -Force
-        }
-        
-        # Check if source file exists
-        if(-Not (Test-Path $sourceFile)){
-            throw "File $sourceFile not found"
-        }
-        
-        if ($PSCmdlet.ShouldProcess("$sourceFile", "copy to $destinationFile")) {
-            Copy-Item -Path $sourceFile -Destination $destinationFile -Force
+        $SourceModulePath = Convert-Path -Path $SourceModulePath
+        $DestinationModulePath = Convert-Path -Path $DestinationModulePath
+
+        return $SourceModulePath, $DestinationModulePath
+
+}
+
+function Expand-FileNameTransformation{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,ValueFromPipeline,Position=0)][string]$FileName,
+        [Parameter(Mandatory,ValueFromPipeline,Position=1)][string]$DestinationModulePath
+    )
+
+    begin{
+        $moduleName = (Get-ChildItem -Path $DestinationModulePath -Filter *.psd1 | Select-Object -First 1).BaseName
+        if(-Not $moduleName){
+            # This should nevere happen as we should call with a proper DestinationModulePath
+            throw "Module not found for Transformation at $DestinationModulePath"
         }
     }
+    process{
+        #ModuleName transformation
+        $ret = $FileName -replace '{modulename}', $moduleName
 
-} Export-ModuleMember -Function Copy-IncludeToWorkSpace
+        return $ret
+    }
+}

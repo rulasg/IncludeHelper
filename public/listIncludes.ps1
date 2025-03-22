@@ -3,22 +3,56 @@
 Displays the available includes.
 
 .DESCRIPTION
-This function retrieves and displays the available includes. It is useful for understanding what includes are available in the current context.
-
+    This function retrieves and displays the available includes. It is useful for understanding what includes are available in the current context.
+.PARAMETER Filter
+    The filter pattern to apply when retrieving includes. It is optional and defaults to '*', which retrieves all includes.
+.PARAMETER ModuleRootPath
+    The root path of the module. This parameter is optional and can be used to specify a different module root path if needed.
+    If not specified, the function will use Local or IncludeHelper module root path.
+.PARAMETER Local
+    Specifies whether to use the local module root path. If this switch is set, the function will use the current directory as the module root path.
+.EXAMPLE
+    Get-IncludeFile
+    List all include files available in IncludeHelper module to import to the workspace
+.EXAMPLE
+    Get-IncludeFile -Filter "MyInclude.ps1"
+    List "MyInclude.ps1" include file if available in IncludeHelper module to import to the workspace
+.EXAMPLE
+    Get-IncludeFile -Local
+    List all includes files localy on the workspace you are working on.
+.EXAMPLE
+    Get-IncludeFile -Filter "MyInclude.ps1" -Local
+    List "MyInclude.ps1" include file if available in the workspace you are working on.
+.EXAMPLE
+    Get-IncludeFile -Filter "MyInclude.ps1" | Add-IncludeToWorkspace
+    Copies "MyInclude.ps1" from IncludeHelper module to the workspace you are working on.
+.EXAMPLE
+    Get-IncludeFile -Filter "MyInclude.ps1" -Local | Update-IncludeToIncludeHelper
+    Copies "MyInclude.ps1" from the workspace you are working on to IncludeHelper module.
 #>
 function Get-IncludeFile{
     [CmdletBinding()]
     param(
         #add filter pattern
-        [Parameter(Mandatory = $false, Position = 0)] [string]$Filter = '*'
+        [Parameter(Mandatory = $false, Position = 0)] [string]$Filter = '*',
+        [Parameter(Mandatory = $false)][switch]$Local,
+        [Parameter(Mandatory = $false)][string]$ModuleRootPath
     )
+
+    #checkif $moduleRootPath is null,  whitespace or empty
+    # If value keep value.
+    # If Local use '.' 
+    # If not Localuse includeHelper module
+    if([string]::IsNullOrWhiteSpace($ModuleRootPath)){
+        $moduleRootPath = $Local ? "." : ""
+    }
 
     $ret =@()
 
-    $include = Get-ModuleFolder -FolderName 'Include'
-    $includeTest = Get-ModuleFolder -FolderName 'TestInclude'
+    $include = Get-ModuleFolder -FolderName 'Include' -ModuleRootPath $ModuleRootPath
+    $includeTest = Get-ModuleFolder -FolderName 'TestInclude' -ModuleRootPath $ModuleRootPath
 
-    $includeItems = Get-ChildItem -Path $include -Filter "*$Filter*" | ForEach-Object {
+    $includeItems = Get-ChildItem -Path $include -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
         [PSCustomObject]@{
             Name       = $_.Name
             FolderName = 'Include'
@@ -28,7 +62,7 @@ function Get-IncludeFile{
         $ret += $includeItems
     }
 
-    $includeTestItems = Get-ChildItem -Path $includeTest -Filter "*$Filter*" | ForEach-Object {
+    $includeTestItems = Get-ChildItem -Path $includeTest -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
         [PSCustomObject]@{
             Name       = $_.Name
             FolderName = 'TestInclude'
@@ -59,7 +93,7 @@ function Open-IncludeFile{
     param (
         [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$Name,
         [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)]
-        [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')]
+        # [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')]
         [string]$FolderName
     )
 
