@@ -5,15 +5,13 @@ function Test_Ps1Helper_AreEqual_InModule_And_TestModule{
     # code in both module and test modules
 
     $name = "ps1.helper.ps1"
-    # Load include file to test
-    $moduleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
     
     $files = get-includefile -Filter $name
 
     $filePath = @{}
 
     0,1 | ForEach-Object{
-        $path = Get-ModuleFolder -FolderName $files[$_].FolderName -ModuleRootPath $moduleRootPath
+        $path = Get-ModuleFolder -FolderName $files[$_].FolderName -ModuleRootPath $MODULE_ROOT_PATH
         $filePath[$_]= $path | Join-Path -ChildPath $files[$_].Name
     }
 
@@ -26,12 +24,8 @@ function Test_Ps1Helper_AreEqual_InModule_And_TestModule{
 
 function Test_GetModuleFolder{
 
-    # Not calling Get-ModuleFolder before loading the module to avoid confiusion. Smae function name from different ps1, test include or main include.
-    $moduleRootPath = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
-    
     # Load include file to test
-    $moduleRootPath = $PsScriptRoot | Split-Path -Parent | Split-Path -Parent
-    . $(Get-Ps1FullPath -Name "ps1.helper.ps1" -FolderName "Include" -ModuleRootPath $moduleRootPath)
+    . $(Get-Ps1FullPath -Name "ps1.helper.ps1" -FolderName "Include" -ModuleRootPath $MODULE_ROOT_PATH)
 
     $result = Get-ModuleFolder -FolderName "Public"
 

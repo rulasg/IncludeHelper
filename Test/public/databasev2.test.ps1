@@ -4,11 +4,9 @@ function Test_Database{
     Reset-InvokeCommandMock
     Mock_Database -ResetDatabase
 
-    
     # Load include files needed to test databaser
-    $moduleRootPath = $PsScriptRoot | Split-Path -Parent | Split-Path -Parent
-    . $(Get-Ps1FullPath -Name "invokeCommand.helper.ps1" -FolderName "helper" -ModuleRootPath $moduleRootPath)
-    . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include" -ModuleRootPath $moduleRootPath)
+    . $(Get-Ps1FullPath -Name "invokeCommand.helper.ps1" -FolderName "helper" -ModuleRootPath $MODULE_ROOT_PATH)
+    . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include" -ModuleRootPath $MODULE_ROOT_PATH)
 
     # Get Default Database Root Path
     $result = GetDatabaseRootPath
@@ -54,9 +52,8 @@ function Test_Database_MultyKey{
     Reset-InvokeCommandMock
     Mock_Database -ResetDatabase
 
-    $moduleRootPath = $PsScriptRoot | Split-Path -Parent | Split-Path -Parent
-    . $(Get-Ps1FullPath -Name "invokeCommand.helper.ps1" -FolderName "helper" -ModuleRootPath $moduleRootPath)
-    . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include" -ModuleRootPath $moduleRootPath)
+    . $(Get-Ps1FullPath -Name "invokeCommand.helper.ps1" -FolderName "helper" -ModuleRootPath $MODULE_ROOT_PATH)
+    . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include" -ModuleRootPath $MODULE_ROOT_PATH)
 
     # Add several keys
     Save-DatabaseKey -Key "test1" -Value "dummy content 1"

@@ -1,8 +1,7 @@
 function Test_GetHashCode{
 
     # Load include file to test
-    $moduleRootPath = $PsScriptRoot | Split-Path -Parent | Split-Path -Parent
-    . $(Get-Ps1FullPath -Name getHashCode.ps1 -FolderName "Include" -ModuleRootPath $moduleRootPath)
+    . $(Get-Ps1FullPath -Name getHashCode.ps1 -FolderName "Include" -ModuleRootPath $MODULE_ROOT_PATH)
 
     $result = Get-HashCode -InputString "test"
 

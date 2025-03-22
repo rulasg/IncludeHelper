@@ -1,5 +1,4 @@
 function Test_AddIncludeToWorkspace{
-
     Import-Module -Name TestingHelper
     New-ModuleV3 -Name TestModule
 

@@ -1,3 +1,10 @@
+# PS1 HELPER
+#
+# Helper functions to manage the PS1 module files.
+#
+# THIS INCLUDE FILE REQURED module.helper.ps1
+if(-not $MODULE_ROOT_PATH){ throw "Missing MODULE_ROOT_PATH varaible initialization. Check for module.helerp.ps1 file." }
+
 $VALID_FOLDER_NAMES = @('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')
 
 class ValidFolderNames : System.Management.Automation.IValidateSetValuesGenerator {
