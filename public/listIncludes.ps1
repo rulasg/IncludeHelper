@@ -56,6 +56,7 @@ function Get-IncludeFile{
         [PSCustomObject]@{
             Name       = $_.Name
             FolderName = 'Include'
+            Path = $_.FullName
         }
     }
     if ($includeItems.Count -ne 0) {
@@ -66,6 +67,7 @@ function Get-IncludeFile{
         [PSCustomObject]@{
             Name       = $_.Name
             FolderName = 'TestInclude'
+            Path = $_.FullName
         }
     }
     if ($includeTestItems.Count -ne 0) {
