@@ -1,4 +1,5 @@
 # Helper for module variables
+
 function Find-ModuleRootPath{
     [CmdletBinding()]
     param(
@@ -100,9 +101,6 @@ function Get-ModuleName{
 
     return $MODULE_NAME
 }
-
-
-
 
 function Get-ModuleFolder{
     [CmdletBinding()]

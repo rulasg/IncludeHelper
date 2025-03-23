@@ -136,3 +136,29 @@ function Expand-FileNameTransformation{
         return $ret
     }
 }
+
+function Update-IncludeFileToIncludeHelper{
+    [CmdletBinding(SupportsShouldProcess)]
+    param (
+        [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$Name,
+        [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)][string]$FolderName,
+        [Parameter()][string]$SourceModulePath
+    )
+
+    begin{
+        # Destination always IncludeHelper
+        $DestinationModulePath = Get-ModuleFolder -FolderName 'Root'
+
+        $SourceModulePath = [string]::IsNullOrWhiteSpace($SourceModulePath) ? $(Get-ModuleFolder -FolderName 'Root' -ModuleRootPath '.') : $SourceModulePath
+    }
+
+    process{
+        $params = @{
+            Name = $Name
+            FolderName = $FolderName
+            SourceModulePath = $SourceModulePath
+            DestinationModulePath = $DestinationModulePath
+        }
+        Add-IncludeToWorkspace @params
+    }
+}
