@@ -13,8 +13,8 @@
 #
 
 
-$moduleRootPath = $PSScriptRoot | Split-Path -Parent
-$MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
+$MODULE_ROOT_PATH = $PSScriptRoot | Split-Path -Parent
+$MODULE_NAME = (Get-ChildItem -Path $MODULE_ROOT_PATH -Filter *.psd1 | Select-Object -First 1).BaseName
 $CONFIG_ROOT = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "config"
 
 # Create the config root if it does not exist

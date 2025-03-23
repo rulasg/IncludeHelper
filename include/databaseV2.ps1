@@ -12,8 +12,8 @@
 # All functions of this ps1 will depend on `GetDatabaseFile` for functionality.
 #
 
-$moduleRootPath = $PSScriptRoot | Split-Path -Parent
-$MODULE_NAME = (Get-ChildItem -Path $moduleRootPath -Filter *.psd1 | Select-Object -First 1).BaseName
+$MODULE_ROOT_PATH = $PSScriptRoot | Split-Path -Parent
+$MODULE_NAME = (Get-ChildItem -Path $MODULE_ROOT_PATH -Filter *.psd1 | Select-Object -First 1).BaseName
 $DATABASE_ROOT = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "databaseCache"
 
 $DB_INVOKE_GET_ROOT_PATH_ALIAS = "$($MODULE_NAME)GetDbRootPath"

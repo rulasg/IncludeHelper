@@ -5,6 +5,8 @@ function Test_GetIncludeFile{
 
     $includelist = Get-ModuleFolder -FolderName $folderName | Get-ChildItem
     $includelist += Get-ModuleFolder -FolderName "TestInclude" | Get-ChildItem
+    $includelist += Get-ModuleFolder -FolderName "Helper" | Get-ChildItem
+    $includelist += Get-ModuleFolder -FolderName "TestHelper" | Get-ChildItem
 
     #Act all includes
     $result = Get-IncludeFile

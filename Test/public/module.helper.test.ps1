@@ -1,10 +1,10 @@
 
-function Test_Ps1Helper_AreEqual_InModule_And_TestModule{
+function Test_ModuleHelper_AreEqual_InModule_And_TestModule{
     
     # to avoid confusion we need to ensure that this helper has the same 
     # code in both module and test modules
 
-    $name = "ps1.helper.ps1"
+    $name = "module.helper.ps1"
     
     $files = get-includefile -Filter $name
 
@@ -25,7 +25,7 @@ function Test_Ps1Helper_AreEqual_InModule_And_TestModule{
 function Test_GetModuleFolder{
 
     # Load include file to test
-    . $(Get-Ps1FullPath -Name "ps1.helper.ps1" -FolderName "Include" -ModuleRootPath $MODULE_ROOT_PATH)
+    . $(Get-Ps1FullPath -Name "module.helper.ps1" -FolderName "Helper" -ModuleRootPath $MODULE_ROOT_PATH)
 
     $result = Get-ModuleFolder -FolderName "Public"
 
@@ -67,4 +67,41 @@ function Test_GetModuleFolder{
 
     $result = Get-ModuleFolder -FolderName "WorkFlows"
     Assert-AreEqual -Expected ($moduleRootPath | Join-Path -ChildPath ".github/workflows") -Presented $result
+}
+
+function Test_FindModuleRootPath{
+
+    # Load include file to test
+    . $(Get-Ps1FullPath -Name "module.helper.ps1" -FolderName "Helper" -ModuleRootPath $MODULE_ROOT_PATH)
+
+    $moduleName = "TestModule"
+    New-ModuleV3 -Name $moduleName -AddTesting
+    New-TestingFolder -Path "$moduleName/include/kk1/kk2" 
+    New-TestingFolder -Path "$moduleName/Test/include/kk1/kk2" 
+    New-testingFolder -Path "kk1/kk2/kk3"
+
+    $moduleRootPath = $moduleName | Convert-Path
+
+    @(
+        "$moduleName",
+        "$moduleName/Test",
+        "$moduleName//include/kk1/kk2",
+        "$moduleName/Test/include/kk1/kk2"
+    ) | foreach{
+        $path = $_
+        $result = Find-ModuleRootPath -Path $path
+        Assert-AreEqual -Expected $moduleRootPath -Presented $result
+    }
+
+    @( 
+        ".",
+        "kk1",
+        "kk1/kk2",
+        "kk1/kk2/kk3"
+
+    ) | foreach{
+        $path = $_
+        $result = Find-ModuleRootPath -Path $path
+        Assert-IsNull -Object $result
+    }
 }
