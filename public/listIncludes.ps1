@@ -34,9 +34,9 @@ function Get-IncludeFile{
     [CmdletBinding()]
     param(
         #add filter pattern
-        [Parameter(Mandatory = $false, Position = 0)] [string]$Filter = '*',
-        [Parameter(Mandatory = $false)][switch]$Local,
-        [Parameter(Mandatory = $false)][string]$ModuleRootPath
+        [Parameter( Position = 0 )] [string]$Filter = '*',
+        [Parameter()][switch]$Local,
+        [Parameter()][string]$ModuleRootPath
     )
 
     #checkif $moduleRootPath is null,  whitespace or empty
@@ -44,7 +44,7 @@ function Get-IncludeFile{
     # If Local use '.' 
     # If not Localuse includeHelper module
     if([string]::IsNullOrWhiteSpace($ModuleRootPath)){
-        $moduleRootPath = $Local ? "." : ""
+        $moduleRootPath = $Local ? "." : " "
     }
 
     $ret =@()
@@ -55,10 +55,13 @@ function Get-IncludeFile{
 
         $path = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $ModuleRootPath
 
+        $moduleName = $ModuleRootPath | Split-Path -Leaf
+
         $items = Get-ChildItem -Path $path -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
             [PSCustomObject]@{
                 Name       = $_.Name
                 FolderName = $FolderName
+                ModuleName = $moduleName
                 Path       = $_.FullName
             }
         }
