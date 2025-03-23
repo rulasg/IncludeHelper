@@ -180,24 +180,45 @@ function Test_ResolveSourceDestinationPath{
 
     $LocalModuleName | Set-Location
 
-    # Act Null / Null
+    # Act Null / Null - Soruce:Include to Destination:local
     $resultsource,$resultdestination = Resolve-SourceDestinationPath
     Assert-AreEqualPath -Presented $resultsource -Expected $IncludeHelperModulePath
     Assert-AreEqualPath -Presented $resultdestination -Expected $LocalModulePath
 
-    # Act Source / Null
+    # Act Source / Null - Source: Path to Destination: local
     $resultsource,$resultdestination = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath
     Assert-AreEqualPath -Presented $resultsource -Expected $SourceModulePath
     Assert-AreEqualPath -Presented $resultdestination -Expected $LocalModulePath
 
-    # Act Null / Destination
+    # Act Null / Destination sourceI:Include to Destination: Path
     $resultsource,$resultdestination = Resolve-SourceDestinationPath -DestinationModulePath $DestinationModulePath
     Assert-AreEqualPath -Presented $resultsource -Expected $IncludeHelperModulePath
     Assert-AreEqualPath -Presented $resultdestination -Expected $DestinationModulePath
 
-    # Act Sorce / Destination
+    # Act Sorce / Destination - Source: Path to Destination: Path
     $resultsource,$resultdestination = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
     Assert-AreEqualPath -Presented $resultsource -Expected $SourceModulePath
     Assert-AreEqualPath -Presented $resultdestination -Expected $DestinationModulePath
 
+}
+
+function Test_UpdateIncludeFileToIncludeHelper{
+
+    Assert-SkipTest -Message "Interactive test. Run manually"
+
+    # Arrange
+    New-ModuleV3 -Name TestModule
+    New-TestingFile -Name "MyInclude.ps1" -Path TestModule\Include
+    $includes = Get-IncludeFile -ModuleRootPath TestModule -Filter "My*"
+
+    # Act
+    $includes | Update-IncludeFileToIncludeHelper -SourceModulePath "TestModule"
+
+    #Assert
+    $includeHelperPath = Get-ModuleFolder -FolderName Include
+    Assert-ItemExist -Path "$includeHelperPath/MyInclude.ps1"
+
+    # Ceanup
+    Remove-Item -Path "$includeHelperPath/MyInclude.ps1"
+    Assert-ItemNotExist -Path "$includeHelperPath/MyInclude.ps1"
 }
