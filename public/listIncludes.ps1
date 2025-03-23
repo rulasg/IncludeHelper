@@ -49,32 +49,52 @@ function Get-IncludeFile{
 
     $ret =@()
 
-    $include = Get-ModuleFolder -FolderName 'Include' -ModuleRootPath $ModuleRootPath
-    $includeTest = Get-ModuleFolder -FolderName 'TestInclude' -ModuleRootPath $ModuleRootPath
+    @("Include","TestInclude","Helper","TestHelper") | ForEach-Object {
 
-    $includeItems = Get-ChildItem -Path $include -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
-        [PSCustomObject]@{
-            Name       = $_.Name
-            FolderName = 'Include'
-            Path = $_.FullName
-        }
-    }
-    if ($includeItems.Count -ne 0) {
-        $ret += $includeItems
-    }
+        $FolderName = $_
 
-    $includeTestItems = Get-ChildItem -Path $includeTest -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
-        [PSCustomObject]@{
-            Name       = $_.Name
-            FolderName = 'TestInclude'
-            Path = $_.FullName
+        $path = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $ModuleRootPath
+
+        $items = Get-ChildItem -Path $path -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
+            [PSCustomObject]@{
+                Name       = $_.Name
+                FolderName = $FolderName
+                Path       = $_.FullName
+            }
         }
-    }
-    if ($includeTestItems.Count -ne 0) {
-        $ret += $includeTestItems
+        if ($items.Count -ne 0) {
+            $ret += $items
+        }
     }
 
     return $ret
+
+    # $include = Get-ModuleFolder -FolderName 'Include' -ModuleRootPath $ModuleRootPath
+    # $includeTest = Get-ModuleFolder -FolderName 'TestInclude' -ModuleRootPath $ModuleRootPath
+
+    # $includeItems = Get-ChildItem -Path $include -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
+    #     [PSCustomObject]@{
+    #         Name       = $_.Name
+    #         FolderName = 'Include'
+    #         Path = $_.FullName
+    #     }
+    # }
+    # if ($includeItems.Count -ne 0) {
+    #     $ret += $includeItems
+    # }
+
+    # $includeTestItems = Get-ChildItem -Path $includeTest -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
+    #     [PSCustomObject]@{
+    #         Name       = $_.Name
+    #         FolderName = 'TestInclude'
+    #         Path = $_.FullName
+    #     }
+    # }
+    # if ($includeTestItems.Count -ne 0) {
+    #     $ret += $includeTestItems
+    # }
+
+    # return $ret
 } Export-ModuleMember -Function Get-IncludeFile
 
 <#
