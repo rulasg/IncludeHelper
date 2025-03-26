@@ -49,7 +49,7 @@ function Get-IncludeFile{
 
     $ret =@()
 
-    @("Include","TestInclude","Helper","TestHelper") | ForEach-Object {
+    @("github","Include","TestInclude","Helper","TestHelper") | ForEach-Object {
 
         $FolderName = $_
 
