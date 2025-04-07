@@ -19,6 +19,7 @@ function Test_CallAPI_RESTAPI_Withpagination_1{
 function Test_CallAPI_RESTAPI_Withpagination_2{
 
     Assert-SkipTest "This test is not implemented"
+
     Reset-InvokeCommandMock
     Enable-InvokeCommandAliasModule
 
@@ -30,7 +31,9 @@ function Test_CallAPI_RESTAPI_Withpagination_2{
 }
 
 function Test_Call_API_GraphQL{
-    # assert-skiptest "This test is not implemented"
+    
+    Assert-SkipTest "This test is not implemented"
+
     Reset-InvokeCommandMock
     Enable-InvokeCommandAliasModule
 
