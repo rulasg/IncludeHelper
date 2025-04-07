@@ -28,3 +28,21 @@ function Test_CallAPI_RESTAPI_Withpagination_2{
 
     Assert-NotImplemented
 }
+
+function Test_Call_API_GraphQL{
+    # assert-skiptest "This test is not implemented"
+    Reset-InvokeCommandMock
+    Enable-InvokeCommandAliasModule
+
+    $query = @'
+    query UserOrgOwner($login:String!){
+        organization(login: $login){login,id}
+        }
+'@
+    $variables = @{login = "octodemo"}
+
+    $result = Invoke-GraphQL -Query $query -variables $variables
+
+    Assert-AreEqual -Presented $result.data.organization.id -Expected "MDEyOk9yZ2FuaXphdGlvbjM4OTQwODk3"
+
+}

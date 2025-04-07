@@ -4,6 +4,66 @@
 # This module provides functions to call the GitHub API
 #
 
+function Invoke-GraphQL {
+    param(
+        [Parameter(Mandatory=$true)] [string]$Query,
+        [Parameter(Mandatory=$true)] [object]$Variables,
+        [Parameter()] [string]$Token,
+        [Parameter()] [string]$ApiHost
+    )
+
+    ">>>" | Write-MyVerbose
+
+    $ApiHost = Get-ApiHost -ApiHost:$ApiHost
+    $token = Get-ApiToken -Token:$Token -ApiHost:$ApiHost
+
+    try {
+        $apiUri = "https://api.$ApiHost/graphql"
+    
+        # Define the headers for the request
+        $headers = @{
+            "Authorization" = "Bearer $token"
+            "Content-Type" = "application/json"
+            "GraphQL-Features" = $GRAPHQL_FEATURES
+        }
+    
+        # Define the body for the request
+        $body = @{
+            query = $Query
+            variables = $Variables
+        } | ConvertTo-Json -Depth 100
+    
+        # Trace request
+        "[[QUERY]]" | Write-MyVerbose
+        $Query | Write-MyVerbose
+    
+        "[[VARIABLES]]" | Write-MyVerbose
+        $Variables | ConvertTo-Json -Depth 100 | Write-MyVerbose
+    
+        # Send the request
+        $start = Get-Date
+        ">>> Invoke-RestMethod - $apiUri" | Write-MyVerbose
+        $response = Invoke-RestMethod -Uri $apiUri -Method Post -Body $body -Headers $headers
+        "<<< Invoke-RestMethod - $apiUri [ $(((Get-Date) - $start).TotalSeconds) seconds]" | Write-MyVerbose
+    
+        # Trace response
+        "[[RESPONSE]]" | Write-MyVerbose
+        $response | ConvertTo-Json -Depth 100 | Write-MyVerbose
+    
+        if($response.errors){
+            throw "GraphQL query return errors - Error: $($response.errors.message)"
+        }
+    
+        return $response
+    }
+    catch {
+        throw 
+
+    }
+} Export-ModuleMember -Function Invoke-GraphQL
+
+
+
 function Invoke-RestAPI {
     param(
         [Parameter(Mandatory)][string]$Api,
@@ -74,6 +134,63 @@ function Invoke-RestAPI {
         throw
     }
 } Export-ModuleMember -Function Invoke-GraphQL, Invoke-RestAPI
+
+function Invoke-GraphQL {
+    param(
+        [Parameter(Mandatory)][string]$Query,
+        [Parameter(Mandatory)][object]$Variables,
+        [Parameter()][string]$Token,
+        [Parameter()][string]$ApiHost
+    )
+
+    ">>>" | Write-MyVerbose
+
+    $ApiHost = Get-ApiHost -ApiHost:$ApiHost
+    $token = Get-ApiToken -ApiHost:$ApiHost
+
+    try {
+        $apiUri = "https://api.$ApiHost/graphql"
+    
+        # Define the headers for the request
+        $headers = @{
+            "Authorization" = "Bearer $token"
+            "Content-Type" = "application/json"
+        }
+    
+        # Define the body for the request
+        $body = @{
+            query = $Query
+            variables = $Variables
+        } | ConvertTo-Json -Depth 100
+    
+        # Trace request
+        "[[QUERY]]" | Write-MyVerbose
+        $Query | Write-MyVerbose
+    
+        "[[VARIABLES]]" | Write-MyVerbose
+        $Variables | ConvertTo-Json -Depth 100 | Write-MyVerbose
+    
+        # Send the request
+        $start = Get-Date
+        ">>> Invoke-RestMethod - $apiUri" | Write-MyVerbose
+        $response = Invoke-RestMethod -Uri $apiUri -Method Post -Body $body -Headers $headers
+        "<<< Invoke-RestMethod - $apiUri [ $(((Get-Date) - $start).TotalSeconds) seconds]" | Write-MyVerbose
+    
+        # Trace response
+        "[[RESPONSE]]" | Write-MyVerbose
+        $response | ConvertTo-Json -Depth 100 | Write-MyVerbose
+    
+        if($response.errors){
+            throw "GraphQL query return errors - Error: $($response.errors.message)"
+        }
+    
+        return $response
+    }
+    catch {
+        throw New-Object system.Exception("Error calling GraphQL",$_.Exception)
+
+    }
+}
 
 ####################################################################################################
 
