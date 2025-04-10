@@ -33,10 +33,15 @@ function Add-IncludeToWorkspace {
         # [ValidateSet([ValidFolderNames])]
         [string]$FolderName,
         [Parameter()][string]$SourceModulePath,
-        [Parameter()][string]$DestinationModulePath
+        [Parameter()][string]$DestinationModulePath,
+        [Parameter()][switch]$SourceLocal,
+        [Parameter()][switch]$DestinationIncludeHelper
     )
 
     process{
+
+        $SourceModulePath = $SourceLocal ? "." : $SourceModulePath
+        $DestinationModulePath = $DestinationIncludeHelper ? (Get-ModuleFolder -FolderName 'Root') : $DestinationModulePath
 
         # Resolve source and destination module paths
         $SourceModulePath, $DestinationModulePath = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath

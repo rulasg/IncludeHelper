@@ -7,14 +7,14 @@ function Write-MyError{
     param(
         [Parameter(Mandatory,ValueFromPipeline)][string]$Message
     )
-    Write-Host "Error: $message" -ForegroundColor $ERROR_COLOR
+    Write-ToConsole "Error: $message" -Color $ERROR_COLOR
 }
 
 function Write-MyWarning{
     param(
         [Parameter(Mandatory,ValueFromPipeline)][string]$Message
     )
-    Write-Host "Error: $message" -ForegroundColor $WARNING_COLOR
+    Write-ToConsole "Warning: $message" -Color $WARNING_COLOR
 }
 
 function Write-MyVerbose{
@@ -28,5 +28,14 @@ function Write-MyHost{
     param(
         [Parameter(ValueFromPipeline)][string]$Message
     )
-    Write-Host $message -ForegroundColor $OUTPUT_COLOR
+    # Write-Host $message -ForegroundColor $OUTPUT_COLOR
+    Write-ToConsole $message -Color $OUTPUT_COLOR
+}
+
+function Write-ToConsole{
+    param(
+        [Parameter(ValueFromPipeline)][string]$Color,
+        [Parameter(ValueFromPipeline, Position=0)][string]$Message
+    )
+    Write-Host $message -ForegroundColor $Color
 }

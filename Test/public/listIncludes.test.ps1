@@ -3,10 +3,11 @@ function Test_GetIncludeFile{
     $name = "getHashCode.ps1"
     $folderName = "Include"
 
-    $includelist = Get-ModuleFolder -FolderName $folderName | Get-ChildItem
-    $includelist += Get-ModuleFolder -FolderName "TestInclude" | Get-ChildItem
-    $includelist += Get-ModuleFolder -FolderName "Helper" | Get-ChildItem
-    $includelist += Get-ModuleFolder -FolderName "TestHelper" | Get-ChildItem
+    $includelist =@()
+
+    @("github","Include","TestInclude","Helper","TestHelper") | ForEach-Object{
+        $includelist += Get-ModuleFolder -FolderName $_ | Get-ChildItem
+    }
 
     #Act all includes
     $result = Get-IncludeFile
