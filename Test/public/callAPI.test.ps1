@@ -44,8 +44,33 @@ function Test_Call_API_GraphQL{
 '@
     $variables = @{login = "octodemo"}
 
-    $result = Invoke-GraphQL -Query $query -variables $variables
+    $result = Invoke-GraphQL -Query $query -variables $variables 
 
     Assert-AreEqual -Presented $result.data.organization.id -Expected "MDEyOk9yZ2FuaXphdGlvbjM4OTQwODk3"
 
+}
+
+function Test_Call_API_GraphQL_outfile{
+    
+    Assert-SkipTest "This test is not implemented"
+
+    Reset-InvokeCommandMock
+    Enable-InvokeCommandAliasModule
+
+    $file = "outfile.json"
+
+    $query = @'
+    query UserOrgOwner($login:String!){
+        organization(login: $login){login,id}
+        }
+'@
+    $variables = @{login = "octodemo"}
+
+    $result = Invoke-GraphQL -Query $query -variables $variables -OutFile $file
+
+    Assert-ItemExist -Path $file
+
+    $result = Get-Content $file | ConvertFrom-Json -Depth 10
+
+    Assert-AreEqual -Presented $result.data.organization.id -Expected "MDEyOk9yZ2FuaXphdGlvbjM4OTQwODk3"
 }
