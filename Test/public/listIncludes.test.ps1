@@ -6,7 +6,7 @@ function Test_GetIncludeFile{
     $includelist =@()
 
     @("github","Include","TestInclude","Helper","TestHelper") | ForEach-Object{
-        $includelist += Get-ModuleFolder -FolderName $_ | Get-ChildItem
+        $includelist += Get-ModuleFolder -FolderName $_ | Get-ChildItem -File
     }
 
     #Act all includes

@@ -57,7 +57,7 @@ function Get-IncludeFile{
 
         $moduleName = $ModuleRootPath | Split-Path -Leaf
 
-        $items = Get-ChildItem -Path $path -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
+        $items = Get-ChildItem -Path $path -Filter "*$Filter*" -File  -ErrorAction SilentlyContinue | ForEach-Object {
             [PSCustomObject]@{
                 Name       = $_.Name
                 FolderName = $FolderName

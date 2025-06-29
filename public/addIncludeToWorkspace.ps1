@@ -35,7 +35,8 @@ function Add-IncludeToWorkspace {
         [Parameter()][string]$SourceModulePath,
         [Parameter()][string]$DestinationModulePath,
         [Parameter()][switch]$SourceLocal,
-        [Parameter()][switch]$DestinationIncludeHelper
+        [Parameter()][switch]$DestinationIncludeHelper,
+        [Parameter()][switch]$IfExists
     )
 
     process{
@@ -78,6 +79,18 @@ function Add-IncludeToWorkspace {
         # Check if source file exists
         if(-Not (Test-Path $sourceFile)){
             throw "File $sourceFile not found"
+        }
+
+        # Check for $IfExist switch
+        if ($IfExists) {
+            # Only copy if destination file exists
+            # This is an upgrade functionality
+            if (-Not (Test-Path $destinationFile)) {
+                Write-Verbose "File $destinationFile does not exist and -IfExists was specified. Skipping."
+                return
+            } else {
+                Write-Verbose "File $destinationFile exists and -IfExists was specified. Proceeding with copy."
+            }
         }
         
         if ($PSCmdlet.ShouldProcess("$sourceFile", "copy to $destinationFile")) {

@@ -46,6 +46,40 @@ function Test_AddIncludeToWorkspace_WithFileTransformation{
     Assert-ItemExist -path $destinationFilePath
 }
 
+function Test_AddIncludeToWorkspace_IfExists{
+
+    $moduleName = "TestModule"
+    Import-Module -Name TestingHelper
+
+    # Test for Include
+    $includefiles = Get-IncludeFile
+    $include1 = $includefiles | Where-Object { $_.FolderName -eq "github" } | Select-Object -First 1
+    $include2 = $includefiles | Where-Object { $_.FolderName -eq "Include" } | Select-Object -First 1
+
+    New-ModuleV3 -Name $moduleName
+    $destFolder1 = get-Modulefolder -FolderName $include1.FolderName -ModuleRootPath $moduleName
+    $destFolder2 = get-Modulefolder -FolderName $include2.FolderName -ModuleRootPath $moduleName
+
+    New-TestingFile -Name $include1.Name -Path $destFolder1 -Content "Test content for $($include1.Name)"
+    New-TestingFile -Name $include2.Name -Path $destFolder2 -Content "Test content for $($include2.Name)"
+
+    #Act
+    $includefiles | Add-IncludeToWorkspace -DestinationModulePath $moduleName -IfExists
+
+    #Assert
+    $filesDest1 = Get-ChildItem -Path $destFolder1
+    Assert-Count -Expected 1 -Presented $filesDest1
+    $contentFile1 = Get-Content -Path $filesDest1.FullName | Out-String
+    $sourceFile1  = Get-Content -Path $include1.Path | Out-String
+    Assert-AreEqual -Expected $sourceFile1 -Presented $contentFile1
+
+    $filesDest2 = Get-ChildItem -Path $destFolder2
+    Assert-Count -Expected 1 -Presented $filesDest2
+    $contentFile2 = Get-Content -Path $filesDest2.FullName | Out-String
+    $sourceFile2  = Get-Content -Path $include2.Path | Out-String
+    Assert-AreEqual -Expected $sourceFile2 -Presented $contentFile2
+}
+
 function Test_AddIncludeToWorkspace_PipeParameters{
     
     Import-Module -Name TestingHelper
