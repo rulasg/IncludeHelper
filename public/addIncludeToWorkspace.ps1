@@ -36,7 +36,8 @@ function Add-IncludeToWorkspace {
         [Parameter()][string]$DestinationModulePath,
         [Parameter()][switch]$SourceLocal,
         [Parameter()][switch]$DestinationIncludeHelper,
-        [Parameter()][switch]$IfExists
+        [Parameter()][switch]$IfExists,
+        [Parameter()][switch]$Force
     )
 
     process{
@@ -65,10 +66,13 @@ function Add-IncludeToWorkspace {
         $destinationFile = $destinationpath | Join-Path -ChildPath $destinationName
         "Destination file is $destinationFile" | Write-Verbose
         
-        # Check if there is a .psd1 file in the DestinationModulePath
-        $psd1File = Get-ChildItem -Path $DestinationModulePath -Filter *.psd1 -ErrorAction SilentlyContinue
-        if (-Not $psd1File) {
-            throw "Destination Path $DestinationModulePath does not seem to be a PowershellMddule."
+        #Skip destination module check if Force is set
+        if(-Not $Force){
+            # Check if there is a .psd1 file in the DestinationModulePath
+            $psd1File = Get-ChildItem -Path $DestinationModulePath -Filter *.psd1 -ErrorAction SilentlyContinue
+            if (-Not $psd1File) {
+                throw "Destination Path $DestinationModulePath does not seem to be a PowershellMddule."
+            }
         }
         
         # create destination folder if it does not exist
@@ -141,11 +145,16 @@ function Expand-FileNameTransformation{
     )
 
     begin{
-        $moduleName = (Get-ChildItem -Path $DestinationModulePath -Filter *.psd1 | Select-Object -First 1).BaseName
+        $moduleName = $DestinationModulePath | Split-Path -Leaf
         if(-Not $moduleName){
-            # This should nevere happen as we should call with a proper DestinationModulePath
-            throw "Module not found for Transformation at $DestinationModulePath"
+            throw "Unable to figure out Module Name from destination path $DestinationModulePath"
         }
+
+        # $moduleName = (Get-ChildItem -Path $DestinationModulePath -Filter *.psd1 | Select-Object -First 1).BaseName
+        # if(-Not $moduleName){
+        #     # This should nevere happen as we should call with a proper DestinationModulePath
+        #     throw "Module not found for Transformation at $DestinationModulePath"
+        # }
     }
     process{
         #ModuleName transformation

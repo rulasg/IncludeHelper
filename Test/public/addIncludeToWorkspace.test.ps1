@@ -29,6 +29,37 @@ function Test_AddIncludeToWorkspace{
     Assert-ItemExist -path $path
 }
 
+function Test_AddIncludeToWorkspace_Force{
+    Import-Module -Name TestingHelper
+    New-TestingFolder -Name TestModule
+
+    # Test for Include
+    $name = "getHashCode.ps1"
+    $folderName = "Include"
+    $destinationModulePath = "TestModule"
+
+    #Act
+    Add-IncludeToWorkspace -Name $name -FolderName $folderName -DestinationModulePath $destinationModulePath -Force
+
+    #Assert
+    $folderNamePath = get-Modulefolder -FolderName $folderName -ModuleRootPath $destinationModulePath
+    $path = $folderNamePath | Join-Path -ChildPath $name
+    Assert-ItemExist -path $path
+
+    ## Test for TestInclude
+    $name = "invokeCommand.mock.ps1"
+    $folderName = "TestInclude"
+    $destinationModulePath = "TestModule"
+
+    #Act
+    Add-IncludeToWorkspace -Name $name -FolderName $folderName -DestinationModulePath $destinationModulePath -Force
+
+    #Assert
+    $folderNamePath = get-Modulefolder -FolderName $folderName -ModuleRootPath $destinationModulePath
+    $path = $folderNamePath | Join-Path -ChildPath $name
+    Assert-ItemExist -path $path
+}
+
 function Test_AddIncludeToWorkspace_WithFileTransformation{
     
     Import-Module -Name TestingHelper
