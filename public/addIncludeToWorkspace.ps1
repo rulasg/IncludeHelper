@@ -65,6 +65,21 @@ function Add-IncludeToWorkspace {
         "Source file is $sourceFile" | Write-Verbose
         $destinationFile = $destinationpath | Join-Path -ChildPath $destinationName
         "Destination file is $destinationFile" | Write-Verbose
+
+        # Check for $IfExist switch
+        if ($IfExists) {
+            # Only copy if destination file exists
+            # This is an upgrade functionality
+            if (-Not (Test-Path $destinationFile)) {
+                Write-Verbose "File $destinationFile does not exist and -IfExists was specified. Skipping."
+                return
+            } else {
+                Write-Verbose "File $destinationFile exists and -IfExists was specified. Proceeding with copy."
+            }
+        }
+
+        # Expand filecontent Transformations
+        $content = Expand-FileContentTransformation -SourceFileName $sourceFile -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
         
         #Skip destination module check if Force is set
         if(-Not $Force){
@@ -84,21 +99,10 @@ function Add-IncludeToWorkspace {
         if(-Not (Test-Path $sourceFile)){
             throw "File $sourceFile not found"
         }
-
-        # Check for $IfExist switch
-        if ($IfExists) {
-            # Only copy if destination file exists
-            # This is an upgrade functionality
-            if (-Not (Test-Path $destinationFile)) {
-                Write-Verbose "File $destinationFile does not exist and -IfExists was specified. Skipping."
-                return
-            } else {
-                Write-Verbose "File $destinationFile exists and -IfExists was specified. Proceeding with copy."
-            }
-        }
         
         if ($PSCmdlet.ShouldProcess("$sourceFile", "copy to $destinationFile")) {
-            Copy-Item -Path $sourceFile -Destination $destinationFile -Force
+            # Copy-Item -Path $sourceFile -Destination $destinationFile -Force
+            Set-Content -Path $destinationFile -Value $content -Force
         }
     }
 
@@ -145,22 +149,42 @@ function Expand-FileNameTransformation{
     )
 
     begin{
-        $moduleName = $DestinationModulePath | Split-Path -Leaf
-        if(-Not $moduleName){
-            throw "Unable to figure out Module Name from destination path $DestinationModulePath"
-        }
-
-        # $moduleName = (Get-ChildItem -Path $DestinationModulePath -Filter *.psd1 | Select-Object -First 1).BaseName
-        # if(-Not $moduleName){
-        #     # This should nevere happen as we should call with a proper DestinationModulePath
-        #     throw "Module not found for Transformation at $DestinationModulePath"
-        # }
+        $moduleName = Get-ModuleNameFromPath -Path $DestinationModulePath
     }
     process{
         #ModuleName transformation
         $ret = $FileName -replace '{modulename}', $moduleName
 
         return $ret
+    }
+}
+
+function Expand-FileContentTransformation{
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromPipeline,Position=1)][string]$SourceFileName,
+        [Parameter(Position=0)][string]$SourceModulePath,
+        [Parameter(Position=2)][string]$DestinationModulePath
+    )
+
+    begin{
+        $moduleName = Get-ModuleNameFromPath -Path $DestinationModulePath
+        $sourceGuid = Get-ModuleGuidFromPath -Path $SourceModulePath
+        $destinationGuid = Get-ModuleGuidFromPath -Path $DestinationModulePath
+    }
+    process{
+        $content = Get-Content -Path $SourceFileName -Raw
+
+        # Trasnformation ModuleName
+        $content = $content -replace '{modulename}', $moduleName
+
+        # Trasnformation GUID
+        #if $sourceGuid is not null, replace $sourceGuid with $destinationGuid
+        if ($null -ne $sourceGuid -AND $null -ne $destinationGuid) {
+            $content = $content -replace $sourceGuid, $destinationGuid
+        }
+
+        return $content
     }
 }
 
@@ -187,5 +211,43 @@ function Update-IncludeFileToIncludeHelper{
             DestinationModulePath = $DestinationModulePath
         }
         Add-IncludeToWorkspace @params
+    }
+}
+
+function Get-ModuleNameFromPath{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,ValueFromPipeline,Position=0)][string]$Path
+    )
+
+    process{
+        # Get the module name from the path
+        $moduleName = (Get-ChildItem -Path $Path -Filter *.psd1 | Select-Object -First 1).BaseName
+        if(-Not $moduleName){
+            # Not a module folder. Figure out the module name from the path
+            $moduleName = $Path | Split-Path -Leaf
+            if(-Not $moduleName){
+                # This should never happen as we should call with a proper Path
+                throw "Unable to figure out Module Name from path $Path"
+            }
+        }
+        return $moduleName
+    }
+}
+
+function Get-ModuleGuidFromPath{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,ValueFromPipeline,Position=0)][string]$Path
+    )
+
+    process{
+        # Get the module guid from the path
+        $psd1File = Get-ChildItem -Path $Path -Filter *.psd1 | Select-Object -First 1
+        if(-Not $psd1File){
+            return $null
+        }
+        $moduleGuid = (Import-PowerShellDataFile -Path $psd1File.FullName).GUID
+        return $moduleGuid
     }
 }

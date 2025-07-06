@@ -11,6 +11,7 @@ function Get-IncludeSystemFiles{
     # Root
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'deploy.ps1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'LICENSE' }
+    $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = '{modulename}.psd1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = '{modulename}.psm1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'release.ps1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'sync.ps1' }
