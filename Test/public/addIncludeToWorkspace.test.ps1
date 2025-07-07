@@ -77,38 +77,6 @@ function Test_AddIncludeToWorkspace_WithFileTransformation{
     Assert-ItemExist -path $destinationFilePath
 }
 
-function Test_AddIncludeToWorkspace_WithContentTransformation_GUID{
-    $SourceModuleName = "SourceModule"
-    $DestinationModuleName = "DestinationModule"
-
-    Import-Module -Name TestingHelper
-    New-ModuleV3 -Name $SourceModuleName
-    New-ModuleV3 -Name $DestinationModuleName
-
-    $fileInfo = Get-IncludeSystemFiles -Filter psd1
-
-    $sourcePsd1Path = $SourceModuleName | Join-Path -ChildPath "$SourceModuleName.psd1"
-    $destinationPsd1Path = $DestinationModuleName | Join-Path -ChildPath "$DestinationModuleName.psd1"
-    $sourceManifest = Import-PowerShellDataFile -Path $sourcePsd1Path
-    $destinationManifest = Import-PowerShellDataFile -Path $destinationPsd1Path
-    
-    # $destinationName = $fileInfo.Name -replace '{modulename}', $DestinationModuleName
-    # $destinationPath = Get-ModuleFolder -FolderName $fileInfo.FolderName -ModuleRootPath $DestinationModuleName
-    # $destinationFilePath = $destinationPath | Join-Path -ChildPath $destinationName
-
-    # Act
-    $fileInfo | Add-IncludeToWorkspace -DestinationModulePath $DestinationModuleName -SourceModulePath $SourceModuleName -IfExists
-
-    # Assert
-    $resultManifest = Import-PowerShellDataFile -Path $destinationPsd1Path
-
-    # Content has changed
-    Assert-AreEqual -Expected $sourceManifest.RootModule -Presented $resultManifest.RootModule
-    # GUID has been replaced
-    Assert-AreEqual -Expected $destinationManifest.Guid -Presented $resultManifest.Guid
-
-}
-
 function Test_AddIncludeToWorkspace_IfExists{
 
     $moduleName = "TestModule"

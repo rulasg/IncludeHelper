@@ -11,7 +11,7 @@ function Get-IncludeSystemFiles{
     # Root
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'deploy.ps1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'LICENSE' }
-    $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = '{modulename}.psd1' }
+    # $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = '{modulename}.psd1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = '{modulename}.psm1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'release.ps1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'Root' ; Name = 'sync.ps1' }
@@ -22,7 +22,7 @@ function Get-IncludeSystemFiles{
     $includeItems += [PSCustomObject]@{ FolderName = 'Tools' ; Name = 'sync.Helper.ps1' }
 
     # TestRoot
-    $includeItems += [PSCustomObject]@{ FolderName = 'TestRoot' ; Name = 'Test.psd1' }
+    # $includeItems += [PSCustomObject]@{ FolderName = 'TestRoot' ; Name = 'Test.psd1' }
     $includeItems += [PSCustomObject]@{ FolderName = 'TestRoot' ; Name = 'Test.psm1' }
 
     # DevContainer
