@@ -169,3 +169,21 @@ function Get-ModuleFolder{
     }
     return $moduleFolder
 } Export-ModuleMember -Function Get-ModuleFolder
+
+function Get-MouduleFilePath{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,Position = 0)][ValidateSet([ValidFolderNames])][string]$FolderName,
+        [Parameter(Position = 1)][string]$ModuleRootPath,
+        [Parameter(Position = 2)][string]$Name
+    )
+
+    $ModuleRootPath = Get-ModuleRootPath -ModuleRootPath $ModuleRootPath
+
+    $folder = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $ModuleRootPath
+
+    $path = $folder | Join-Path -ChildPath $Name
+
+    return $path
+
+} Export-ModuleMember -Function Get-MouduleFilePath
