@@ -178,12 +178,6 @@ function Expand-FileContentTransformation{
         # Trasnformation ModuleName
         $content = $content -replace '{modulename}', $moduleName
 
-        # Trasnformation GUID
-        #if $sourceGuid is not null, replace $sourceGuid with $destinationGuid
-        if ($null -ne $sourceGuid -AND $null -ne $destinationGuid) {
-            $content = $content -replace $sourceGuid, $destinationGuid
-        }
-
         return $content
     }
 }
