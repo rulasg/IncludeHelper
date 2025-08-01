@@ -12,9 +12,10 @@
 # All functions of this ps1 will depend on `GetConfigFile` for functionality.
 #
 
+# MODULE_NAME
+$MODULE_NAME = ($PSScriptRoot | Split-Path -Parent | Get-ChildItem -Filter *.psd1 | Select-Object -First 1).BaseName
+if(-Not $MODULE_NAME){ throw "Module name not found. Please check the module structure." }
 
-$MODULE_ROOT_PATH = $PSScriptRoot | Split-Path -Parent
-$MODULE_NAME = (Get-ChildItem -Path $MODULE_ROOT_PATH -Filter *.psd1 | Select-Object -First 1).BaseName
 $CONFIG_ROOT = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "config"
 
 # Create the config root if it does not exist
