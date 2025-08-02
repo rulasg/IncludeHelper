@@ -102,6 +102,7 @@ function Add-IncludeToWorkspace {
         
         if ($PSCmdlet.ShouldProcess("$sourceFile", "copy to $destinationFile")) {
             # Copy-Item -Path $sourceFile -Destination $destinationFile -Force
+            Write-Output $destinationFile
             Set-Content -Path $destinationFile -Value $content -Force
         }
     }
