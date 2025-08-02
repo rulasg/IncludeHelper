@@ -37,5 +37,7 @@ References:
 
 ## Pull Reques description
 
-Add a summery of the intention of the PR. Use the title and the messages of the commits to create a summary.
+- Add a summery of the intention of the PR. Use the title and the messages of the commits to create a summary.
+- Add a list with all the commit messages in the PR.
+
 
