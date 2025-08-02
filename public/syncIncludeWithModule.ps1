@@ -4,6 +4,6 @@ function Sync-IncludeWithModule{
 
     Get-IncludeFile | Add-IncludeToWorkspace -IfExists
 
-    Get-IncludeFile | Add-IncludeToWorkspace -IfExists
+    Get-IncludeSystemFiles | Add-IncludeToWorkspace -IfExists
 
 } Export-ModuleMember -Function Sync-IncludeWithModule
