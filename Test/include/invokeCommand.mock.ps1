@@ -4,9 +4,9 @@
 # This includes help commands to mock invokes in a test module
 #
 # THIS INCLUDE REQURED module.helper.ps1
+if(-not $MODULE_NAME){ throw "Missing MODULE_NAME varaible initialization. Check for module.helerp.ps1 file." }
+if(-not $MODULE_ROOT_PATH){ throw "Missing MODULE_ROOT_PATH varaible initialization. Check for module.helerp.ps1 file." }
 
-$MODULE_ROOT_PATH = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
-$MODULE_NAME = (Get-ChildItem -Path $MODULE_ROOT_PATH -Filter *.psd1 | Select-Object -First 1).BaseName
 
 $testRootPath = $MODULE_ROOT_PATH | Join-Path -ChildPath 'Test'
 $MOCK_PATH = $testRootPath | Join-Path -ChildPath 'private' -AdditionalChildPath 'mocks'
@@ -22,7 +22,7 @@ function Set-InvokeCommandMock{
     )
 
     InvokeHelper\Set-InvokeCommandAlias -Alias $Alias -Command $Command -Tag $MODULE_INVOKATION_TAG_MOCK
-} 
+}
 
 function Reset-InvokeCommandMock{
     [CmdletBinding()]
@@ -57,6 +57,19 @@ function MockCall{
     Set-InvokeCommandMock -Alias $command -Command "Get-MockFileContent -filename $filename"
 }
 
+function MockCallAsync{
+    param(
+        [Parameter(Position=0)][string] $command,
+        [Parameter(Position=1)][string] $filename
+    )
+
+    Assert-MockFileNotfound $fileName
+
+    $moduleTest = $PSScriptRoot | Split-Path -Parent | Convert-Path
+
+    Set-InvokeCommandMock -Alias $command -Command "Import-Module $moduleTest ; Get-MockFileContent -filename $filename"
+}
+
 function MockCallJson{
     param(
         [Parameter(Position=0)][string] $command,
@@ -67,6 +80,20 @@ function MockCallJson{
     Assert-MockFileNotfound $fileName
 
     Set-InvokeCommandMock -Alias $command -Command "Get-MockFileContentJson -filename $filename"
+}
+
+function MockCallJsonAsync{
+    param(
+        [Parameter(Position=0)][string] $command,
+        [Parameter(Position=1)][string] $filename
+
+    )
+
+    Assert-MockFileNotfound $fileName
+
+    $moduleTest = $PSScriptRoot | Split-Path -Parent | Convert-Path
+
+    Set-InvokeCommandMock -Alias $command -Command "Import-Module $moduleTest ; Get-MockFileContentJson -filename $filename"
 }
 
 function Get-MockFileFullPath{
@@ -130,7 +157,6 @@ function MockCallToObject{
     Set-Variable -Name $varName -Value $OutObject -Scope Global
 
     Set-InvokeCommandMock -Alias $command -Command "(Get-Variable -Name $varName -Scope Global).Value"
-
 }
 
 function MockCallToNull{
@@ -180,8 +206,8 @@ function Save-InvokeAsMockFile{
 
     $result = Invoke-Expression -Command $Command
 
-    $json = $result | ConvertTo-Json -Depth 100 
-    
+    $json = $result | ConvertTo-Json -Depth 100
+
     $json | Out-File -FilePath $filePath
 
     Write-Host $FileName
@@ -222,4 +248,3 @@ function Assert-MockFileNotfound{
         throw "File not found or wrong case name. Expected[ $filename ] - Found[$( $file.name )]"
     }
 }
-
