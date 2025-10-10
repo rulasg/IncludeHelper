@@ -4,7 +4,11 @@ function Test_transcript{
 
     Write-Host "This is a test transcript."
     Write-Warning "This is a warning message."
-    Write-Error "This is an error message."
+
+    try {
+        Write-Error "This is an error message."
+    }
+    catch {}
 
     $result = Stop-MyTranscript
 
