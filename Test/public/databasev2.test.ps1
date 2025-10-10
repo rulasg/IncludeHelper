@@ -15,8 +15,7 @@ function Test_Database{
     # Get actual store path
     $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
     Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
-    $items = Get-ChildItem -Path $StorePath
-    Assert-Count -Expected 0 -Presented $items
+    Assert-IsFalse -Condition (Test-Path -Path $StorePath)
 
     # GetDatabaseFile
     $result = GetDatabaseFile -Key "test"
@@ -43,6 +42,144 @@ function Test_Database{
     # Reset Database
     Reset-DatabaseKey -Key "test"
     $result = Test-DatabaseKey -Key "test"
+    Assert-IsFalse -Condition $result
+}
+
+function Test_Database_JSON{
+
+    Reset-InvokeCommandMock
+    Mock_Database -ResetDatabase
+
+    # Load include files needed to test database
+    . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include" -ModuleRootPath $MODULE_ROOT_PATH)
+
+    # Get Default Database Root Path
+    $result = GetDatabaseRootPath
+    $expected = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "databaseCache"
+    Assert-AreEqual -Expected $expected -Presented $result
+
+    # Get actual store path
+    $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
+    Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
+    Assert-IsFalse -Condition (Test-Path -Path $StorePath)
+
+    # GetDatabaseFile
+    $result = GetDatabaseFile -Key "test" -DBFormat "JSON"
+    Assert-AreEqual -Expected "test_database_path/test.json" -Presented $result
+
+    # Test if database is empty
+    $result = Test-DatabaseKey -Key "test" -DBFormat "JSON"
+    Assert-IsFalse -Condition $result
+    $result = Get-DatabaseKey -Key "test" -DBFormat "JSON"
+    Assert-IsNull -Object $result
+
+    # Save content to database
+    Save-DatabaseKey -Key "test" -Value "dummy content" -DBFormat "JSON"
+    $result = Test-DatabaseKey -Key "test" -DBFormat "JSON"
+    Assert-IsTrue -Condition $result
+
+    $result = Get-DatabaseKey -Key "test" -DBFormat "JSON"
+    Assert-AreEqual -Expected "dummy content" -Presented $result
+
+    # Check the number of files in store
+    $items = Get-ChildItem -Path $StorePath
+    Assert-Count -Expected 1 -Presented $items
+
+    # Reset Database
+    Reset-DatabaseKey -Key "test" -DBFormat "JSON"
+    $result = Test-DatabaseKey -Key "test" -DBFormat "JSON"
+    Assert-IsFalse -Condition $result
+}
+
+function Test_Database_XML{
+
+    Reset-InvokeCommandMock
+    Mock_Database -ResetDatabase
+
+    # Load include files needed to test database
+    . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include" -ModuleRootPath $MODULE_ROOT_PATH)
+
+    # Get Default Database Root Path
+    $result = GetDatabaseRootPath
+    $expected = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "databaseCache"
+    Assert-AreEqual -Expected $expected -Presented $result
+
+    # Get actual store path
+    $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
+    Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
+    Assert-IsFalse -Condition (Test-Path -Path $StorePath)
+
+    # GetDatabaseFile
+    $result = GetDatabaseFile -Key "test" -DBFormat "XML"
+    Assert-AreEqual -Expected "test_database_path/test.xml" -Presented $result
+
+    # Test if database is empty
+    $result = Test-DatabaseKey -Key "test" -DBFormat "XML"
+    Assert-IsFalse -Condition $result
+    $result = Get-DatabaseKey -Key "test" -DBFormat "XML"
+    Assert-IsNull -Object $result
+
+    # Save content to database
+    Save-DatabaseKey -Key "test" -Value "dummy content" -DBFormat "XML"
+    $result = Test-DatabaseKey -Key "test" -DBFormat "XML"
+    Assert-IsTrue -Condition $result
+
+    $result = Get-DatabaseKey -Key "test" -DBFormat "XML"
+    Assert-AreEqual -Expected "dummy content" -Presented $result
+
+    # Check the number of files in store
+    $items = Get-ChildItem -Path $StorePath
+    Assert-Count -Expected 1 -Presented $items
+
+    # Reset Database
+    Reset-DatabaseKey -Key "test" -DBFormat "XML"
+    $result = Test-DatabaseKey -Key "test" -DBFormat "XML"
+    Assert-IsFalse -Condition $result
+}
+
+function Test_Database_TXT{
+
+    Reset-InvokeCommandMock
+    Mock_Database -ResetDatabase
+
+    # Load include files needed to test database
+    . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include" -ModuleRootPath $MODULE_ROOT_PATH)
+
+    # Get Default Database Root Path
+    $result = GetDatabaseRootPath
+    $expected = [System.Environment]::GetFolderPath('UserProfile') | Join-Path -ChildPath ".helpers" -AdditionalChildPath $MODULE_NAME, "databaseCache"
+    Assert-AreEqual -Expected $expected -Presented $result
+
+    # Get actual store path
+    $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
+    Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
+    Assert-IsFalse -Condition (Test-Path -Path $StorePath)
+
+    # GetDatabaseFile
+    $result = GetDatabaseFile -Key "test" -DBFormat "TXT"
+    Assert-AreEqual -Expected "test_database_path/test.txt" -Presented $result
+
+    # Test if database is empty
+    $result = Test-DatabaseKey -Key "test" -DBFormat "TXT"
+    Assert-IsFalse -Condition $result
+    $result = Get-DatabaseKey -Key "test" -DBFormat "TXT"
+    Assert-IsNull -Object $result
+
+    # Save content to database
+    Save-DatabaseKey -Key "test" -Value "dummy content" -DBFormat "TXT"
+    $result = Test-DatabaseKey -Key "test" -DBFormat "TXT"
+    Assert-IsTrue -Condition $result
+
+    $result = Get-DatabaseKey -Key "test" -DBFormat "TXT"
+    Assert-AreEqual -Expected "dummy content" -Presented $result
+
+    # Check the number of files in store
+    $items = Get-ChildItem -Path $StorePath
+    Assert-Count -Expected 1 -Presented $items
+
+    # Reset Database
+    Reset-DatabaseKey -Key "test" -DBFormat "TXT"
+    $result = Test-DatabaseKey -Key "test" -DBFormat "TXT"
     Assert-IsFalse -Condition $result
 }
 

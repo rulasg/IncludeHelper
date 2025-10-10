@@ -66,29 +66,57 @@ function GetDatabaseRootPath {
 function GetDatabaseFile{
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0)][string]$Key
+        [Parameter(Mandatory, Position = 0)][string]$Key,
+        [Parameter(Position = 1)][ValidateSet("JSON","XML","TXT")][string]$DBFormat = "JSON"
     )
 
     $databaseRoot = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_ALIAS
 
-    $path = $databaseRoot | Join-Path -ChildPath "$Key.json"
+    if(-not (Test-Path -Path $databaseRoot)){
+        New-Item -Path $databaseRoot -ItemType Directory -Force | Out-Null
+    }
+
+    $ext = GetFileExtension -DbFormat $DBFormat
+
+    $path = $databaseRoot | Join-Path -ChildPath "$Key$ext"
 
     return $path
+}
+
+function GetFileExtension{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string]$DbFormat
+    )
+
+    switch ($DbFormat.ToUpper()){
+        "JSON" { $ret =  ".json" ; Break }
+        "XML"  { $ret =  ".xml"  ; Break }
+        "TXT"  { $ret =  ".txt"  ; Break }
+        default { throw "Unsupported database format $DbFormat" }
+    }
+    return $ret
 }
 
 function Get-DatabaseKey{
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0)][string]$Key
+        [Parameter(Mandatory, Position = 0)][string]$Key,
+        [Parameter(Position = 1)][ValidateSet("JSON","XML","TXT")][string]$DBFormat = "JSON"
     )
 
-    if(-Not (Test-DatabaseKey $Key)){
+    if(-Not (Test-DatabaseKey $Key -DBFormat $DBFormat)){
         return $null
     }
 
-    $path =  GetDatabaseFile $Key
+    $path =  GetDatabaseFile $Key -DBFormat $DBFormat
 
-    $ret = Get-Content $path | ConvertFrom-Json -Depth 10 -AsHashtable
+    switch ($DBFormat) {
+        "JSON" { $ret = Get-Content $path | ConvertFrom-Json ; Break }
+        "XML"  { $ret = Import-Clixml -Path $path ; Break }
+        "TXT"  { $ret = Get-Content $path ; Break }
+        default { throw "Unsupported database format $DbFormat" }
+    }
 
     return $ret
 }
@@ -96,9 +124,10 @@ function Get-DatabaseKey{
 function Reset-DatabaseKey{
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0)][string]$Key
+        [Parameter(Mandatory, Position = 0)][string]$Key,
+        [Parameter(Position = 1)][ValidateSet("JSON","XML","TXT")][string]$DBFormat = "JSON"
     )
-    $path =  GetDatabaseFile -Key $Key
+    $path =  GetDatabaseFile -Key $Key -DBFormat $DBFormat
     Remove-Item -Path $path -Force -ErrorAction SilentlyContinue
     return
 }
@@ -106,22 +135,30 @@ function Reset-DatabaseKey{
 function Save-DatabaseKey{
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0)][string]$Key,
-        [Parameter(Position = 2)][Object]$Value
+        [Parameter(Mandatory, Position = 0)][string]$Key,
+        [Parameter(Mandatory, Position = 2)][Object]$Value,
+        [Parameter(Position = 3)][ValidateSet("JSON","XML","TXT")][string]$DbFormat = "JSON"
     )
 
-    $path = GetDatabaseFile -Key $Key
+    $path = GetDatabaseFile -Key $Key -DBFormat $DbFormat
 
-    $Value | ConvertTo-Json -Depth 10 | Set-Content $path
+    switch ($DbFormat) {
+        "JSON" { $Value | ConvertTo-Json -Depth 10 | Set-Content $path -Encoding UTF8 -Force ; Break }
+        "XML"  { $Value | Export-Clixml -Path $path -Force ; Break }
+        "TXT"  { $Value | Set-Content -Path $path -Encoding UTF8 -Force ; Break }
+        default { throw "Unsupported database format $DbFormat"
+        }
+    }
 }
 
 function Test-DatabaseKey{
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0)][string]$Key
+        [Parameter(Mandatory, Position = 0)][string]$Key,
+        [Parameter(Position = 1)][ValidateSet("JSON","XML","TXT")][string]$DBFormat = "JSON"
     )
 
-    $path = GetDatabaseFile -Key $Key
+    $path = GetDatabaseFile -Key $Key -DBFormat $DBFormat
 
     # Key file not exists
     if(-Not (Test-Path $path)){
@@ -132,3 +169,5 @@ function Test-DatabaseKey{
 
     return $true
 }
+
+
