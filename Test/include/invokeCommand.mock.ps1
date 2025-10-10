@@ -79,8 +79,13 @@ function MockCallJson{
     )
 
     Assert-MockFileNotfound $fileName
+    $asHashTableString = $AsHashtable ? '$true' : '$false'
 
-    Set-InvokeCommandMock -Alias $command -Command "Get-MockFileContentJson -filename $filename -AsHashtable:$AsHashtable"
+    $commandstr ='Get-MockFileContentJson -filename {filename} -AsHashtable:{asHashTableString}'
+    $commandstr = $commandstr -replace "{asHashTableString}", $asHashTableString
+    $commandstr = $commandstr -replace "{filename}", $filename
+
+    Set-InvokeCommandMock -Alias $command -Command $commandstr
 }
 
 function MockCallJsonAsync{

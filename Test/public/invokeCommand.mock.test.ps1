@@ -1,4 +1,36 @@
 
+function Test_MockCallJson{
+
+    Reset-InvokeCommandMock
+
+    $fileName = 'test.json'
+
+    MockCallJson -Command 'Test-Command' -filename $fileName
+
+    $result = Invoke-MyCommand -Command 'Test-Command'
+
+    Assert-IsTrue -Condition ($result -is [PSCustomObject])
+    Assert-AreEqual -Expected 'Test' -Presented $result.Name
+    Assert-AreEqual -Expected 42 -Presented $result.Value
+}
+
+function Test_MockCallJson_AsHashtable{
+
+    Reset-InvokeCommandMock
+
+    $fileName = 'test.json'
+
+    # Act
+    MockCallJson -Command 'Test-Command' -filename $fileName -AsHashtable
+
+    # Assert invoking mock command
+    $result = Invoke-MyCommand -Command 'Test-Command'
+
+    Assert-IsTrue -Condition ($result -is [hashtable])
+    Assert-AreEqual -Expected 'Test' -Presented $result.Name
+    Assert-AreEqual -Expected 42 -Presented $result.Value
+}
+
 function Test_MockCallToObject{
 
     Reset-InvokeCommandMock
