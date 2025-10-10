@@ -12,6 +12,8 @@ function Test_transcript{
 
     $result = Stop-MyTranscript
 
+    Write-Host $result
+
     Assert-Contains -Expected "This is a test transcript." -Presented $result
     Assert-Contains -Expected "WARNING: This is a warning message." -Presented $result
     Assert-Contains -Expected "     | This is an error message." -Presented $result
