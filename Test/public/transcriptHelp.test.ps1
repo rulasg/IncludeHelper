@@ -5,13 +5,14 @@ function Test_transcript{
     Write-Host "This is a test transcript."
     Write-Warning "This is a warning message."
 
-    # We don´t assert errors as if failin in Actions pipes while working in local run
+    # Commenting out error generation to avoid test failures in pipe
+    # mac local run is success
     # try {
     #     Write-Error "This is an error message."
     # }
     # catch {}
 
-    Write-Host $result
+    $result = Stop-MyTranscript
 
     Assert-Contains -Expected "This is a test transcript." -Presented $result
     Assert-Contains -Expected "WARNING: This is a warning message." -Presented $result
