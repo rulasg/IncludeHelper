@@ -15,8 +15,7 @@ function Test_Database{
     # Get actual store path
     $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
     Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
-    $items = Get-ChildItem -Path $StorePath
-    Assert-Count -Expected 0 -Presented $items
+    Assert-IsFalse -Condition (Test-Path -Path $StorePath)
 
     # GetDatabaseFile
     $result = GetDatabaseFile -Key "test"
@@ -62,8 +61,7 @@ function Test_Database_JSON{
     # Get actual store path
     $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
     Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
-    $items = Get-ChildItem -Path $StorePath
-    Assert-Count -Expected 0 -Presented $items
+    Assert-IsFalse -Condition (Test-Path -Path $StorePath)
 
     # GetDatabaseFile
     $result = GetDatabaseFile -Key "test" -DBFormat "JSON"
@@ -109,8 +107,7 @@ function Test_Database_XML{
     # Get actual store path
     $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
     Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
-    $items = Get-ChildItem -Path $StorePath
-    Assert-Count -Expected 0 -Presented $items
+    Assert-IsFalse -Condition (Test-Path -Path $StorePath)
 
     # GetDatabaseFile
     $result = GetDatabaseFile -Key "test" -DBFormat "XML"
@@ -156,8 +153,7 @@ function Test_Database_TXT{
     # Get actual store path
     $StorePath = Invoke-MyCommand -Command "Invoke-IncludeHelperGetDbRootPath"
     Assert-AreEqual -Expected "test_database_path" -Presented $StorePath
-    $items = Get-ChildItem -Path $StorePath
-    Assert-Count -Expected 0 -Presented $items
+    Assert-IsFalse -Condition (Test-Path -Path $StorePath)
 
     # GetDatabaseFile
     $result = GetDatabaseFile -Key "test" -DBFormat "TXT"
