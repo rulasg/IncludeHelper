@@ -32,10 +32,9 @@ function Reset-DatabaseStore{
     [CmdletBinding()]
     param()
 
+        # Get actual store path
         $databaseRoot = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_CMD
-    
+
+        # Remove the database root directory
         Remove-Item -Path $databaseRoot -Recurse -Force -ErrorAction SilentlyContinue
-
-        New-Item -Path $databaseRoot -ItemType Directory
-
 }

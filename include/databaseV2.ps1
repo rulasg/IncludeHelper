@@ -72,6 +72,10 @@ function GetDatabaseFile{
 
     $databaseRoot = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_ALIAS
 
+    if(-not (Test-Path -Path $databaseRoot)){
+        New-Item -Path $databaseRoot -ItemType Directory -Force | Out-Null
+    }
+
     $ext = GetFileExtension -DbFormat $DBFormat
 
     $path = $databaseRoot | Join-Path -ChildPath "$Key$ext"
@@ -165,3 +169,5 @@ function Test-DatabaseKey{
 
     return $true
 }
+
+
