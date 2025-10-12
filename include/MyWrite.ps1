@@ -50,11 +50,11 @@ function Write-MyHost {
     [Alias("Write-Host")]
     param(
         [Parameter(ValueFromPipeline)][string]$Message,
-        #NoNewLine
+        [Parameter()][string]$ForegroundColor = $OUTPUT_COLOR,
         [Parameter()][switch]$NoNewLine
     )
     # Write-Host $message -ForegroundColor $OUTPUT_COLOR
-    Write-ToConsole $message -Color $OUTPUT_COLOR -NoNewLine:$NoNewLine
+    Write-ToConsole $message -Color $ForegroundColor -NoNewLine:$NoNewLine
 }
 
 function Write-MyDebug {
@@ -199,3 +199,5 @@ function Get-ObjetString {
         return $Object | ConvertTo-Json -Depth 10 -ErrorAction SilentlyContinue
     }
 }
+
+
