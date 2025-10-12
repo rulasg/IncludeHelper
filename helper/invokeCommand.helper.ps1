@@ -16,15 +16,23 @@ function Set-MyInvokeCommandAlias{
         [Parameter(Mandatory,Position=1)][string]$Command
     )
 
-    # throw if MODULE_INVOKATION_TAG is not set or is "MyModuleModule"
-    if (-not $MODULE_INVOKATION_TAG) {
-        throw "MODULE_INVOKATION_TAG is not set. Please set it to a unique value before calling Set-MyInvokeCommandAlias."
-    }
-
     if ($PSCmdlet.ShouldProcess("InvokeCommandAliasList", ("Add Command Alias [{0}] = [{1}]" -f $Alias, $Command))) {
         InvokeHelper\Set-InvokeCommandAlias -Alias $Alias -Command $Command -Tag $MODULE_INVOKATION_TAG
     }
 }
+
+function Invoke-MyCommand{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,ValueFromPipeline,Position=0)][string]$Command,
+        [Parameter(Position=1)][hashtable]$Parameters
+    )
+
+    Write-MyDebug "[invoke] $Command" $Parameters
+
+    return InvokeHelper\Invoke-MyCommand -Command $Command -Parameters $Parameters
+}
+
 
 function Reset-MyInvokeCommandAlias{
     [CmdletBinding(SupportsShouldProcess)]
