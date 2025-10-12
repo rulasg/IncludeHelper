@@ -4,22 +4,26 @@
 #
 # sample usage:
 #
-# function Get-SomeCommand {
-#    [CmdletBinding()]
-#    param()
-#
-#    Write-Verbose "this is a verbose message"
-# }
-#
-# $result = Get-SomeCommand @ VerboseParameters
-# Assert-Contains -Expected "this is a verbose message" -Presented $verboseVar
+# function Get-DummyFunction{
+#     [CmdletBinding()]
+#     param()
 
-# Verbose parameters will now work.to capture the verbose outptut pipe 4>&1 and capture the output
-# [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments','',Scope='function')]
-# $VerboseParameters =@{
-#     VerboseAction = 'SilentlyContinue'
-#     VerboseVariable = 'verboseVar'
+#     Write-Error "Error Message from dummyFunction"
+#     Write-Verbose "Verbose Message from dummyFunction"
+#     Write-Warning "Warning Message from dummyFunction"
+#     Write-Information "Information Message from dummyFunction"
+#     Write-host "Host Message from dummyFunction"
+
+#     return $true
 # }
+
+# $result = Get-DummyFunction @ErrorParameters @WarningParameters @InfoParameters
+
+# Assert-IsTrue -Condition $result
+# Assert-Contains -Expected "Error Message from dummyFunction" -Presented $errorVar[0].exception.Message
+# Assert-Contains -Expected "Warning Message from dummyFunction" -Presented $warningVar
+# Assert-Contains -Expected "Information Message from dummyFunction" -Presented $infoVar
+# Assert-Contains -Expected "Host Message from dummyFunction" -Presented $infoVar
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments','',Scope='function')]
 $WarningParameters = @{
