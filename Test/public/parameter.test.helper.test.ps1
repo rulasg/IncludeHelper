@@ -1,37 +1,56 @@
+
 function Test_parameterstest{
 
-    $result = Get-DummyFunction @WarningParameters @InfoParameters @ErrorParameters
-    
-    Assert-IsTrue -Condition $result
-    Assert-Contains -Expected "Warning Message from dummyFunction" -Presented $warningVar
-    Assert-Contains -Expected "Information Message from dummyFunction" -Presented $infoVar
-    Assert-Contains -Expected "Error Message from dummyFunction" -Presented $errorVar
-}
-
-function Test_parameterstest_Error{
-
-    # $ErrorActionPreference = 'SilentlyContinue'
+    Set-IncludeHelperVerbose
+    Start-MyTranscript
     $result = Get-DummyFunction @ErrorParameters @WarningParameters @InfoParameters
-    
+    $tt = Stop-MyTranscript
+    Clear-IncludeHelperVerbose
+
+    # Assert result
     Assert-IsTrue -Condition $result
+    Assert-Contains -Expected "Error Message from dummyFunction" -Presented $errorVar[0].exception.Message
     Assert-Contains -Expected "Warning Message from dummyFunction" -Presented $warningVar
     Assert-Contains -Expected "Information Message from dummyFunction" -Presented $infoVar
+    Assert-Contains -Expected "Information Message from dummyFunction" -Presented $infoVar
+
+    # Not displaied
+    Assert-NotContains -Presented $tt -Expected "Error Message from dummyFunction"
+    Assert-NotContains -Presented $tt -Expected "Warning Message from dummyFunction"
+    Assert-NotContains -Presented $tt -Expected "Information Message from dummyFunction"
+
+    # Host message
+    Assert-Contains -Presented $tt -Expected "Host Message from dummyFunction"
 }
 
 function Test_parameterstest_Verbose{
 
-    $result = Get-DummyFunction -Verbose 4>&1 @ErrorParameters @WarningParameters @InfoParameters
-    Assert-Contains -Presented $result -Expected "True"
-    Assert-Contains -Presented $result -Expected "Verbose Message from dummyFunction"
+    Set-IncludeHelperVerbose
+    Start-MyTranscript
+    $result = Get-DummyFunction @ErrorParameters @WarningParameters @InfoParameters -Verbose
+    $tt = Stop-MyTranscript
+    Clear-IncludeHelperVerbose
+
+    # Assert result
+    Assert-IsTrue -Condition $result
+    Assert-Contains -Expected "Error Message from dummyFunction" -Presented $errorVar[0].exception.Message
+    Assert-Contains -Expected "Warning Message from dummyFunction" -Presented $warningVar
+    Assert-Contains -Expected "Information Message from dummyFunction" -Presented $infoVar
+    Assert-Contains -Expected "Information Message from dummyFunction" -Presented $infoVar
+
+    # Not displaied
+    Assert-NotContains -Presented $tt -Expected "Error Message from dummyFunction"
+    Assert-NotContains -Presented $tt -Expected "Warning Message from dummyFunction"
+    Assert-NotContains -Presented $tt -Expected "Information Message from dummyFunction"
+
+    # Host message
+    Assert-Contains -Presented $tt -Expected "VERBOSE: Verbose Message from dummyFunction"
+    Assert-Contains -Presented $tt -Expected "Host Message from dummyFunction"
 }
 
 function Get-DummyFunction{
     [CmdletBinding()]
     param()
-
-    Assert-AreEqual -Expected "SilentlyContinue" -Presented $ErrorActionPreference
-    Assert-AreEqual -Expected "SilentlyContinue" -Presented $WarningPreference
-    Assert-AreEqual -Expected "SilentlyContinue" -Presented $InformationPreference
 
     Write-Error "Error Message from dummyFunction"
     Write-Verbose "Verbose Message from dummyFunction"

@@ -13,14 +13,15 @@ function Test_ImportDepepency_Already_loaded{
     Mock_ImportModule -Name $name -Folder $modulesFolder
     
     #Act
-    $result = Import-Dependency -Name $name -Verbose -Confirm:$false 4>&1 # pipe verbose stream to standard output
+    Set-IncludeHelperVerbose
+    Start-MyTranscript
+    $result = Import-Dependency -Name $name -Verbose -Confirm:$false
+    $tt = Stop-MyTranscript
+    Clear-IncludeHelperVerbose
 
     #Assert verbose message
-    Assert-IsNotNull -Object $result
-    Assert-Contains -Presented $result -Expected "Module [$Name] imported from own module" 
-    # Assert module output
-    $module = $result | where-object {$_.GetType().Name -eq "PSCustomObject"}
-    Assert-AreEqual -Expected $name -Presented $module.Name
+    Assert-AreEqual -Expected $name -Presented $result.Name
+    Assert-Contains -Presented $tt -Expected "Module [$Name] imported from own module" 
 }
 
 function Test_ImportDepepency_SideBySide{
@@ -41,14 +42,17 @@ function Test_ImportDepepency_SideBySide{
     Mock_ImportModule -Name $name -Folder $modulesFolder
 
     # Act
-    $result = Import-Dependency -Name $name -Verbose -Confirm:$false 4>&1  # pipe verbose stream to standard output
+    Set-IncludeHelperVerbose
+    Start-MyTranscript
+    $result = Import-Dependency -Name $name -Verbose -Confirm:$false
+    $tt = Stop-MyTranscript
+    Clear-IncludeHelperVerbose
 
-    #Assert verbose message
-    Assert-IsNotNull -Object $result
-    Assert-Contains -Presented $result -Expected "Module [$Name] imported from side by side path"
     # Assert module output
-    $module = $result | where-object {$_.GetType().Name -eq "PSCustomObject"}
-    Assert-AreEqual -Expected $name -Presented $module.Name
+    Assert-AreEqual -Expected $name -Presented $result.Name
+    #Assert verbose message
+    Assert-AreEqual -Presented $tt -Expected "Module [$Name] imported from side by side path"
+
 }
 
 function Test_ImportDepepency_Import_From_Module_Manager{
@@ -73,13 +77,16 @@ function Test_ImportDepepency_Import_From_Module_Manager{
 
 
     #Act
-    $result = Import-Dependency -Name $name -Verbose -Confirm:$false 4>&1 # pipe verbose stream to standard output
+    Set-IncludeHelperVerbose
+    Start-MyTranscript
+    $output = Import-Dependency -Name $name -Verbose -Confirm:$false
+    $result = Stop-MyTranscript
+    Clear-IncludeHelperVerbose
 
     #Assert verbose message
+    Assert-AreEqual -Expected $name -Presented $output.Name
     Assert-Contains -Presented $result -Expected "Module [$Name] imported from Powershell Module Manager"
-    # Assert module output
-    $module = $result | where-object {$_.GetType().Name -eq "PSCustomObject"}
-    Assert-AreEqual -Expected $name -Presented $module.Name
+
 }
 
 function Test_ImportDepepency_Install_From_Gallery{
@@ -106,15 +113,20 @@ function Test_ImportDepepency_Install_From_Gallery{
     return $null
 '@
     $expression = $expression -replace "{alias}", "Get-Module -Name $name -ListAvailable"
-    $expression = $expression -replace "{command}", 'New-Object -TypeName PSCustomObject -Property @{ Name = "$name" }'
+    $expression = $expression -replace "{command}", 'New-Object -TypeName PSCustomObject -Property @{ Name = "{name}" }'
+    $expression = $expression -replace "{name}", $name
     $expression = $expression -replace "{tag}", $MODULE_INVOKATION_TAG_MOCK
     MockCallExpression -Command "Install-Module -Name $name -AllowPrerelease -Force" -Expression $expression
 
     #Act
-    $result = Import-Dependency -Name $name -Verbose -Confirm:$false 4>&1 # pipe verbose stream to standard output
+    Set-IncludeHelperVerbose
+    Start-MyTranscript
+    $output = Import-Dependency -Name $name -Verbose -Confirm:$false
+    $result = Stop-MyTranscript
+    Clear-IncludeHelperVerbose
 
     #Assert verbose message
-    Assert-IsNotNull -Object $result
+    Assert-AreEqual -Expected $name -Presented $output.Name
     Assert-Contains -Presented $result -Expected "Module [$Name] installed from PowerShell Gallery"
 }
 
@@ -142,10 +154,15 @@ function Test_ImportDependency_Clone_From_GitHub{
     Mock_ImportModule -Name $name -Folder $modulesFolder
 
 
-    $result = Import-Dependency -Name $name -Verbose -Confirm:$false 4>&1 # pipe verbose stream to standard output
+    Set-IncludeHelperVerbose
+    Start-MyTranscript
+    $output = Import-Dependency -Name $name -Verbose -Confirm:$false
+    $result = Stop-MyTranscript
+    Clear-IncludeHelperVerbose
 
     #Assert verbose message
-    Assert-IsNotNull -Object $result
+    Assert-AreEqual -Expected $name -Presented $output.Name
+
     Assert-Contains -Presented $result -Expected "Module [$Name] cloned from GitHub repository"
     Assert-Contains -Presented $result -Expected "Module [$Name] imported from GitHub repository"
 }
