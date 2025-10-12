@@ -18,3 +18,25 @@ function Test_transcript{
     Assert-Contains -Expected "WARNING: This is a warning message." -Presented $result
     # Assert-Contains -Expected "     | This is an error message." -Presented $result
 }
+
+function Test_ExportTranscriptLines{
+
+    # Act
+    Start-MyTranscript
+
+    Write-Host "Line 1"
+    Write-Host "Line 2"
+    Write-Host "Line 3"
+
+    $result = Stop-MyTranscript
+
+    # Assert
+    $expectedLines = @(
+        "Line 1",
+        "Line 2",
+        "Line 3"
+    )
+    for($i=0; $i -lt $expectedLines.Count; $i++){
+        Assert-AreEqual -Expected $expectedLines[$i] -Presented $result[$i]
+    }
+}
