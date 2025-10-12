@@ -103,7 +103,7 @@ function Import-Dependency{
             if ($moduleAvailable) {
                 # this does not return any module
                 if ($PSCmdlet.ShouldProcess("Installing module $name", "Do you want to install [$Name] from PowerShell Gallery?")) {
-                    Invoke-MyCommand -Command 'InstallModule' -Parameters @{ name = $Name }
+                    $null = Invoke-MyCommand -Command 'InstallModule' -Parameters @{ name = $Name }
                     #Check if the module is available now
                     $module = Invoke-MyCommand -Command 'GetModuleListAvailable' -Parameters @{ name = $Name }
                     if($module){
@@ -131,7 +131,7 @@ function Import-Dependency{
             $local = Invoke-MyCommand -Command 'GetMyModuleRootPath'
             $modulePath = $local | split-path -Parent | Join-Path -ChildPath $Name
 
-            if ($PSCmdlet.ShouldProcess("Cloning module $name", "Do you want to cline [$url] to [$modulePath]?")) {
+            if ($PSCmdlet.ShouldProcess("Cloning module $name", "Do you want to clone [$url] to [$modulePath]?")) {
                 $null = Invoke-MyCommand -Command 'CloneRepo' -Parameters @{ url = $url; folder = $modulePath }
             } else {
                 "Module [$Name] not cloned. Skipped clone from GitHub repository" | Write-Warning
