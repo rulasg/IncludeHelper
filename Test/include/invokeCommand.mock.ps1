@@ -134,7 +134,7 @@ function Get-MockFileContentJson{
 
     Assert-MockFileNotfound $FileName
 
-    $content = Get-MockFileContent -fileName $filename | ConvertFrom-Json -AsHashtable:$AsHashtable -Depth 10
+    $content = Get-MockFileContent -fileName $filename | ConvertFrom-Json -AsHashtable:$AsHashtable -Depth 100
 
     return $content
 } Export-ModuleMember -Function Get-MockFileContentJson
@@ -255,3 +255,5 @@ function Assert-MockFileNotfound{
         throw "File not found or wrong case name. Expected[ $filename ] - Found[$( $file.name )]"
     }
 }
+
+
