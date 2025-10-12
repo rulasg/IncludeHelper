@@ -4,7 +4,6 @@ function Test_WriteMyHost_Singleline {
 
     Invoke-PrivateContext {
         Write-MyHost -Message "This is a test transcript."
-        Write-Host -Message "This is a second test transcript."
     }
     
     $result = Stop-MyTranscript
