@@ -86,3 +86,36 @@ function Test_MockCallExpression{
     Assert-Contains -Presented $result -Expected 'new string from mock 2'
     Assert-Contains -Presented $result -Expected 'more things to say'
 }
+
+function Test_TraceInvokeCOmmandAlias{
+
+    
+    $fileName = "traceInvoke.log"
+    Assert-ItemNotExist -Path $fileName
+    
+    # Set flag 
+    touch $fileName
+    $fileNamePath = $fileName | Resolve-Path
+    $env:TraceInvokeMockFilePath = $fileNamePath
+    Assert-ItemExist -Path $fileNamePath
+    
+    # Act record invoke alias
+    Set-InvokeCommandMock -alias "fakeAlias1" -Command 'echo "hello from fakeAlias1"'
+    Set-InvokeCommandMock -alias "fakeAlias2" -Command 'echo "hello from fakeAlias2"'
+    
+    # Assert the two new alias are recorded
+    $content = Get-Content $fileNamePath
+    Assert-Count -Expected 2 -Presented $content
+    Assert-Contains -Presented $content -Expected 'fakeAlias1'
+    Assert-Contains -Presented $content -Expected 'fakeAlias2'
+    
+    # Assert no duplicate alias are recorded
+    Set-InvokeCommandMock -alias "fakeAlias1" -Command 'echo "hello from fakeAlias1"'
+    $content = Get-Content $fileNamePath
+    Assert-Count -Expected 2 -Presented $content
+    
+    # Assert new alias are recorded
+    Set-InvokeCommandMock -alias "fakeAlias3" -Command 'echo "hello from fakeAlias1"'
+    $content = Get-Content $fileNamePath
+    Assert-Count -Expected 3 -Presented $content
+}
