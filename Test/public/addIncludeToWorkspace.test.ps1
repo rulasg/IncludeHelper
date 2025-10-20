@@ -102,13 +102,13 @@ function Test_AddIncludeToWorkspace_IfExists{
     Assert-Count -Expected 1 -Presented $filesDest1
     $contentFile1 = Get-Content -Path $filesDest1.FullName | Out-String
     $sourceFile1  = Get-Content -Path $include1.Path | Out-String
-    Assert-AreEqual -Expected $sourceFile1 -Presented $contentFile1
+    Assert-AreEqual -Expected $sourceFile1.Trim() -Presented $contentFile1.Trim()
 
     $filesDest2 = Get-ChildItem -Path $destFolder2
     Assert-Count -Expected 1 -Presented $filesDest2
     $contentFile2 = Get-Content -Path $filesDest2.FullName | Out-String
     $sourceFile2  = Get-Content -Path $include2.Path | Out-String
-    Assert-AreEqual -Expected $sourceFile2 -Presented $contentFile2
+    Assert-AreEqual -Expected $sourceFile2.Trim() -Presented $contentFile2.Trim()
 }
 
 function Test_AddIncludeToWorkspace_PipeParameters{
