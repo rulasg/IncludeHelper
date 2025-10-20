@@ -150,7 +150,7 @@ function Get-ApiHost {
         return $ApiHost
     }
 
-    $envValue = Get-ApiHostFromEnv
+    $envValue = Get-EnvVariable -Name $ENV_VAR_HOST_NAME
     if(![string]::IsNullOrWhiteSpace($envValue)){
         "Host from env $envValue" | Write-MyVerbose
         return $envValue
@@ -160,9 +160,6 @@ function Get-ApiHost {
     return $DEFAULT_GH_HOST
 } Export-ModuleMember -Function Get-ApiHost
 
-function Get-ApiHostFromEnv{
-    (Get-Item -path "Env:$ENV_VAR_HOST_NAME" -ErrorAction SilentlyContinue).Value
-}
 
 ####################################################################################################
 
@@ -183,7 +180,7 @@ function Get-ApiToken {
         return $Token
     }
 
-    $envValue = Get-TokenFromEnv
+    $envValue = Get-EnvVariable -Name $ENV_VAR_TOKEN_NAME
     if(![string]::IsNullOrWhiteSpace($envValue)){
         "Token from env" | Write-MyVerbose
         return $envValue
@@ -203,6 +200,20 @@ function Get-ApiToken {
     return $result
 } Export-ModuleMember -Function Get-ApiToken
 
-function Get-TokenFromEnv{
-    (Get-Item -path "Env:$ENV_VAR_TOKEN_NAME" -ErrorAction SilentlyContinue).Value
+####################################################################################################
+
+function Get-EnvVariable{
+    param(
+        [Parameter(Mandatory)][string]$Name
+    )
+
+    if(! (Test-Path -Path "env:$Name") ){
+        return $null
+    }
+
+    $ret = "env:$Name"
+
+    return $ret
 }
+
+
