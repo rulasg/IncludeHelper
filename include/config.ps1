@@ -42,7 +42,7 @@ function GetConfigFile {
     return $path
 }
 
-function Test-Configuration {
+function Test-ConfigurationFile {
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)][string]$Key = "config"
@@ -59,9 +59,16 @@ function Get-Configuration {
         [Parameter(Position = 0)][string]$Key = "config"
     )
 
+    # Check for cached configuration
+    $configVar = Get-Variable -scope Script -Name "config-$Key" -ErrorAction SilentlyContinue
+    if($configVar){
+        return $configVar
+    }
+
+    # No cached configuration; read from file
     $path = GetConfigFile -Key $Key
 
-    if(-Not (Test-Configuration -Key $Key)){
+    if(-Not (Test-ConfigurationFile -Key $Key)){
         return $null
     }
 
@@ -78,7 +85,7 @@ function Get-Configuration {
 function Save-Configuration {
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0)][string]$Key = "config",
+        [Parameter()][string]$Key = "config",
         [Parameter(Mandatory = $true, Position = 1)][Object]$Config
     )
 
@@ -90,6 +97,9 @@ function Save-Configuration {
     catch {
         Write-Warning "Error saving configuration ($Key) to file: $($path). $($_.Exception.Message)"
         return $false
+    }
+    finally{
+        Remove-Variable -Scope Script -Name "config-$Key" -ErrorAction SilentlyContinue 
     }
 
     return $true
@@ -199,6 +209,8 @@ function Add-MyModuleConfigAttribute{
 $NewName = $function -Replace "MyModule", $MODULE_NAME
 Rename-Item -path Function:$Function -NewName $NewName
 Export-ModuleMember -Function $NewName
+
+
 
 
 
