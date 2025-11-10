@@ -13,7 +13,7 @@ function Test_FeatureFlag_Success{
         Assert-IsTrue -Condition $result
         
         Clear-FeatureFlag $ffName
-        $result = Test-FeatureFlag -Key $ffName
+        $result = tff $ffName
         Assert-IsFalse -Condition $result
     }
 }

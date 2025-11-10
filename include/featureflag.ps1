@@ -50,6 +50,7 @@ function Save-FeatureFlags{
 
 function Test-FeatureFlag {
     [CmdletBinding()]
+    [Alias("tff")]
     param(
         [Parameter(Mandatory,Position=0)][string]$Key
     )
