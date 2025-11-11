@@ -7,38 +7,21 @@ function Test_ConfigInclude{
     $result = Get-IncludeHelperConfig
     Assert-IsNull -Object $result
 
-    # Add acount
-    Add-IncludeHelperConfigAttribute -objectType "Account" -Attribute "acountattribute"
+    # Add Value String
+    $value = "Some value"
+    Set-IncludeHelperConfigValue -Name "TestKey" -Value $value
     $result = Get-IncludeHelperConfig
-    Assert-Count -Expected 1 -Presented $result.account_attributes
-    Assert-Contains -Expected "acountattribute" -Presented $result.account_attributes
-    Add-IncludeHelperConfigAttribute -objectType "Account" -Attribute "acountattribute2"
-    $result = Get-IncludeHelperConfig
-    Assert-Count -Expected 2 -Presented $result.account_attributes
-    Assert-Contains -Expected "acountattribute" -Presented $result.account_attributes
-    Assert-Contains -Expected "acountattribute2" -Presented $result.account_attributes
+    Assert-AreEqual -Expected $value -Presented $result.TestKey
 
-    # Add user
-    Add-IncludeHelperConfigAttribute -objectType "User" -Attribute "userattribute"
+    # Add Value Hashtable
+    $htable = @{ Key1 = "Value1"; Key2 = "Value2" }
+    Set-IncludeHelperConfigValue -Name "TestHashtable" -Value $htable
     $result = Get-IncludeHelperConfig
-    Assert-Count -Expected 1 -Presented $result.user_attributes
-    Assert-Contains -Expected "userattribute" -Presented $result.user_attributes
-    Add-IncludeHelperConfigAttribute -objectType "User" -Attribute "userattribute2"
-    $result = Get-IncludeHelperConfig
-    Assert-Count -Expected 2 -Presented $result.user_attributes
-    Assert-Contains -Expected "userattribute" -Presented $result.user_attributes
-    Assert-Contains -Expected "userattribute2" -Presented $result.user_attributes
+    Assert-AreEqual -Expected $htable.Key1 -Presented $result.TestHashtable.Key1
+    Assert-AreEqual -Expected $htable.Key2 -Presented $result.TestHashtable.Key2
 
-    # Add Opportunity
-    Add-IncludeHelperConfigAttribute -objectType "Opportunity" -Attribute "opportunityattribute"
-    $result = Get-IncludeHelperConfig
-    Assert-Count -Expected 1 -Presented $result.opportunity_attributes
-    Assert-Contains -Expected "opportunityattribute" -Presented $result.opportunity_attributes
-    Add-IncludeHelperConfigAttribute -objectType "Opportunity" -Attribute "opportunityattribute2"
-    $result = Get-IncludeHelperConfig
-    Assert-Count -Expected 2 -Presented $result.opportunity_attributes
-    Assert-Contains -Expected "opportunityattribute" -Presented $result.opportunity_attributes
-    Assert-Contains -Expected "opportunityattribute2" -Presented $result.opportunity_attributes
+    # Previuse value still there
+    Assert-AreEqual -Expected $value -Presented $result.TestKey
 
 }
 
