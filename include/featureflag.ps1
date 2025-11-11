@@ -32,22 +32,9 @@ function Save-FeatureFlags{
         [Parameter(Mandatory,Position=0)][hashtable]$FeatureFlags
     )
 
-    $config = Get-Configuration
+    $result = Set-ModuleNameConfigValue -Name "FeatureFlags" -Value $FeatureFlags
 
-    if(! $config){
-        $config = @{}
-    }
-
-    if(! $config.FeatureFlags){
-        $config.FeatureFlags = @{}
-    }
-
-
-    $config.FeatureFlags = $FeatureFlags
-    
-    $reuslt = Save-Configuration -Config $config
-
-    if(! $reuslt){
+    if(! $result){
         throw "Failed to save Feature Flags"
     }
 }
