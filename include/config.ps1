@@ -182,6 +182,7 @@ function Set-ModuleNameConfigValue{
 $function = "Set-ModuleNameConfigValue"
 $destFunction = $function -replace "ModuleName", $MODULE_NAME
 if( -not (Test-Path function:$destFunction )){
-    Rename-Item -path Function:$function -NewName $destFunction
+    # Rename-Item -path Function:$function -NewName $destFunction
+    Copy-Item -path Function:$function -Destination Function:$destFunction
     Export-ModuleMember -Function $destFunction
 }
