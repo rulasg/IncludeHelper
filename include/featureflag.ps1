@@ -45,7 +45,11 @@ function Save-FeatureFlags{
 
     $config.FeatureFlags = $FeatureFlags
     
-    Save-Configuration -Config $config
+    $reuslt = Save-Configuration -Config $config
+
+    if(! $reuslt){
+        throw "Failed to save Feature Flags"
+    }
 }
 
 function Test-FeatureFlag {
@@ -57,9 +61,14 @@ function Test-FeatureFlag {
 
     $ffs = Get-FeatureFlags
 
-    $value = $ffs.$key
+    $value = $ffs.$Key
 
-    return $value -eq $true
+    if($null -eq $value){
+        Set-FeatureFlag -Key $Key -Value $false
+        return $false
+    }
+
+    return $value
 }
 
 function Set-FeatureFlag{
