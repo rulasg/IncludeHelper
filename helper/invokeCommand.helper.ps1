@@ -28,7 +28,7 @@ function Invoke-MyCommand{
         [Parameter(Position=1)][hashtable]$Parameters
     )
 
-    Write-MyDebug "[invoke] $Command" $Parameters
+    Write-MyDebug "invoke" $Command $Parameters
 
     return InvokeHelper\Invoke-MyCommand -Command $Command -Parameters $Parameters
 }
@@ -47,3 +47,4 @@ function Reset-MyInvokeCommandAlias{
 
 # Reset all aliases for this module on each refresh
 Reset-MyInvokeCommandAlias
+
