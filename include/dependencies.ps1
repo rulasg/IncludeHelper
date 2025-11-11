@@ -15,10 +15,9 @@
 
 $MODULE_ROOT_PATH = $PSScriptRoot | split-path -Parent
 $MODULE_NAME = (Get-ChildItem -Path $MODULE_ROOT_PATH -Filter *.psd1 | Select-Object -First 1).BaseName
-$DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME = "Invoke-$($MODULE_NAME)RootPath"
 
 # SET MY INVOKE COMMAND ALIAS
-Set-MyInvokeCommandAlias -Alias "GetMyModuleRootPath"    -Command $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
+Set-MyInvokeCommandAlias -Alias "GetMyModuleRootPath"    -Command "Invoke-$($MODULE_NAME)RootPath"
 Set-MyInvokeCommandAlias -Alias "CloneRepo"              -Command 'git clone {url} {folder}'
 Set-MyInvokeCommandAlias -Alias "TestGitHubRepo"         -Command 'Invoke-WebRequest -Uri "{url}" -Method Head -ErrorAction SilentlyContinue | ForEach-Object { $_.StatusCode -eq 200 }'
 Set-MyInvokeCommandAlias -Alias "FindModule"             -Command 'Find-Module -Name {name} -AllowPrerelease -ErrorAction SilentlyContinue'
@@ -28,7 +27,7 @@ Set-MyInvokeCommandAlias -Alias "GetModuleListAvailable" -Command 'Get-Module -N
 Set-MyInvokeCommandAlias -Alias "ImportModule"           -Command 'Import-Module -Name {name} -Scope Global -Verbose:$false -PassThru'
 
 # This function will be renamed to avoid collision with other modules
-function Invoke-MODULE_NAME_RootPath{
+function Invoke-MyModuleRootPath{
     [CmdletBinding()]
     param()
     
@@ -44,8 +43,12 @@ function Invoke-MODULE_NAME_RootPath{
     
     return $root
 } 
-Rename-Item -path Function:Invoke-MODULE_NAME_RootPath -NewName $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
-Export-ModuleMember -Function $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
+$function = "Invoke-MyModuleRootPath"
+$destFunction = $function -replace "MyModule", $MODULE_NAME
+if( -not (Test-Path function:$destFunction )){
+    Rename-Item -path Function:$function -NewName $destFunction
+    Export-ModuleMember -Function $destFunction
+}
 
 function Import-Dependency{
     [CmdletBinding(SupportsShouldProcess,ConfirmImpact = 'High')]
