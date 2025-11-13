@@ -126,7 +126,7 @@ function Enable-ModuleNameVerbose{
     $moduleDebugVarName = $MODULE_NAME + "_VERBOSE"
     [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $flag)
 }
-$function = "Set-ModuleNameVerbose"
+$function = "Enable-ModuleNameVerbose"
 $destFunction = $function -replace "ModuleName", $MODULE_NAME
 if( -not (Test-Path function:$destFunction )){
     Rename-Item -path Function:$function -NewName $destFunction
@@ -139,7 +139,7 @@ function Disable-ModuleNameVerbose{
     $moduleDebugVarName = $MODULE_NAME + "_VERBOSE"
     [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $null)
 }
-$function = "Clear-ModuleNameVerbose"
+$function = "Disable-ModuleNameVerbose"
 $destFunction = $function -replace "ModuleName", $MODULE_NAME
 if( -not (Test-Path function:$destFunction )){
     Rename-Item -path Function:$function -NewName $destFunction
@@ -181,7 +181,7 @@ function Enable-ModuleNameDebug{
     $moduleDebugVarName = $MODULE_NAME + "_DEBUG"
     [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $flag)
 }
-$function = "Set-ModuleNameDebug"
+$function = "Enable-ModuleNameDebug"
 $destFunction = $function -replace "ModuleName", $MODULE_NAME
 if( -not (Test-Path function:$destFunction )){
     Rename-Item -path Function:$function -NewName $destFunction
@@ -194,7 +194,7 @@ function Disable-ModuleNameDebug {
     $moduleDebugVarName = $MODULE_NAME + "_DEBUG"
     [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $null)
 }
-$function = "Clear-ModuleNameDebug"
+$function = "Disable-ModuleNameDebug"
 $destFunction = $function -replace "ModuleName", $MODULE_NAME
 if( -not (Test-Path function:$destFunction )){
     Rename-Item -path Function:$function -NewName $destFunction
