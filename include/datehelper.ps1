@@ -1,9 +1,27 @@
+
+# DATE HELPER
+#
+# Date and time utility functions including epoch time conversion
+#
+# This module provides functions for:
+# - Calculating days between dates
+# - Converting to/from Unix epoch time
+# - Getting current date and time (with Invoke-MyCommand pattern for testability)
+#
+
+Set-MyInvokeCommandAlias -Alias GetNow -Command "Get-Date -Format 'yyyy-MM-dd'"
+Set-MyInvokeCommandAlias -Alias GetUtcNow -Command "Get-Date -AsUTC"
+
 function Get-DaysBetweenDates {
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0)][string]$StartDate = (Get-Date -Format 'yyyy-MM-dd'),
+        [Parameter(Position = 0)][string]$StartDate,
         [Parameter(Mandatory, Position = 1)][string]$EndDate
     )
+
+    if ([string]::IsNullOrWhiteSpace($StartDate)) {
+        $StartDate = Invoke-MyCommand -Command GetNow
+    }
 
     $start = [DateTime]::ParseExact($StartDate, 'yyyy-MM-dd', $null)
     $end = [DateTime]::ParseExact($EndDate, 'yyyy-MM-dd', $null)
@@ -11,7 +29,7 @@ function Get-DaysBetweenDates {
     $timeSpan = $end - $start
     
     return [Math]::Abs($timeSpan.Days)
-} Export-ModuleMember -Function Get-DaysBetweenDates
+}
 
 function Get-EpochTime {
     [CmdletBinding()]
@@ -19,11 +37,11 @@ function Get-EpochTime {
     param()
     
     $epoch = [datetime]::UnixEpoch
-    $now = [datetime]::UtcNow
+    $now = Invoke-MyCommand -Command GetUtcNow
     $timeSpan = $now - $epoch
     
     return [long]$timeSpan.TotalSeconds
-} Export-ModuleMember -Function Get-EpochTime
+}
 
 function ConvertFrom-EpochTime {
     [CmdletBinding()]
@@ -37,7 +55,7 @@ function ConvertFrom-EpochTime {
     $dateTime = $epoch.AddSeconds($EpochTime)
     
     return $dateTime
-} Export-ModuleMember -Function ConvertFrom-EpochTime
+}
 
 function ConvertTo-EpochTime {
     [CmdletBinding()]
@@ -51,4 +69,4 @@ function ConvertTo-EpochTime {
     $timeSpan = $DateTime.ToUniversalTime() - $epoch
     
     return [long]$timeSpan.TotalSeconds
-} Export-ModuleMember -Function ConvertTo-EpochTime
+}

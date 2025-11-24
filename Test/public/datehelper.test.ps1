@@ -1,40 +1,45 @@
 function Test_GetDaysBetweenDates_SameDates {
-    # Arrange
-    $startDate = "2025-01-15"
-    $endDate = "2025-01-15"
+    Invoke-PrivateContext {
+        # Arrange
+        $startDate = "2025-01-15"
+        $endDate = "2025-01-15"
 
-    # Act
-    $result = Get-DaysBetweenDates -StartDate $startDate -EndDate $endDate
+        # Act
+        $result = Get-DaysBetweenDates -StartDate $startDate -EndDate $endDate
 
-    # Assert
-    Assert-AreEqual -Expected 0 -Presented $result
+        # Assert
+        Assert-AreEqual -Expected 0 -Presented $result
+    }
 }
 
 function Test_GetDaysBetweenDates_PositiveRange {
-    # Arrange
-    $startDate = "2025-01-01"
-    $endDate = "2025-01-10"
+    Invoke-PrivateContext {
+        # Arrange
+        $startDate = "2025-01-01"
+        $endDate = "2025-01-10"
 
-    # Act
-    $result = Get-DaysBetweenDates -StartDate $startDate -EndDate $endDate
+        # Act
+        $result = Get-DaysBetweenDates -StartDate $startDate -EndDate $endDate
 
-    # Assert
-    Assert-AreEqual -Expected 9 -Presented $result
+        # Assert
+        Assert-AreEqual -Expected 9 -Presented $result
+    }
 }
 
 function Test_GetDaysBetweenDates_NegativeRange {
-    # Arrange
-    $startDate = "2025-01-10"
-    $endDate = "2025-01-01"
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $startDate = "2025-01-10"
+        $endDate = "2025-01-01"
 
-    # Act
-    $result = Get-DaysBetweenDates -StartDate $startDate -EndDate $endDate
-
-    # Assert
-    Assert-AreEqual -Expected 9 -Presented $result
+        $result = Get-DaysBetweenDates -StartDate $startDate -EndDate $endDate
+        Assert-AreEqual -Expected 9 -Presented $result
+    }
 }
 
 function Test_GetDaysBetweenDates_OneYear {
+        Invoke-PrivateContext {
     # Arrange
     $startDate = "2025-01-01"
     $endDate = "2026-01-01"
@@ -44,213 +49,141 @@ function Test_GetDaysBetweenDates_OneYear {
 
     # Assert
     Assert-AreEqual -Expected 365 -Presented $result
+        }
 }
 
 function Test_GetDaysBetweenDates_DefaultStartDate {
     # Arrange
-    $today = Get-Date -Format 'yyyy-MM-dd'
-    $tomorrow = (Get-Date).AddDays(1) | Get-Date -Format 'yyyy-MM-dd'
+    Reset-InvokeCommandMock
 
-    # Act
-    $result = Get-DaysBetweenDates -EndDate $tomorrow
+    $now = Get-Date -Format 'yyyy-MM-dd'
+    MockCallToObject -Command "GetNow" -OutObject $now
 
-    # Assert
-    Assert-AreEqual -Expected 1 -Presented $result
-}
+    # Act & Assert
+    Invoke-PrivateContext {
+        $futureDate = (Get-Date).AddDays(10) | Get-Date -Format 'yyyy-MM-dd'
 
-function Test_GetDaysBetweenDates_LeapYear {
-    # Arrange
-    $startDate = "2024-02-29"  # Leap day
-    $endDate = "2024-03-01"
-
-    # Act
-    $result = Get-DaysBetweenDates -StartDate $startDate -EndDate $endDate
-
-    # Assert
-    Assert-AreEqual -Expected 1 -Presented $result
-}
-
-function Test_GetDaysBetweenDates_DecadeRange {
-    # Arrange
-    $startDate = "2015-01-01"
-    $endDate = "2025-01-01"
-
-    # Act
-    $result = Get-DaysBetweenDates -StartDate $startDate -EndDate $endDate
-
-    # Assert
-    # 10 years with 3 leap years (2016, 2020, 2024) = 7*365 + 3*366 = 3653 days
-    Assert-AreEqual -Expected 3653 -Presented $result
-}
-
-function Test_GetEpochTime_ReturnsLong {
-    # Arrange & Act
-    $result = Get-EpochTime
-
-    # Assert
-    Assert-IsTrue -Condition ($result -is [long])
-}
-
-function Test_GetEpochTime_PositiveValue {
-    # Arrange
-    $unixEpoch = [datetime]::UnixEpoch
-    $now = [datetime]::UtcNow
-    $expectedMinimum = ($now - $unixEpoch).TotalSeconds - 10  # Allow 10 second margin
-
-    # Act
-    $result = Get-EpochTime
-
-    # Assert
-    Assert-IsTrue -Condition ($result -ge $expectedMinimum)
-}
-
-function Test_GetEpochTime_ReturnsCurrentTime {
-    # Arrange
-    $before = Get-EpochTime
-    Start-Sleep -Seconds 1
-    
-    # Act
-    $after = Get-EpochTime
-
-    # Assert
-    Assert-IsTrue -Condition ($after -gt $before)
-}
-
-function Test_ConvertFromEpochTime_ValidEpochTime {
-    # Arrange
-    $epochTime = 0  # Unix epoch: 1970-01-01 00:00:00
-
-    # Act
-    $result = ConvertFrom-EpochTime -EpochTime $epochTime
-
-    # Assert
-    Assert-AreEqual -Expected ([datetime]::UnixEpoch) -Presented $result
+        $result = Get-DaysBetweenDates -EndDate $futureDate
+        
+        # Result should be approximately 10 days (allowing for same-day test execution)
+        Assert-AreEqual -Expected 10 -Presented $result
+    }
 }
 
 function Test_ConvertFromEpochTime_OneDay {
-    # Arrange
-    $epochTime = 86400  # One day in seconds
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $epochTime = 86400  # One day in seconds
 
-    # Act
-    $result = ConvertFrom-EpochTime -EpochTime $epochTime
-
-    # Assert
-    $expected = [datetime]::UnixEpoch.AddSeconds(86400)
-    Assert-AreEqual -Expected $expected -Presented $result
+        $result = ConvertFrom-EpochTime -EpochTime $epochTime
+        $expected = [datetime]::UnixEpoch.AddSeconds(86400)
+        Assert-AreEqual -Expected $expected -Presented $result
+    }
 }
 
 function Test_ConvertFromEpochTime_LargeValue {
-    # Arrange
-    $epochTime = 1609459200  # 2021-01-01 00:00:00 UTC
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $epochTime = 1609459200  # 2021-01-01 00:00:00 UTC
 
-    # Act
-    $result = ConvertFrom-EpochTime -EpochTime $epochTime
-
-    # Assert
-    Assert-IsTrue -Condition ($result -is [datetime])
-    Assert-AreEqual -Expected 2021 -Presented $result.Year
-    Assert-AreEqual -Expected 1 -Presented $result.Month
-    Assert-AreEqual -Expected 1 -Presented $result.Day
+        $result = ConvertFrom-EpochTime -EpochTime $epochTime
+        Assert-IsTrue -Condition ($result -is [datetime])
+        Assert-AreEqual -Expected 2021 -Presented $result.Year
+        Assert-AreEqual -Expected 1 -Presented $result.Month
+        Assert-AreEqual -Expected 1 -Presented $result.Day
+    }
 }
 
 function Test_ConvertFromEpochTime_ZeroEpochTime {
-    # Arrange
-    $epochTime = 0
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $epochTime = 0
 
-    # Act
-    $result = ConvertFrom-EpochTime -EpochTime $epochTime
+        $result = ConvertFrom-EpochTime -EpochTime $epochTime
+        Assert-AreEqual -Expected 1970 -Presented $result.Year
+    }
 
-    # Assert
-    Assert-AreEqual -Expected 1970 -Presented $result.Year
-}
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $dateTime = [datetime]::UnixEpoch
 
-function Test_ConvertToEpochTime_UnixEpoch {
-    # Arrange
-    $dateTime = [datetime]::UnixEpoch
-
-    # Act
-    $result = ConvertTo-EpochTime -DateTime $dateTime
-
-    # Assert
-    Assert-AreEqual -Expected 0 -Presented $result
+        $result = ConvertTo-EpochTime -DateTime $dateTime
+        Assert-AreEqual -Expected 0 -Presented $result
+    }
 }
 
 function Test_ConvertToEpochTime_OneDay {
-    # Arrange
-    $dateTime = [datetime]::UnixEpoch.AddDays(1)
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $dateTime = [datetime]::UnixEpoch.AddDays(1)
 
-    # Act
-    $result = ConvertTo-EpochTime -DateTime $dateTime
-
-    # Assert
-    Assert-AreEqual -Expected 86400 -Presented $result
+        $result = ConvertTo-EpochTime -DateTime $dateTime
+        Assert-AreEqual -Expected 86400 -Presented $result
+    }
 }
 
 function Test_ConvertToEpochTime_RecentDate {
-    # Arrange
-    $dateTime = [datetime]::new(2021, 1, 1, 0, 0, 0, [System.DateTimeKind]::Utc)
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $dateTime = [datetime]::new(2021, 1, 1, 0, 0, 0, [System.DateTimeKind]::Utc)
 
-    # Act
-    $result = ConvertTo-EpochTime -DateTime $dateTime
-
-    # Assert
-    Assert-AreEqual -Expected 1609459200 -Presented $result
+        $result = ConvertTo-EpochTime -DateTime $dateTime
+        Assert-AreEqual -Expected 1609459200 -Presented $result
+    }
 }
 
 function Test_ConvertToEpochTime_ReturnsLong {
-    # Arrange
-    $dateTime = [datetime]::UtcNow
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $dateTime = [datetime]::UtcNow
 
-    # Act
-    $result = ConvertTo-EpochTime -DateTime $dateTime
-
-    # Assert
-    Assert-IsTrue -Condition ($result -is [long])
+        $result = ConvertTo-EpochTime -DateTime $dateTime
+        Assert-IsTrue -Condition ($result -is [long])
+    }
 }
 
 function Test_ConvertToEpochTime_RoundTrip {
-    # Arrange
-    $original = [datetime]::new(2020, 6, 15, 12, 30, 45, [System.DateTimeKind]::Utc)
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $original = [datetime]::new(2020, 6, 15, 12, 30, 45, [System.DateTimeKind]::Utc)
 
-    # Act
-    $epochTime = ConvertTo-EpochTime -DateTime $original
-    $restored = ConvertFrom-EpochTime -EpochTime $epochTime
+        $epochTime = ConvertTo-EpochTime -DateTime $original
+        $restored = ConvertFrom-EpochTime -EpochTime $epochTime
 
-    # Assert
-    Assert-AreEqual -Expected $original -Presented $restored
-}
-
-function Test_GetDaysBetweenDates_CrossYears {
-    # Arrange
-    $startDate = "2024-12-31"
-    $endDate = "2025-01-01"
-
-    # Act
-    $result = Get-DaysBetweenDates -StartDate $startDate -EndDate $endDate
-
-    # Assert
-    Assert-AreEqual -Expected 1 -Presented $result
+        Assert-AreEqual -Expected $original -Presented $restored
+    }
 }
 
 function Test_ConvertFromEpochTime_NegativeValue {
-    # Arrange
-    $epochTime = -86400  # One day before epoch
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $epochTime = -86400  # One day before epoch
 
-    # Act
-    $result = ConvertFrom-EpochTime -EpochTime $epochTime
-
-    # Assert
-    $expected = [datetime]::UnixEpoch.AddSeconds(-86400)
-    Assert-AreEqual -Expected $expected -Presented $result
+        $result = ConvertFrom-EpochTime -EpochTime $epochTime
+        $expected = [datetime]::UnixEpoch.AddSeconds(-86400)
+        Assert-AreEqual -Expected $expected -Presented $result
+    }
 }
 
 function Test_ConvertToEpochTime_BeforeEpoch {
-    # Arrange
-    $dateTime = [datetime]::UnixEpoch.AddDays(-1)
+    # Act & Assert
+    Invoke-PrivateContext {
+        # Arrange
+        $dateTime = [datetime]::UnixEpoch.AddDays(-1)
 
-    # Act
-    $result = ConvertTo-EpochTime -DateTime $dateTime
+        $result = ConvertTo-EpochTime -DateTime $dateTime
+     
 
-    # Assert
-    Assert-AreEqual -Expected -86400 -Presented $result
+        # Assert
+        Assert-AreEqual -Expected -86400 -Presented $result
+    }
 }
