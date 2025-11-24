@@ -42,7 +42,7 @@ function GetConfigFile {
     return $path
 }
 
-function Test-Configuration {
+function Test-ConfigurationFile {
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)][string]$Key = "config"
@@ -59,9 +59,16 @@ function Get-Configuration {
         [Parameter(Position = 0)][string]$Key = "config"
     )
 
+    # Check for cached configuration
+    $configVar = Get-Variable -scope Script -Name "config-$Key" -ErrorAction SilentlyContinue
+    if($configVar){
+        return $configVar
+    }
+
+    # No cached configuration; read from file
     $path = GetConfigFile -Key $Key
 
-    if(-Not (Test-Configuration -Key $Key)){
+    if(-Not (Test-ConfigurationFile -Key $Key)){
         return $null
     }
 
@@ -78,7 +85,7 @@ function Get-Configuration {
 function Save-Configuration {
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0)][string]$Key = "config",
+        [Parameter()][string]$Key = "config",
         [Parameter(Mandatory = $true, Position = 1)][Object]$Config
     )
 
@@ -91,6 +98,9 @@ function Save-Configuration {
         Write-Warning "Error saving configuration ($Key) to file: $($path). $($_.Exception.Message)"
         return $false
     }
+    finally{
+        Remove-Variable -Scope Script -Name "config-$Key" -ErrorAction SilentlyContinue 
+    }
 
     return $true
 }
@@ -98,7 +108,7 @@ function Save-Configuration {
 ############
 
 
-# Define unique aliases for "MyModule"
+# Define unique aliases for "ModuleName"
 $CONFIG_INVOKE_GET_ROOT_PATH_ALIAS = "$($MODULE_NAME)GetConfigRootPath"
 $CONFIG_INVOKE_GET_ROOT_PATH_CMD = "Invoke-$($MODULE_NAME)GetConfigRootPath"
 
@@ -106,106 +116,74 @@ $CONFIG_INVOKE_GET_ROOT_PATH_CMD = "Invoke-$($MODULE_NAME)GetConfigRootPath"
 Set-MyInvokeCommandAlias -Alias $CONFIG_INVOKE_GET_ROOT_PATH_ALIAS -Command $CONFIG_INVOKE_GET_ROOT_PATH_CMD
 
 # Define the function to get the configuration root path
-function Invoke-MyModuleGetConfigRootPath {
+function Invoke-ModuleNameGetConfigRootPath {
     [CmdletBinding()]
     param()
 
     $configRoot = GetConfigRootPath
     return $configRoot
 }
-$function = "Invoke-MyModuleGetConfigRootPath"
-$NewName = $function -Replace "MyModule", $MODULE_NAME
-Rename-Item -path Function:$Function -NewName $NewName
-Export-ModuleMember -Function $NewName
+$function = "Invoke-ModuleNameGetConfigRootPath"
+$destFunction = $function -replace "ModuleName", $MODULE_NAME
+if( -not (Test-Path function:$destFunction )){
+    Copy-Item -path Function:$function -Destination Function:$destFunction
+    Export-ModuleMember -Function $destFunction
+}
 
 # Extra functions not needed by INCLUDE CONFIG
 
-function Get-MyModuleConfig{
+function Get-ModuleNameConfig{
     [CmdletBinding()]
     param()
 
     $config = Get-Configuration
 
     return $config
-} 
-$function = "Get-MyModuleConfig"
-$NewName = $function -Replace "MyModule", $MODULE_NAME
-Rename-Item -path Function:$Function -NewName $NewName
-Export-ModuleMember -Function $NewName
+}
+$function = "Get-ModuleNameConfig"
+$destFunction = $function -replace "ModuleName", $MODULE_NAME
+if( -not (Test-Path function:$destFunction )){
+    Copy-Item -path Function:$function -Destination Function:$destFunction
+    Export-ModuleMember -Function $destFunction
+}
 
-function Save-MyModuleConfig{
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory, ValueFromPipeline, Position = 0)][Object]$Config
-    )
-
-    return Save-Configuration -Config $Config
-} $function = "Save-MyModuleConfig"
-$NewName = $function -Replace "MyModule", $MODULE_NAME
-Rename-Item -path Function:$Function -NewName $NewName
-Export-ModuleMember -Function $NewName
-
-function Open-MyModuleConfig{
+function Open-ModuleNameConfig{
     [CmdletBinding()]
     param()
 
     $path = GetConfigFile -Key "config"
 
     code $path
+}
+$function = "Open-ModuleNameConfig"
+$destFunction = $function -replace "ModuleName", $MODULE_NAME
+if( -not (Test-Path function:$destFunction )){
+    Copy-Item -path Function:$function -Destination Function:$destFunction
+    Export-ModuleMember -Function $destFunction
+}
 
-} $function = "Open-MyModuleConfig"
-$NewName = $function -Replace "MyModule", $MODULE_NAME
-Rename-Item -path Function:$Function -NewName $NewName
-Export-ModuleMember -Function $NewName
-
-function Add-MyModuleConfigAttribute{
+function Set-ModuleNameConfigValue{
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory,Position=0)][ValidateSet("Account", "User", "Opportunity")][string]$objectType,
-
-        [Parameter(Mandatory, ValueFromPipeline, Position = 1)][string]$Attribute
-
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][object]$Value
     )
 
-    begin{
-        $config = Get-Configuration
-        $configAttribute = ($objectType + "_attributes").ToLower()
+    $config = Get-Configuration
 
-        if(-Not $config){
-            $config = @{}
-        }
-    
-        if(-Not $config.$configAttribute){
-            $config.$configAttribute = @()
-        }
+    if(-Not $config){
+        $config = @{}
     }
 
-    process{
-        $config.$configAttribute += $Attribute
-    }
-    
-    End{
-        $ret = Save-Configuration -Config $config
-        if(-Not $ret){
-            throw "Error saving configuration"
-        }
+    $config.$Name = $Value
 
-        $config = Get-Configuration
-        Write-Output $config.$configAttribute
-        
-    }
-
-} $function = "Add-MyModuleConfigAttribute"
-$NewName = $function -Replace "MyModule", $MODULE_NAME
-Rename-Item -path Function:$Function -NewName $NewName
-Export-ModuleMember -Function $NewName
-
-
-
-
-
-
-
-
-
+    Save-Configuration -Key "config" -Config $config
+}
+$function = "Set-ModuleNameConfigValue"
+$destFunction = $function -replace "ModuleName", $MODULE_NAME
+if( -not (Test-Path function:$destFunction )){
+    # Rename-Item -path Function:$function -NewName $destFunction
+    Copy-Item -path Function:$function -Destination Function:$destFunction
+    Export-ModuleMember -Function $destFunction
+}
 

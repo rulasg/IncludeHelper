@@ -44,7 +44,7 @@ function Invoke-MODULE_NAME_RootPath{
     
     return $root
 } 
-Rename-Item -path Function:Invoke-MODULE_NAME_RootPath -NewName $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
+Copy-Item -path Function:Invoke-MODULE_NAME_RootPath -Destination Function:$DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
 Export-ModuleMember -Function $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
 
 function Import-Dependency{
