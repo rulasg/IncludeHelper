@@ -207,5 +207,3 @@ function Get-ObjetString {
 
 
 
-
-
