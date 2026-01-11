@@ -1,44 +1,84 @@
-# Copilot Instructions
+# Copilot Instructions for IncludeHelper
 
-## Powershell Modules Code Instructions
+IncludeHelper is a PowerShell module that provides shared utility functions and a framework for distributing reusable code components ("includes") across other modules.
 
-### PowerShell Functions Instructions
+## Architecture Overview
 
-Every powershell function will contain the `CmdletBinding` attribute and the `parm`iven if there are no parameters. 
-If the function is on the public folder of the module, we will add the Èxport-ModuleFunction` statement in the same line as the closing `}` of the function
+**Module Structure:**
+- `config/`: Configuration utilities and module initialization
+- `helper/`: Core module helpers (module path resolution, folder management)
+- `include/`: Shared utility functions (logging, API calls, database, config management)
+- `private/`: Internal functions not exported
+- `public/`: Exported functions (the public API)
+- `Test/`: Mirrored structure with unit tests and mocks
 
-Sample of function will be:
+**Loading Order** (in `IncludeHelper.psm1`): `config` → `helper` → `include` → `private` → `public`
 
+## PowerShell Function Conventions
+
+### All Functions
+- Must include `[CmdletBinding()]` attribute
+- Must include `param()` block (even if empty)
+- Use proper script documentation with `<# .SYNOPSIS #>` blocks
+
+### Public Functions (`public/` folder)
+- Add `Export-ModuleMember -Function 'FunctionName'` on the closing `}` line
+- Example:
+  ```powershell
+  function Add-IncludeToWorkspace {
+      [CmdletBinding()]
+      param([Parameter(Mandatory)][string]$Name)
+      # Logic
+  } Export-ModuleMember -Function 'Add-IncludeToWorkspace'
+  ```
+
+### Helper Functions (`helper/` folder)
+- Available module-wide; follow naming convention: verbs that clearly indicate utility purpose
+- Key helpers: `Find-ModuleRootPath`, `Get-ModuleFolder`, `Get-Ps1FullPath`
+
+## Logging and Debugging
+
+- Use `MyWrite.ps1` functions: `Write-MyError`, `Write-MyWarning`, `Write-MyVerbose`, `Write-MyDebug`, `Write-MyHost`
+- Control verbosity via environment variables: `$env:ModuleHelper_VERBOSE="all"` or specific function names
+- Control debugging via `$env:ModuleHelper_DEBUG="all"` or specific sections
+- Test verbosity/debug state with `Test-MyVerbose` and `Test-MyDebug`
+
+## Test Conventions
+
+Tests use `TestingHelper` module and follow pattern: `function Test_FunctionName_Scenario`
+
+**Test Structure:**
 ```powershell
-
-function Get-UserName{
-    [CmdletBinding()]
-    param()
-
-    #Logic of the function
-} Export-ModuleFunction -FunctionName 'Get-UserName'
+function Test_AddIncludeToWorkspace {
+    # Arrange - Setup test data and mocks
+    Import-Module -Name TestingHelper
+    New-ModuleV3 -Name TestModule
+    
+    # Act - Execute the function being tested
+    Add-IncludeToWorkspace -Name "getHashCode.ps1" -FolderName "Include" -DestinationModulePath "TestModule"
+    
+    # Assert - Verify results
+    Assert-ItemExist -path (Join-Path $folderPath "getHashCode.ps1")
+}
 ```
 
-### PowerShell Test Instructions
+- Use `Assert-NotImplemented` for unfinished tests
+- Test files in `Test/public/` mirror functions in `public/`
+- Run tests with `./test.ps1` (uses `TestingHelper` module)
 
-Every public function on the Test module will have the following format
+## Core Patterns
 
-- Name will start with `Test_` will follow the name of the function that we are testing with no '-'. It will follow the intention of the test splited with a '_'
-- Every time we create a new function with no body we will add the `Assert-NotImplemented` statement at the end
-- We will add the 3 sections as with comments `Arrange`, `Act` and `Assert` to make the test more readable.
-- Sample of a test function to test `Get-UserName` function  will be `Test_GetUserName_UserNotFound`
+**Module Discovery:** Use `Find-ModuleRootPath` to locate module root by searching up from current path for `*.psd1` files (skips Test.psd1).
 
-Full sample will be as follows
+**Folder Management:** `Get-ModuleFolder` maps logical names (`Include`, `Public`, `TestPrivate`, etc.) to filesystem paths. Valid names defined in `helper/module.helper.ps1` `$VALID_FOLDER_NAMES`.
 
-```powershell
-function Test_GetUserName_UserNotFound{
+**Configuration:** JSON-based, stored in `~/.helpers/{ModuleName}/config/`. Use `Get-Configuration`, `Save-Configuration`, `Test-Configuration` from `include/config.ps1`.
 
-    # Arrange
+**Command Aliasing:** Use `Set-MyInvokeCommandAlias` and `Invoke-MyCommand` for mockable external commands (database calls, API invocations).
 
-    # Act
+## Development Commands
 
-    # Assert
-
-    Assert-NotImplemented
-} 
-```
+- `./test.ps1` - Run all unit tests
+- `./sync.ps1` - Sync includes to workspace/module
+- `./deploy.ps1` - Deploy module
+- `./release.ps1` - Release module version
