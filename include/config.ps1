@@ -128,7 +128,7 @@ function Invoke-ModuleNameGetConfigRootPath {
 $function = "Invoke-ModuleNameGetConfigRootPath"
 $destFunction = $function -replace "ModuleName", $MODULE_NAME
 if( -not (Test-Path function:$destFunction )){
-    Rename-Item -path Function:$function -NewName $destFunction
+    Copy-Item -path Function:$function -Destination Function:$destFunction
     Export-ModuleMember -Function $destFunction
 }
 
@@ -145,7 +145,7 @@ function Get-ModuleNameConfig{
 $function = "Get-ModuleNameConfig"
 $destFunction = $function -replace "ModuleName", $MODULE_NAME
 if( -not (Test-Path function:$destFunction )){
-    Rename-Item -path Function:$function -NewName $destFunction
+    Copy-Item -path Function:$function -Destination Function:$destFunction
     Export-ModuleMember -Function $destFunction
 }
 
@@ -160,7 +160,7 @@ function Open-ModuleNameConfig{
 $function = "Open-ModuleNameConfig"
 $destFunction = $function -replace "ModuleName", $MODULE_NAME
 if( -not (Test-Path function:$destFunction )){
-    Rename-Item -path Function:$function -NewName $destFunction
+    Copy-Item -path Function:$function -Destination Function:$destFunction
     Export-ModuleMember -Function $destFunction
 }
 

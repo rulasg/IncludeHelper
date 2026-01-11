@@ -43,12 +43,8 @@ function Invoke-MyModuleRootPath{
     
     return $root
 } 
-$function = "Invoke-MyModuleRootPath"
-$destFunction = $function -replace "MyModule", $MODULE_NAME
-if( -not (Test-Path function:$destFunction )){
-    Rename-Item -path Function:$function -NewName $destFunction
-    Export-ModuleMember -Function $destFunction
-}
+Copy-Item -path Function:Invoke-MODULE_NAME_RootPath -Destination Function:$DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
+Export-ModuleMember -Function $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
 
 function Import-Dependency{
     [CmdletBinding(SupportsShouldProcess,ConfirmImpact = 'High')]

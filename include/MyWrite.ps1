@@ -126,12 +126,8 @@ function Enable-ModuleNameVerbose{
     $moduleDebugVarName = $MODULE_NAME + "_VERBOSE"
     [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $flag)
 }
-$function = "Enable-ModuleNameVerbose"
-$destFunction = $function -replace "ModuleName", $MODULE_NAME
-if( -not (Test-Path function:$destFunction )){
-    Rename-Item -path Function:$function -NewName $destFunction
-    Export-ModuleMember -Function $destFunction
-}
+Copy-Item -path Function:Enable-ModuleNameVerbose -Destination Function:"Set-$($MODULE_NAME)Verbose"
+Export-ModuleMember -Function "Set-$($MODULE_NAME)Verbose"
 
 function Disable-ModuleNameVerbose{
     param()
@@ -139,12 +135,8 @@ function Disable-ModuleNameVerbose{
     $moduleDebugVarName = $MODULE_NAME + "_VERBOSE"
     [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $null)
 }
-$function = "Disable-ModuleNameVerbose"
-$destFunction = $function -replace "ModuleName", $MODULE_NAME
-if( -not (Test-Path function:$destFunction )){
-    Rename-Item -path Function:$function -NewName $destFunction
-    Export-ModuleMember -Function $destFunction
-}
+Copy-Item -path Function:Disable-ModuleNameVerbose -Destination Function:"Clear-$($MODULE_NAME)Verbose"
+Export-ModuleMember -Function "Clear-$($MODULE_NAME)Verbose"
 
 function Test-MyDebug {
     param(
@@ -181,12 +173,8 @@ function Enable-ModuleNameDebug{
     $moduleDebugVarName = $MODULE_NAME + "_DEBUG"
     [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $flag)
 }
-$function = "Enable-ModuleNameDebug"
-$destFunction = $function -replace "ModuleName", $MODULE_NAME
-if( -not (Test-Path function:$destFunction )){
-    Rename-Item -path Function:$function -NewName $destFunction
-    Export-ModuleMember -Function $destFunction
-}
+Copy-Item -path Function:Enable-ModuleNameDebug -Destination Function:"Enable-$($MODULE_NAME)Debug"
+Export-ModuleMember -Function "Enable-$($MODULE_NAME)Debug"
 
 function Disable-ModuleNameDebug {
     param()
@@ -194,12 +182,8 @@ function Disable-ModuleNameDebug {
     $moduleDebugVarName = $MODULE_NAME + "_DEBUG"
     [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $null)
 }
-$function = "Disable-ModuleNameDebug"
-$destFunction = $function -replace "ModuleName", $MODULE_NAME
-if( -not (Test-Path function:$destFunction )){
-    Rename-Item -path Function:$function -NewName $destFunction
-    Export-ModuleMember -Function $destFunction
-}
+Copy-Item -path Function:Disable-ModuleNameDebug -Destination Function:"Disable-$($MODULE_NAME)Debug"
+Export-ModuleMember -Function "Disable-$($MODULE_NAME)Debug"
 
 function Get-ObjetString {
     param(

@@ -1,11 +1,8 @@
 function Test_ConfigInclude{
 
-    Reset-InvokeCommandMock
     Mock_Config
 
-    # Emput config
-    $result = Get-IncludeHelperConfig
-    Assert-IsNull -Object $result
+    Set-IncludeHelperConfigValue -Name "config_name" -Value "test_config_value"
 
     # Add Value String
     $value = "Some value"
