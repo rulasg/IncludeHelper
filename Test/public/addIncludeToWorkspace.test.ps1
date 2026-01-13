@@ -233,37 +233,44 @@ $targetPS1 = $moduleRootPath | Join-Path -ChildPath "public\addIncludeToWorkspac
 
 function Test_ResolveSourceDestinationPath{
 
-    $DestinationModuleName = "TargetModule"
-    $SourceModuleName = "SourceModule"
-    $LocalModuleName = "LocalModule"
+    Invoke-PrivateContext {
 
-    $IncludeHelperModulePath = (Get-Module -name Includehelper).Path | Split-Path -parent
-
-    New-ModuleV3 -Name $DestinationModuleName ; $DestinationModulePath = $DestinationModuleName | Convert-Path
-    New-ModuleV3 -Name $SourceModuleName ; $SourceModulePath = $SourceModuleName | Convert-Path
-    New-ModuleV3 -Name $LocalModuleName ; $LocalModulePath = $LocalModuleName | Convert-Path
-
-    $LocalModuleName | Set-Location
-
-    # Act Null / Null - Soruce:Include to Destination:local
-    $resultsource,$resultdestination = Resolve-SourceDestinationPath
-    Assert-AreEqualPath -Presented $resultsource -Expected $IncludeHelperModulePath
-    Assert-AreEqualPath -Presented $resultdestination -Expected $LocalModulePath
-
-    # Act Source / Null - Source: Path to Destination: local
-    $resultsource,$resultdestination = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath
-    Assert-AreEqualPath -Presented $resultsource -Expected $SourceModulePath
-    Assert-AreEqualPath -Presented $resultdestination -Expected $LocalModulePath
-
-    # Act Null / Destination sourceI:Include to Destination: Path
-    $resultsource,$resultdestination = Resolve-SourceDestinationPath -DestinationModulePath $DestinationModulePath
-    Assert-AreEqualPath -Presented $resultsource -Expected $IncludeHelperModulePath
-    Assert-AreEqualPath -Presented $resultdestination -Expected $DestinationModulePath
-
-    # Act Sorce / Destination - Source: Path to Destination: Path
-    $resultsource,$resultdestination = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
-    Assert-AreEqualPath -Presented $resultsource -Expected $SourceModulePath
-    Assert-AreEqualPath -Presented $resultdestination -Expected $DestinationModulePath
+        $DestinationModuleName = "TargetModule"
+        $SourceModuleName = "SourceModule"
+        $LocalModuleName = "LocalModule"
+        
+        # Includehelper root folder
+        $local = $PSScriptRoot
+        $IncludeHelperModulePath = $local | Split-Path -Parent | Split-Path -Parent
+        
+        # TEsting modules
+        New-ModuleV3 -Name $DestinationModuleName ; $DestinationModulePath = $DestinationModuleName | Convert-Path
+        New-ModuleV3 -Name $SourceModuleName ; $SourceModulePath = $SourceModuleName | Convert-Path
+        New-ModuleV3 -Name $LocalModuleName ; $LocalModulePath = $LocalModuleName | Convert-Path
+        
+        # Set location to test module
+        $LocalModuleName | Set-Location
+        
+        # Act Null / Null - Soruce:Include to Destination:local
+        $resultsource,$resultdestination = Resolve-SourceDestinationPath
+        Assert-AreEqualPath -Presented $resultsource -Expected $IncludeHelperModulePath
+        Assert-AreEqualPath -Presented $resultdestination -Expected $LocalModulePath
+        
+        # Act Source / Null - Source: Path to Destination: local
+        $resultsource,$resultdestination = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath
+        Assert-AreEqualPath -Presented $resultsource -Expected $SourceModulePath
+        Assert-AreEqualPath -Presented $resultdestination -Expected $LocalModulePath
+        
+        # Act Null / Destination sourceI:Include to Destination: Path
+        $resultsource,$resultdestination = Resolve-SourceDestinationPath -DestinationModulePath $DestinationModulePath
+        Assert-AreEqualPath -Presented $resultsource -Expected $IncludeHelperModulePath
+        Assert-AreEqualPath -Presented $resultdestination -Expected $DestinationModulePath
+        
+        # Act Sorce / Destination - Source: Path to Destination: Path
+        $resultsource,$resultdestination = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
+        Assert-AreEqualPath -Presented $resultsource -Expected $SourceModulePath
+        Assert-AreEqualPath -Presented $resultdestination -Expected $DestinationModulePath
+    }
 
 }
 
