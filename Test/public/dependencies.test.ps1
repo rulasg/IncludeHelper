@@ -13,11 +13,11 @@ function Test_ImportDepepency_Already_loaded{
     Mock_ImportModule -Name $name -Folder $modulesFolder
     
     #Act
-    Set-IncludeHelperVerbose
+    Enable-IncludeHelperVerbose
     Start-MyTranscript
     $result = Import-Dependency -Name $name -Verbose -Confirm:$false
     $tt = Stop-MyTranscript
-    Clear-IncludeHelperVerbose
+    Disable-IncludeHelperVerbose
 
     #Assert verbose message
     Assert-AreEqual -Expected $name -Presented $result.Name
@@ -42,11 +42,11 @@ function Test_ImportDepepency_SideBySide{
     Mock_ImportModule -Name $name -Folder $modulesFolder
 
     # Act
-    Set-IncludeHelperVerbose
+    Enable-IncludeHelperVerbose
     Start-MyTranscript
     $result = Import-Dependency -Name $name -Verbose -Confirm:$false
     $tt = Stop-MyTranscript
-    Clear-IncludeHelperVerbose
+    Disable-IncludeHelperVerbose
 
     # Assert module output
     Assert-AreEqual -Expected $name -Presented $result.Name
@@ -77,11 +77,11 @@ function Test_ImportDepepency_Import_From_Module_Manager{
 
 
     #Act
-    Set-IncludeHelperVerbose
+    Enable-IncludeHelperVerbose
     Start-MyTranscript
     $output = Import-Dependency -Name $name -Verbose -Confirm:$false
     $result = Stop-MyTranscript
-    Clear-IncludeHelperVerbose
+    Disable-IncludeHelperVerbose
 
     #Assert verbose message
     Assert-AreEqual -Expected $name -Presented $output.Name
@@ -119,11 +119,11 @@ function Test_ImportDepepency_Install_From_Gallery{
     MockCallExpression -Command "Install-Module -Name $name -AllowPrerelease -Force" -Expression $expression
 
     #Act
-    Set-IncludeHelperVerbose
+    Enable-IncludeHelperVerbose
     Start-MyTranscript
     $output = Import-Dependency -Name $name -Verbose -Confirm:$false
     $result = Stop-MyTranscript
-    Clear-IncludeHelperVerbose
+    Disable-IncludeHelperVerbose
 
     #Assert verbose message
     Assert-AreEqual -Expected $name -Presented $output.Name
@@ -154,11 +154,11 @@ function Test_ImportDependency_Clone_From_GitHub{
     Mock_ImportModule -Name $name -Folder $modulesFolder
 
 
-    Set-IncludeHelperVerbose
+    Enable-IncludeHelperVerbose
     Start-MyTranscript
     $output = Import-Dependency -Name $name -Verbose -Confirm:$false
     $result = Stop-MyTranscript
-    Clear-IncludeHelperVerbose
+    Disable-IncludeHelperVerbose
 
     #Assert verbose message
     Assert-AreEqual -Expected $name -Presented $output.Name
