@@ -79,4 +79,8 @@ function Test_RegisteredFeatureFlags_Success{
     Assert-Count -Expected 1 -Presented $result.Keys
     Assert-Contains -Expected "ff3" -Presented $result.Keys
 
+    # Not sure why but if we leave kk loaded it may interfere with other tests
+    # In particular when calling Resolve-SourceDestinationPath, that calls Get-ModuleRootPath, it will resolve to kk module.helper.ps1 code and not IncludeHelper module one
+    # resolving to the kk module path and not IncludeHelper module path.
+    Remove-Module -Name $modulename -Force
 }
