@@ -66,11 +66,16 @@ function Test_RegisteredFeatureFlags_Success{
     Set-kkFeatureFlag ff2 -Value $false
     Set-kkFeatureFlag ff3
 
+    # Assert confirm that all 3 flags are set
+    $result = Get-kkFeatureFlags
+    Assert-Count -Expected 3 -Presented $result.Keys
+    Assert-Contains -Expected "ff1" -Presented $result.Keys
+    Assert-Contains -Expected "ff2" -Presented $result.Keys
+    Assert-Contains -Expected "ff3" -Presented $result.Keys
+
     # Act - Clear registered deprecated featureflags from config
     Invoke-PrivateContext -ModulePath $fullpath {
-
         Clear-FeatureFlagsRegistered
-
     }
 
     # Assert confirm that deprecated flags are removed and ff3 remains
