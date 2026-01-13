@@ -84,3 +84,52 @@ function Test_RegisteredFeatureFlags_Success{
     # resolving to the kk module path and not IncludeHelper module path.
     Remove-Module -Name $modulename -Force
 }
+
+function Test_RegisteredFeatureFlags__FFFunction_Success{
+
+    $modulename = "kk"
+
+    # Mock config for module kk
+    Mock_Config -ModuleName $modulename -MockPath "kk_config"
+
+    # Create Module
+    New-ModuleV3 -Name $modulename
+    $fullpath = $modulename | Resolve-Path
+
+    # update module with required code to run featureflags in it
+    Sync-IncludeWithModule -DestinationModulePath $fullpath
+    Get-IncludeFile invokeCommand.helper.ps1 | Add-IncludeToWorkspace -DestinationModulePath $fullpath
+    Get-IncludeFile MyWrite.ps1 | Add-IncludeToWorkspace -DestinationModulePath $fullpath
+    Get-IncludeFile config.ps1 | Add-IncludeToWorkspace -DestinationModulePath $fullpath
+    Get-IncludeFile featureflag.ps1 | Add-IncludeToWorkspace -DestinationModulePath $fullpath
+    Get-IncludeFile module.helper.ps1 | Add-IncludeToWorkspace -DestinationModulePath $fullpath
+
+    $functioncode = @"
+
+function Get-kkString {
+    if(TFF ff){
+        return "ff"
+    } else {
+        return "kk"
+    }
+} Export-ModuleMember -Function Get-kkString
+
+"@
+
+    $functioncode | Out-File -FilePath ./kk/public/getString.ps1
+
+    # Import module
+    Import-Module -Name $fullpath
+
+    Set-kkFeatureFlag ff
+    $result = Get-kkFeatureFlags
+    Assert-IsTrue -Condition $result.ff
+
+    $result = Get-kkString
+    Assert-AreEqual -Expected "ff" -Presented $result
+
+    # Not sure why but if we leave kk loaded it may interfere with other tests
+    # In particular when calling Resolve-SourceDestinationPath, that calls Get-ModuleRootPath, it will resolve to kk module.helper.ps1 code and not IncludeHelper module one
+    # resolving to the kk module path and not IncludeHelper module path.
+    Remove-Module -Name $modulename -Force
+}
