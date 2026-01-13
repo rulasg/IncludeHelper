@@ -19,7 +19,7 @@ function Invoke-PrivateContext {
     )
 
     if ([string]::IsNullOrEmpty($ModulePath)) {
-        $modulePath = $ModulePath | Split-Path -Parent
+        $modulePath = $MODULE_PATH | Split-Path -Parent
     }
     
     $module = Import-Module -Name $modulePath -PassThru
