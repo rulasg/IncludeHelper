@@ -1,11 +1,11 @@
 
 function Test_parameterstest{
 
-    Set-IncludeHelperVerbose
+    Enable-IncludeHelperVerbose
     Start-MyTranscript
     $result = Get-DummyFunction @ErrorParameters @WarningParameters @InfoParameters
     $tt = Stop-MyTranscript
-    Clear-IncludeHelperVerbose
+    Disable-IncludeHelperVerbose
 
     # Assert result
     Assert-IsTrue -Condition $result
@@ -25,11 +25,11 @@ function Test_parameterstest{
 
 function Test_parameterstest_Verbose{
 
-    Set-IncludeHelperVerbose
+    Enable-IncludeHelperVerbose
     Start-MyTranscript
     $result = Get-DummyFunction @ErrorParameters @WarningParameters @InfoParameters -Verbose
     $tt = Stop-MyTranscript
-    Clear-IncludeHelperVerbose
+    Disable-IncludeHelperVerbose
 
     # Assert result
     Assert-IsTrue -Condition $result

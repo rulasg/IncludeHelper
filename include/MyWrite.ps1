@@ -126,8 +126,8 @@ function Enable-ModuleNameVerbose{
     $moduleDebugVarName = $MODULE_NAME + "_VERBOSE"
     [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $flag)
 }
-Copy-Item -path Function:Enable-ModuleNameVerbose -Destination Function:"Set-$($MODULE_NAME)Verbose"
-Export-ModuleMember -Function "Set-$($MODULE_NAME)Verbose"
+Copy-Item -path Function:Enable-ModuleNameVerbose -Destination Function:"Enable-$($MODULE_NAME)Verbose"
+Export-ModuleMember -Function "Enable-$($MODULE_NAME)Verbose"
 
 function Disable-ModuleNameVerbose{
     param()
@@ -135,8 +135,8 @@ function Disable-ModuleNameVerbose{
     $moduleDebugVarName = $MODULE_NAME + "_VERBOSE"
     [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $null)
 }
-Copy-Item -path Function:Disable-ModuleNameVerbose -Destination Function:"Clear-$($MODULE_NAME)Verbose"
-Export-ModuleMember -Function "Clear-$($MODULE_NAME)Verbose"
+Copy-Item -path Function:Disable-ModuleNameVerbose -Destination Function:"Disable-$($MODULE_NAME)Verbose"
+Export-ModuleMember -Function "Disable-$($MODULE_NAME)Verbose"
 
 function Test-MyDebug {
     param(

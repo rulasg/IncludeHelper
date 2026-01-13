@@ -27,24 +27,24 @@ Set-MyInvokeCommandAlias -Alias "GetModuleListAvailable" -Command 'Get-Module -N
 Set-MyInvokeCommandAlias -Alias "ImportModule"           -Command 'Import-Module -Name {name} -Scope Global -Verbose:$false -PassThru'
 
 # This function will be renamed to avoid collision with other modules
-function Invoke-MyModuleRootPath{
-    [CmdletBinding()]
-    param()
+# function Invoke-MyModuleRootPath{
+#     [CmdletBinding()]
+#     param()
     
-    # We will asume that this include file will be on a public,private or include folder.
-    $root = $PSScriptRoot | split-path -Parent
+#     # We will asume that this include file will be on a public,private or include folder.
+#     $root = $PSScriptRoot | split-path -Parent
     
-    # confirm that in root folder we have a psd1 file
-    $psd1 = Get-ChildItem -Path $root -Filter *.psd1 -Recurse -ErrorAction SilentlyContinue
+#     # confirm that in root folder we have a psd1 file
+#     $psd1 = Get-ChildItem -Path $root -Filter *.psd1 -Recurse -ErrorAction SilentlyContinue
     
-    if(-Not $psd1){
-        throw "Wrong root folder. Not PSD1 file found in [$root]. Modify Invoke-GetMyModuleRootPath to adjust location"
-    } 
+#     if(-Not $psd1){
+#         throw "Wrong root folder. Not PSD1 file found in [$root]. Modify Invoke-GetMyModuleRootPath to adjust location"
+#     } 
     
-    return $root
-} 
-Copy-Item -path Function:Invoke-MODULE_NAME_RootPath -Destination Function:$DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
-Export-ModuleMember -Function $DEPENDENCY_GETMYMODULEROOTPATH_INVOKE_FUNCTION_NAME
+#     return $root
+# } 
+# Copy-Item -path Function:Invoke-MyModuleRootPath -Destination Function:"Invoke-$($MODULE_NAME)RootPath"
+# Export-ModuleMember -Function "Invoke-$($MODULE_NAME)RootPath"
 
 function Import-Dependency{
     [CmdletBinding(SupportsShouldProcess,ConfirmImpact = 'High')]
