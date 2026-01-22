@@ -35,31 +35,43 @@ function Get-IncludeFile{
     param(
         #add filter pattern
         [Parameter( Position = 0 )] [string]$Filter = '*',
+        [Parameter()][string[]]$Folders,
         [Parameter()][switch]$Local,
         [Parameter()][string]$ModuleRootPath
     )
 
     #checkif $moduleRootPath is null,  whitespace or empty
     # If value keep value.
-    # If Local use '.' 
+    # If Local use '.'
     # If not Localuse includeHelper module
     if([string]::IsNullOrWhiteSpace($ModuleRootPath)){
-        $moduleRootPath = $Local ? "." : " "
+        $moduleRootPath = $Local ? "." : $(Get-ModuleRootPath)
     }
+
+    $moduleName = Get-ModuleNameFromPath -Path $ModuleRootPath
 
     $ret =@()
 
-    @("github","Include","TestInclude","Helper","TestHelper") | ForEach-Object {
+    # If folder not specified search on default include folders
+    $fileFolders = $Folders ?? @("Include","Helper","TestInclude","TestHelper")
+
+    # Validate that all folder names are valid
+    $invalidFolders = $folders | Where-Object { $_ -notin $VALID_FOLDER_NAMES }
+    if ($invalidFolders.Count -gt 0) {
+        Write-MyError "Invalid folder names: $($invalidFolders -join ', '). Valid names are: $($VALID_FOLDER_NAMES -join ', ')"
+        return
+    }
+
+    $fileFolders| ForEach-Object {
 
         $FolderName = $_
 
         $path = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $ModuleRootPath
 
-        $moduleName = $ModuleRootPath | Split-Path -Leaf
-
         $items = Get-ChildItem -Path $path -Filter "*$Filter*" -File  -ErrorAction SilentlyContinue | ForEach-Object {
+
             [PSCustomObject]@{
-                Name       = $_.Name
+                Name       = Compress-FileNameTransformation -FileName $_.Name -SourceModulePath $ModuleRootPath
                 FolderName = $FolderName
                 ModuleName = $moduleName
                 Path       = $_.FullName
@@ -72,32 +84,6 @@ function Get-IncludeFile{
 
     return $ret
 
-    # $include = Get-ModuleFolder -FolderName 'Include' -ModuleRootPath $ModuleRootPath
-    # $includeTest = Get-ModuleFolder -FolderName 'TestInclude' -ModuleRootPath $ModuleRootPath
-
-    # $includeItems = Get-ChildItem -Path $include -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
-    #     [PSCustomObject]@{
-    #         Name       = $_.Name
-    #         FolderName = 'Include'
-    #         Path = $_.FullName
-    #     }
-    # }
-    # if ($includeItems.Count -ne 0) {
-    #     $ret += $includeItems
-    # }
-
-    # $includeTestItems = Get-ChildItem -Path $includeTest -Filter "*$Filter*" -ErrorAction SilentlyContinue | ForEach-Object {
-    #     [PSCustomObject]@{
-    #         Name       = $_.Name
-    #         FolderName = 'TestInclude'
-    #         Path = $_.FullName
-    #     }
-    # }
-    # if ($includeTestItems.Count -ne 0) {
-    #     $ret += $includeTestItems
-    # }
-
-    # return $ret
 } Export-ModuleMember -Function Get-IncludeFile
 
 <#
@@ -117,22 +103,20 @@ function Open-IncludeFile{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$Name,
-        [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)]
-        # [ValidateSet('Include', 'Private', 'Public', 'Root', 'TestInclude', 'TestPrivate', 'TestPublic', 'TestRoot', 'Tools', 'DevContainer', 'WorkFlows', 'GitHub', 'Helper', 'Config', 'TestHelper', 'TestConfig')]
-        [string]$FolderName
+        [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)][string]$FolderName
     )
 
     process{
 
         $sourceIncludeModuleFolder = Get-ModuleFolder -FolderName $FolderName
-        
+
         $sourceFile = $sourceIncludeModuleFolder | Join-Path -ChildPath $Name
-        
+
         # Check if source file exists
         if(-Not (Test-Path $sourceFile)){
             throw "File $sourceFile not found"
         }
-        
+
         # Open the file using the default application based on the OS
         if ($IsWindows) {
             Start-Process $sourceFile

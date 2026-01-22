@@ -27,7 +27,7 @@
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments','',Scope='function')]
 $WarningParameters = @{
-    WarningAction = 'SilentlyContinue' 
+    WarningAction = 'SilentlyContinue'
     WarningVariable = 'warningVar'
 }
 

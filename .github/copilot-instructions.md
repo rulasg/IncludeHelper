@@ -53,10 +53,10 @@ function Test_AddIncludeToWorkspace {
     # Arrange - Setup test data and mocks
     Import-Module -Name TestingHelper
     New-ModuleV3 -Name TestModule
-    
+
     # Act - Execute the function being tested
     Add-IncludeToWorkspace -Name "getHashCode.ps1" -FolderName "Include" -DestinationModulePath "TestModule"
-    
+
     # Assert - Verify results
     Assert-ItemExist -path (Join-Path $folderPath "getHashCode.ps1")
 }

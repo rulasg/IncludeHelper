@@ -30,19 +30,19 @@ Set-MyInvokeCommandAlias -Alias "ImportModule"           -Command 'Import-Module
 # function Invoke-MyModuleRootPath{
 #     [CmdletBinding()]
 #     param()
-    
+
 #     # We will asume that this include file will be on a public,private or include folder.
 #     $root = $PSScriptRoot | split-path -Parent
-    
+
 #     # confirm that in root folder we have a psd1 file
 #     $psd1 = Get-ChildItem -Path $root -Filter *.psd1 -Recurse -ErrorAction SilentlyContinue
-    
+
 #     if(-Not $psd1){
 #         throw "Wrong root folder. Not PSD1 file found in [$root]. Modify Invoke-GetMyModuleRootPath to adjust location"
-#     } 
-    
+#     }
+
 #     return $root
-# } 
+# }
 # Copy-Item -path Function:Invoke-MyModuleRootPath -Destination Function:"Invoke-$($MODULE_NAME)RootPath"
 # Export-ModuleMember -Function "Invoke-$($MODULE_NAME)RootPath"
 
@@ -124,7 +124,7 @@ function Import-Dependency{
 
         $url = "https://github.com/rulasg/$name"
         $testUrl = Invoke-MyCommand -Command 'TestGitHubRepo' -Parameters @{ url = $url } -ErrorAction SilentlyContinue
-        
+
         if ($testUrl -eq $true) {
             # Clone side by side this module
             $local = Invoke-MyCommand -Command 'GetMyModuleRootPath'
@@ -153,7 +153,7 @@ function Import-Dependency{
                 "Failed to reload module [$Name] from GitHub repository" | Write-Verbose
                 return $null
             }
-        } 
+        }
         else # Url not found
         {
             "Module [$Name] not found in GitHub repository" | Write-Verbose
@@ -174,7 +174,7 @@ function Import-MyModule{
 
         # $result = Get-Module -Name $module.Name
         $result = Invoke-MyCommand -Command 'GetModule' -Parameters @{ name = $module.Name }
-        
+
         return $result
 
     }

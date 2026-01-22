@@ -61,7 +61,7 @@ function Test_AddIncludeToWorkspace_Force{
 }
 
 function Test_AddIncludeToWorkspace_WithFileTransformation{
-    
+
     Import-Module -Name TestingHelper
     New-ModuleV3 -Name TestModule
 
@@ -84,7 +84,7 @@ function Test_AddIncludeToWorkspace_IfExists{
 
     # Test for Include
     $includefiles = Get-IncludeFile
-    $include1 = $includefiles | Where-Object { $_.FolderName -eq "github" } | Select-Object -First 1
+    $include1 = $includefiles | Where-Object { $_.FolderName -eq "Helper" } | Select-Object -First 1
     $include2 = $includefiles | Where-Object { $_.FolderName -eq "Include" } | Select-Object -First 1
 
     New-ModuleV3 -Name $moduleName
@@ -112,13 +112,13 @@ function Test_AddIncludeToWorkspace_IfExists{
 }
 
 function Test_AddIncludeToWorkspace_PipeParameters{
-    
+
     Import-Module -Name TestingHelper
     New-ModuleV3 -Name TestModule
-    
+
     # Test for Include
     $destinationModulePath = "TestModule"
-    
+
     $includesToAdd = @(
         [PSCustomObject]@{ Name = "config.ps1"; FolderName = "Include" },
         [PSCustomObject]@{ Name = "config.mock.ps1"; FolderName = "TestInclude" }
@@ -138,7 +138,7 @@ function Test_AddIncludeToWorkspace_PipeParameters{
 }
 
 function Test_AddIncludeToWorkspace_WithoutSource_WithoutDestination{
-    
+
     Reset-InvokeCommandMock
 
     Import-Module -Name TestingHelper
@@ -150,10 +150,10 @@ function Test_AddIncludeToWorkspace_WithoutSource_WithoutDestination{
     $destinationFilePath = $destinationPath | Join-Path -ChildPath $destinationName
     Remove-Item -Path $destinationFilePath -ErrorAction SilentlyContinue
 
-    
+
     # Act
     Assert-itemNotExist -path $destinationFilePath
-    
+
     Set-Location -Path ./TestModule
     $fileInfo | Add-IncludeToWorkspace
     Set-Location -Path ../
@@ -189,7 +189,7 @@ function Test_AddIncludeToWorkspace_FromSourceToDestination{
     # Act
     $includes = Get-IncludeFile -ModuleRootPath $SourceModuleName
     $includes | Add-IncludeToWorkspace -SourceModulePath $SourceModuleName -DestinationModulePath $TargetModuleName
-    
+
         # Assert
     Assert-ItemExist -Path "$TInclude\MyInclude1.ps1"
     Assert-ItemExist -Path "$TInclude\MyInclude2.ps1"
@@ -197,14 +197,14 @@ function Test_AddIncludeToWorkspace_FromSourceToDestination{
 
 # With soruce not destination
 function Test_AddIncludeToWorkspace_FromSourceToDestination_WithoutDestination{
-    
+
     Reset-InvokeCommandMock
 
     $FileName1 = "MyInclude1.ps1"
     $FileName2 = "MyInclude2.ps1"
 
     $DestinationModuleName = "DestinationModule"
-    $SourceModuleName = "SourceModule" 
+    $SourceModuleName = "SourceModule"
 
     $DestinationModulePath =  New-ModuleV3 -Name $DestinationModuleName
     $SourceModulePath =  New-ModuleV3 -Name $SourceModuleName
@@ -221,7 +221,7 @@ function Test_AddIncludeToWorkspace_FromSourceToDestination_WithoutDestination{
     $includes = Get-IncludeFile -ModuleRootPath $SourceModulePath
     Assert-Count -Expected 2 -Presented $includes
     $includes | Add-IncludeToWorkspace -SourceModulePath $SourceModulePath
-    
+
     # Assert
     Assert-ItemExist -Path "$TInclude\MyInclude1.ps1"
     Assert-ItemExist -Path "$TInclude\MyInclude2.ps1"
@@ -238,34 +238,34 @@ function Test_ResolveSourceDestinationPath{
         $DestinationModuleName = "TargetModule"
         $SourceModuleName = "SourceModule"
         $LocalModuleName = "LocalModule"
-        
+
         # Includehelper root folder
         $local = $PSScriptRoot
         $IncludeHelperModulePath = $local | Split-Path -Parent | Split-Path -Parent
-        
+
         # TEsting modules
         New-ModuleV3 -Name $DestinationModuleName ; $DestinationModulePath = $DestinationModuleName | Convert-Path
         New-ModuleV3 -Name $SourceModuleName ; $SourceModulePath = $SourceModuleName | Convert-Path
         New-ModuleV3 -Name $LocalModuleName ; $LocalModulePath = $LocalModuleName | Convert-Path
-        
+
         # Set location to test module
         $LocalModuleName | Set-Location
-        
+
         # Act Null / Null - Soruce:Include to Destination:local
         $resultsource,$resultdestination = Resolve-SourceDestinationPath
         Assert-AreEqualPath -Presented $resultsource -Expected $IncludeHelperModulePath
         Assert-AreEqualPath -Presented $resultdestination -Expected $LocalModulePath
-        
+
         # Act Source / Null - Source: Path to Destination: local
         $resultsource,$resultdestination = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath
         Assert-AreEqualPath -Presented $resultsource -Expected $SourceModulePath
         Assert-AreEqualPath -Presented $resultdestination -Expected $LocalModulePath
-        
+
         # Act Null / Destination sourceI:Include to Destination: Path
         $resultsource,$resultdestination = Resolve-SourceDestinationPath -DestinationModulePath $DestinationModulePath
         Assert-AreEqualPath -Presented $resultsource -Expected $IncludeHelperModulePath
         Assert-AreEqualPath -Presented $resultdestination -Expected $DestinationModulePath
-        
+
         # Act Sorce / Destination - Source: Path to Destination: Path
         $resultsource,$resultdestination = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
         Assert-AreEqualPath -Presented $resultsource -Expected $SourceModulePath

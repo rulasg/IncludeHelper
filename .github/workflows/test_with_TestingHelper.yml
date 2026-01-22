@@ -31,7 +31,7 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run test.ps1
         shell: pwsh
-        run: | 
+        run: |
           $result = ./test.ps1 -ShowTestErrors
           $result
 
@@ -40,6 +40,6 @@ jobs:
           # $passed = $result.Tests -eq $result.Pass
 
           if($passed)
-          { "All test passed" | Write-Verbose -verbose ; exit 0 } 
-          else 
+          { "All test passed" | Write-Verbose -verbose ; exit 0 }
+          else
           { "Not all tests passed" | Write-Verbose -verbose ; exit 1 }

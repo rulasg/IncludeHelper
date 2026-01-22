@@ -322,5 +322,3 @@ ASALocalRun/
 # MSBuild Binary and Structured Log
 *.binlog
 
-# exclude vscode settings folder
-.vscode/settings.json

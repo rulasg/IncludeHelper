@@ -19,7 +19,7 @@ function Get-HashCode {
         $bytes = [System.Text.Encoding]::UTF8.GetBytes($InputString)
         $hashBytes = $md5.ComputeHash($bytes)
         $hashString = [BitConverter]::ToString($hashBytes) -replace '-', ''
-        
+
         return $hashString
     }
 

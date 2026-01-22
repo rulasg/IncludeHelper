@@ -26,7 +26,7 @@ jobs:
           EVENT_REF: ${{ github.event.ref }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
           RELEASE_NAME: ${{ github.event.release.name }}
-        run: | 
+        run: |
           $env:EVENT_REF = $env:REF
 
           If ([string]::IsNullOrEmpty($env:EVENT_REF)) {
