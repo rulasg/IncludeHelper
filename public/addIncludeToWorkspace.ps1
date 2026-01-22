@@ -3,7 +3,7 @@
 Adds an include folder to the workspace.
 
 .DESCRIPTION
-The Add-IncludeToWorkspace function adds a specified include folder to the workspace. 
+The Add-IncludeToWorkspace function adds a specified include folder to the workspace.
 It supports ShouldProcess for safety and allows specifying the destination module path.
 
 .PARAMETER Name
@@ -87,7 +87,7 @@ function Add-IncludeToWorkspace {
 
         # Expand filecontent Transformations
         $content = Expand-FileContentTransformation -SourceFileName $sourceFile -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
-        
+
         #Skip destination module check if Force is set
         if(-Not $Force){
             # Check if there is a .psd1 file in the DestinationModulePath
@@ -96,18 +96,18 @@ function Add-IncludeToWorkspace {
                 throw "Destination Path $DestinationModulePath does not seem to be a PowershellMddule."
             }
         }
-        
+
         # create destination folder if it does not exist
         if(-Not (Test-Path $destinationpath)){
             #"Create folder $destinationpath" | Write-MyDebug
             $null = New-Item -Path $destinationpath -ItemType Directory -Force
         }
-        
+
         # Check if source file exists
         if(-Not (Test-Path $sourceFile)){
             throw "File $sourceFile not found"
         }
-        
+
         if ($PSCmdlet.ShouldProcess("$sourceFile", "copy to $destinationFile")) {
             # Copy-Item -Path $sourceFile -Destination $destinationFile -Force
             Set-Content -Path $destinationFile -Value $content -Force
@@ -128,7 +128,7 @@ function Resolve-SourceDestinationPath{
         [Parameter(Position=1)][string]$DestinationModulePath
     )
         # This function copies include files from one module to another
-        # We have two wellknown modules: 
+        # We have two wellknown modules:
         #   1. Local Running module: this is the module where this function is running
         #   2. Local Path model : the module present where the location is set. aka '.'
         # We have two parameters:
@@ -146,7 +146,7 @@ function Resolve-SourceDestinationPath{
         if([string]::IsNullOrWhiteSpace($DestinationModulePath)){
             $DestinationModulePath = Get-ModuleFolder -FolderName 'Root' -ModuleRootPath '.'
         }
-        
+
         $SourceModulePath = Convert-Path -Path $SourceModulePath
         $DestinationModulePath = Convert-Path -Path $DestinationModulePath
 

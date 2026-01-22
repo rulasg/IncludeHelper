@@ -63,7 +63,7 @@ function Test_GetIncludeSystemFiles {
 
     # Act
     $result = Get-IncludeSystemFiles
-    
+
     # Assert
     Assert-Count -Expected $expectedList.Count -Presented $result
 

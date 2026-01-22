@@ -1,11 +1,11 @@
 
 function Test_ModuleHelper_AreEqual_InModule_And_TestModule{
-    
-    # to avoid confusion we need to ensure that this helper has the same 
+
+    # to avoid confusion we need to ensure that this helper has the same
     # code in both module and test modules
 
     $name = "module.helper.ps1"
-    
+
     $files = get-includefile -Filter $name
 
     $filePath = @{}
@@ -76,8 +76,8 @@ function Test_FindModuleRootPath{
 
     $moduleName = "TestModule"
     New-ModuleV3 -Name $moduleName -AddTesting
-    New-TestingFolder -Path "$moduleName/include/kk1/kk2" 
-    New-TestingFolder -Path "$moduleName/Test/include/kk1/kk2" 
+    New-TestingFolder -Path "$moduleName/include/kk1/kk2"
+    New-TestingFolder -Path "$moduleName/Test/include/kk1/kk2"
     New-testingFolder -Path "kk1/kk2/kk3"
 
     $moduleRootPath = $moduleName | Convert-Path
@@ -93,7 +93,7 @@ function Test_FindModuleRootPath{
         Assert-AreEqual -Expected $moduleRootPath -Presented $result
     }
 
-    @( 
+    @(
         ".",
         "kk1",
         "kk1/kk2",

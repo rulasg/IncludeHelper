@@ -5,4 +5,4 @@ function Get-PrivateString {
     )
 
     return ("Private string [{0}]" -f $param1)
-} 
+}

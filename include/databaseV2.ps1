@@ -20,15 +20,15 @@ $DB_INVOKE_GET_ROOT_PATH_ALIAS = "$($MODULE_NAME)GetDbRootPath"
 
 $function = "Invoke-$($MODULE_NAME)GetDbRootPath"
 if(-not (Test-Path -Path function:$function)){
-    
+
     # PUBLIC FUNCTION
     function Invoke-MyModuleGetDbRootPath{
         [CmdletBinding()]
         param()
-        
+
         $databaseRoot = GetDatabaseRootPath
         return $databaseRoot
-        
+
     }
     Rename-Item -path Function:Invoke-MyModuleGetDbRootPath -NewName $function
     Export-ModuleMember -Function $function
@@ -41,15 +41,15 @@ if(-not (Test-Path -Path function:$function)){
     function Reset-MyModuleDatabaseStore{
         [CmdletBinding()]
         param()
-        
+
         $databaseRoot = Invoke-MyCommand -Command $DB_INVOKE_GET_ROOT_PATH_ALIAS
-        
+
         Remove-Item -Path $databaseRoot -Recurse -Force -ErrorAction SilentlyContinue
-        
+
         New-Item -Path $databaseRoot -ItemType Directory
-        
+
     }
-    
+
     Rename-Item -path Function:Reset-MyModuleDatabaseStore -NewName $function
     Export-ModuleMember -Function $function
 }

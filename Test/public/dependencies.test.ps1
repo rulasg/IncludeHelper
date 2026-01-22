@@ -11,7 +11,7 @@ function Test_ImportDepepency_Already_loaded{
 
     # Mock Import-Module
     Mock_ImportModule -Name $name -Folder $modulesFolder
-    
+
     #Act
     Enable-IncludeHelperVerbose
     Start-MyTranscript
@@ -21,7 +21,7 @@ function Test_ImportDepepency_Already_loaded{
 
     #Assert verbose message
     Assert-AreEqual -Expected $name -Presented $result.Name
-    Assert-Contains -Presented $tt -Expected "Module [$Name] imported from own module" 
+    Assert-Contains -Presented $tt -Expected "Module [$Name] imported from own module"
 }
 
 function Test_ImportDepepency_SideBySide{
@@ -186,7 +186,7 @@ function Mock_GetModule_Null{
     param(
         [Parameter(Mandatory,Position=0)][string]$Name
     )
-    
+
     MockCallToNull -Command "Get-Module -Name $name"
 }
 
@@ -197,11 +197,11 @@ function Mock_GetModuleListAvailable{
         [Parameter(Mandatory,Position=0)][string]$Name,
         [Parameter(Mandatory,Position=1)][string]$Folder
     )
-    
+
     $path = "$Folder/$Name"
     $path = Convert-Path -Path $path
     $expression = "New-Object -TypeName PSCustomObject -Property @{ Name = '$name'; Path = '$path' }"
-    
+
     MockCallExpression -Command "Get-Module -Name $name -ListAvailable" -Expression $expression
 }
 
@@ -210,8 +210,8 @@ function Mock_GetModuleListAvailable_Null{
     param(
         [Parameter(Mandatory,Position=0)][string]$Name
     )
-    
-    MockCallToNull -Command "Get-Module -Name $name -ListAvailable" 
+
+    MockCallToNull -Command "Get-Module -Name $name -ListAvailable"
 }
 
 
@@ -241,7 +241,7 @@ function Mock_ImportModule{
     $command = $command -replace "{path}", $path
 
     MockCallExpression -Command $command -Expression $expression
-    
+
 }
 
 function Convert-MyPath{
@@ -273,9 +273,9 @@ function Mock_GetMyModuleRootPath{
     )
 
     # Mock GetMyModuleRootPath on SideBySide
-    # Check that happens before ImportFromModuleManager 
+    # Check that happens before ImportFromModuleManager
     # that we are testing here
-    $modulePath = "$Folder/$Name" 
+    $modulePath = "$Folder/$Name"
     New-ModuleV3 -Name $Name -Path $folder
     $path = Convert-Path -Path $modulePath
     MockCallToString -Command 'GetMyModuleRootPath' -OutString "$path"
@@ -304,7 +304,7 @@ function Mock_CloneRepo{
         [Parameter(Mandatory,Position=1)][string]$Name,
         [Parameter(Mandatory,Position=2)][string]$Folder
     )
-    
+
     $url = "https://github.com/$owner/$Name"
     $path = "$Folder/$Name"
     $path = Convert-MyPath -Path $path

@@ -42,7 +42,7 @@ function Get-IncludeFile{
 
     #checkif $moduleRootPath is null,  whitespace or empty
     # If value keep value.
-    # If Local use '.' 
+    # If Local use '.'
     # If not Localuse includeHelper module
     if([string]::IsNullOrWhiteSpace($ModuleRootPath)){
         $moduleRootPath = $Local ? "." : $(Get-ModuleRootPath)
@@ -109,14 +109,14 @@ function Open-IncludeFile{
     process{
 
         $sourceIncludeModuleFolder = Get-ModuleFolder -FolderName $FolderName
-        
+
         $sourceFile = $sourceIncludeModuleFolder | Join-Path -ChildPath $Name
-        
+
         # Check if source file exists
         if(-Not (Test-Path $sourceFile)){
             throw "File $sourceFile not found"
         }
-        
+
         # Open the file using the default application based on the OS
         if ($IsWindows) {
             Start-Process $sourceFile

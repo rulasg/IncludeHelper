@@ -5,7 +5,7 @@ function Test_WriteMyHost_Singleline {
     Invoke-PrivateContext {
         Write-MyHost -Message "This is a test transcript."
     }
-    
+
     $result = Stop-MyTranscript
 
     Assert-AreEqual -Expected "This is a test transcript." -Presented $result

@@ -5,7 +5,7 @@ function Test_CallAPI_RESTAPI_Withpagination_1{
     Enable-InvokeCommandAliasModule
 
     # Act
-    $result = Invoke-RestAPI -Api "/orgs/octodemo/credential-authorizations" 
+    $result = Invoke-RestAPI -Api "/orgs/octodemo/credential-authorizations"
 
     Assert-Count -Expected 31 -Presented $result
 
@@ -31,7 +31,7 @@ function Test_CallAPI_RESTAPI_Withpagination_2{
 }
 
 function Test_Call_API_GraphQL{
-    
+
     Assert-SkipTest "This test is not implemented"
 
     Reset-InvokeCommandMock
@@ -44,14 +44,14 @@ function Test_Call_API_GraphQL{
 '@
     $variables = @{login = "octodemo"}
 
-    $result = Invoke-GraphQL -Query $query -variables $variables 
+    $result = Invoke-GraphQL -Query $query -variables $variables
 
     Assert-AreEqual -Presented $result.data.organization.id -Expected "MDEyOk9yZ2FuaXphdGlvbjM4OTQwODk3"
 
 }
 
 function Test_Call_API_GraphQL_outfile{
-    
+
     Assert-SkipTest "This test is not implemented"
 
     Reset-InvokeCommandMock

@@ -35,7 +35,7 @@ function Get-IncludeSystemFiles{
     )
 
     $includeItems = @()
-    
+
     # Get the files from folders that do not know the number of files in them
     $includeItems += Get-IncludeFile -Folders $systemFolders -Local:$Local
 

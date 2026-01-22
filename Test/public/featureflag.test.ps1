@@ -20,7 +20,7 @@ function Test_FeatureFlag_Success{
         # Set flag adds $true to the config.FeatureFlags
         $config = Get-Content $configFilePath| ConvertFrom-Json -AsHashtable
         Assert-IsTrue -Condition $config.FeatureFlags.$ffName
-        
+
         Clear-FeatureFlag $ffName
         $result = tff $ffName
         Assert-IsFalse -Condition $result
@@ -46,7 +46,7 @@ function Test_RegisteredFeatureFlags_Success{
     Get-IncludeFile config.ps1 | Add-IncludeToWorkspace -DestinationModulePath $fullpath
     Get-IncludeFile featureflag.ps1 | Add-IncludeToWorkspace -DestinationModulePath $fullpath
     Get-IncludeFile module.helper.ps1 | Add-IncludeToWorkspace -DestinationModulePath $fullpath
-    
+
     # Add a fake Registered featureflags configuration
     $reg = @{
         deprecated = @(
