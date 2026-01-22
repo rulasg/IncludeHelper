@@ -169,5 +169,3 @@ function Test-DatabaseKey{
 
     return $true
 }
-
-

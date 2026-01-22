@@ -84,4 +84,3 @@ function Assert-IncludeFile{
     Assert-Count -Expected 1 -Presented $item
     Assert-AreEqual -Expected $FolderName -Presented $item.FolderName -Comment "Include File $Name should be in folder $FolderName"
 }
-
