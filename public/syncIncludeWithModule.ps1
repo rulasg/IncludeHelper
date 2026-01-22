@@ -1,11 +1,15 @@
 function Sync-IncludeWithModule{
     [CmdletBinding()]
     param(
-        [Parameter()][string]$DestinationModulePath
+        [Parameter()][string]$DestinationModulePath,
+        [Parameter()][switch]$DestinationIncludeHelper,
+        [Parameter()][switch]$SourceLocal
     )
 
-    Get-IncludeFile | Add-IncludeToWorkspace -IfExists -DestinationModulePath $DestinationModulePath
+    $local = $SourceLocal.IsPresent
 
-    Get-IncludeSystemFiles | Add-IncludeToWorkspace -IfExists -DestinationModulePath $DestinationModulePath
+    Get-IncludeFile -Local:$local        | Add-IncludeToWorkspace -IfExists -DestinationModulePath $DestinationModulePath -SourceLocal:$SourceLocal -DestinationIncludeHelper:$DestinationIncludeHelper
+
+    Get-IncludeSystemFiles -Local:$local | Add-IncludeToWorkspace -IfExists -DestinationModulePath $DestinationModulePath -SourceLocal:$SourceLocal -DestinationIncludeHelper:$DestinationIncludeHelper
 
 } Export-ModuleMember -Function Sync-IncludeWithModule

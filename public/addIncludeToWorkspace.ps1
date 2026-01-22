@@ -40,20 +40,27 @@ function Add-IncludeToWorkspace {
         [Parameter()][switch]$Force
     )
 
-    process{
+    begin{
+
+        #">> Add-IncludeToWorkspace" | Write-MyDebug
 
         $SourceModulePath = $SourceLocal ? "." : $SourceModulePath
         $DestinationModulePath = $DestinationIncludeHelper ? (Get-ModuleFolder -FolderName 'Root') : $DestinationModulePath
-
         # Resolve source and destination module paths
         $SourceModulePath, $DestinationModulePath = Resolve-SourceDestinationPath -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
+
+        #"SourceModulePath     : $SourceModulePath" | Write-MyDebug
+        #"DestinationModulePath: $DestinationModulePath" | Write-MyDebug
+    }
+
+    process{
 
         # File paths
         # If source empty defaults to IncludeHelper
         $sourcePath = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $sourceModulePath
-        "Source folder is $sourcePath" | Write-Verbose
+        ## "Source folder is $sourcePath" | Write-MyDebug
         $destinationpath = Get-ModuleFolder -FolderName $FolderName -ModuleRootPath $DestinationModulePath
-        "Destination folder is $destinationpath" | Write-Verbose
+        ## "Destination folder is $destinationpath" | Write-MyDebug
 
         # Expand file name trasnformation
         # Replace name {variables} with their value based on destination module
@@ -62,21 +69,21 @@ function Add-IncludeToWorkspace {
 
         # File Full paths
         $sourceFile = $sourcePath | Join-Path -ChildPath $souceName
-        "Source file is $sourceFile" | Write-Verbose
+        ## "Source file is $sourceFile" | Write-MyDebug
         $destinationFile = $destinationpath | Join-Path -ChildPath $destinationName
-        "Destination file is $destinationFile" | Write-Verbose
+        ## "Destination file is $destinationFile" | Write-MyDebug
 
         # Check for $IfExist switch
         if ($IfExists) {
             # Only copy if destination file exists
             # This is an upgrade functionality
             if (-Not (Test-Path $destinationFile)) {
-                Write-Verbose "File $destinationFile does not exist and -IfExists was specified. Skipping."
+                #Write-MyDebug "SKIP : File does not exist and -IfExists was specified. Skipping $destinationFile"
                 return
-            } else {
-                Write-Verbose "File $destinationFile exists and -IfExists was specified. Proceeding with copy."
             }
         }
+
+        #Write-MyDebug "COPY : $destinationFile"
 
         # Expand filecontent Transformations
         $content = Expand-FileContentTransformation -SourceFileName $sourceFile -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
@@ -92,6 +99,7 @@ function Add-IncludeToWorkspace {
         
         # create destination folder if it does not exist
         if(-Not (Test-Path $destinationpath)){
+            #"Create folder $destinationpath" | Write-MyDebug
             $null = New-Item -Path $destinationpath -ItemType Directory -Force
         }
         
@@ -102,9 +110,13 @@ function Add-IncludeToWorkspace {
         
         if ($PSCmdlet.ShouldProcess("$sourceFile", "copy to $destinationFile")) {
             # Copy-Item -Path $sourceFile -Destination $destinationFile -Force
-            Write-Output $destinationFile
             Set-Content -Path $destinationFile -Value $content -Force
+            Write-Output $destinationFile
         }
+    }
+
+    end{
+        #"<< Add-IncludeToWorkspace" | Write-MyDebug
     }
 
 } Export-ModuleMember -Function Add-IncludeToWorkspace
@@ -160,6 +172,24 @@ function Expand-FileNameTransformation{
     }
 }
 
+function Compress-FileNameTransformation{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,ValueFromPipeline,Position=0)][string]$FileName,
+        [Parameter(Mandatory,ValueFromPipeline,Position=1)][string]$SourceModulePath
+    )
+
+    begin{
+        $moduleName = Get-ModuleNameFromPath -Path $SourceModulePath
+    }
+    process{
+        #ModuleName transformation
+        $ret = $FileName -replace $moduleName, '{modulename}'
+
+        return $ret
+    }
+}
+
 function Expand-FileContentTransformation{
     [CmdletBinding()]
     param(
@@ -170,8 +200,6 @@ function Expand-FileContentTransformation{
 
     begin{
         $moduleName = Get-ModuleNameFromPath -Path $DestinationModulePath
-        $sourceGuid = Get-ModuleGuidFromPath -Path $SourceModulePath
-        $destinationGuid = Get-ModuleGuidFromPath -Path $DestinationModulePath
     }
     process{
         $content = Get-Content -Path $SourceFileName -Raw
@@ -180,6 +208,24 @@ function Expand-FileContentTransformation{
         $content = $content -replace '{modulename}', $moduleName
 
         return $content
+    }
+}
+
+function Compress-FileNameTransformation{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,ValueFromPipeline,Position=0)][string]$FileName,
+        [Parameter(Mandatory,ValueFromPipeline,Position=1)][string]$SourceModulePath
+    )
+
+    begin{
+        $moduleName = Get-ModuleNameFromPath -Path $SourceModulePath
+    }
+    process{
+        #ModuleName transformation
+        $ret = $FileName -replace $moduleName, '{modulename}'
+
+        return $ret
     }
 }
 

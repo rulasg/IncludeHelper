@@ -84,7 +84,7 @@ function Test_AddIncludeToWorkspace_IfExists{
 
     # Test for Include
     $includefiles = Get-IncludeFile
-    $include1 = $includefiles | Where-Object { $_.FolderName -eq "github" } | Select-Object -First 1
+    $include1 = $includefiles | Where-Object { $_.FolderName -eq "Helper" } | Select-Object -First 1
     $include2 = $includefiles | Where-Object { $_.FolderName -eq "Include" } | Select-Object -First 1
 
     New-ModuleV3 -Name $moduleName
