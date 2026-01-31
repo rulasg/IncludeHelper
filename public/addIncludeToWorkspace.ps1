@@ -86,7 +86,8 @@ function Add-IncludeToWorkspace {
         #Write-MyDebug "COPY : $destinationFile"
 
         # Expand filecontent Transformations
-        $content = Expand-FileContentTransformation -SourceFileName $sourceFile -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
+        # TODO: Reconsider expand when updating file header with version info
+        # $content = Expand-FileContentTransformation -SourceFileName $sourceFile -SourceModulePath $SourceModulePath -DestinationModulePath $DestinationModulePath
 
         #Skip destination module check if Force is set
         if(-Not $Force){
@@ -109,8 +110,14 @@ function Add-IncludeToWorkspace {
         }
 
         if ($PSCmdlet.ShouldProcess("$sourceFile", "copy to $destinationFile")) {
-            # Copy-Item -Path $sourceFile -Destination $destinationFile -Force
-            Set-Content -Path $destinationFile -Value $content -Force
+            # TODO: Add version info header to each file.
+            # The header will contain a do not modify this file manually message
+            # Avoid using Set-Content as it adds an empty tail line at the end of the file
+            # Implement a Get-ModuleInfo function on module.helper.ps1 to get module name and version
+            # This function will read the psd1 file that has the same name as the folder name. This will allow having more than one psd1 file in the same folder
+            #
+            Copy-Item -Path $sourceFile -Destination $destinationFile -Force
+            # Set-Content -Path $destinationFile -Value $content -Force
             Write-Output $destinationFile
         }
     }
