@@ -14,7 +14,7 @@ Line with no trailing spaces
     $content = @"
 
     Line with spaces
-
+   
           Line with tabs
 
 Line with no trailing spaces
@@ -23,17 +23,23 @@ Line with no trailing spaces
 
 "@
 
+
     $presentedFile = New-TestingFile -Content $content -PassThru
+    Assert-IsTrue -Condition (Test-TailEmptyLines -Path $presentedFile.FullName)
+    Assert-IsTrue -Condition (Test-TailSpacesInLines -Path $presentedFile.FullName)
+
     $expectedFile = New-TestingFile -Content $Expected -PassThru
+    Assert-IsFalse -Condition (Test-TailEmptyLines -Path $expectedFile.FullName)
+    Assert-IsFalse -Condition (Test-TailSpacesInLines -Path $expectedFile.FullName)
 
     # Act
     $result = Remove-TailSpacesAndLines -Path $presentedFile.FullName
 
     # Assert
     Assert-AreEqualPath $presentedFile.FullName $result
-
     Assert-AreEqualFiles $expectedFile.FullName $result
-
+    Assert-IsFalse -Condition (Test-TailEmptyLines -Path $presentedFile.FullName)
+    Assert-IsFalse -Condition (Test-TailSpacesInLines -Path $presentedFile.FullName)
 }
 
 function Test_RemoveTrailingWhitespace_Manyfiles {
