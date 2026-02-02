@@ -119,6 +119,12 @@ function Test_GetIncludeSystemFiles {
     # Act
     $result = Get-IncludeSystemFiles
 
+    Write-Host "Expected vs Result:"
+    $expectedList | ConvertTo-Json | Write-Host
+
+    Write-Host "Result:"
+    $result | ConvertTo-Json | Write-Host
+
     # Assert
     Assert-Count -Expected $expectedList.Count -Presented $result
 
