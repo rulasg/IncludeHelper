@@ -106,6 +106,10 @@ function Test_GetIncludeSystemFiles {
     foreach($folderName in $systemFolders){
         $folder = Get-ModuleFolder -FolderName $folderName
         
+        # Skipp if folder does not exist
+        if(-not $($folder | Test-Path)){ continue }
+
+        # Add files that exist in the folder
         $files = $folder | Get-ChildItem -File
         foreach($file in $files){
             $expectedList += @{ FolderName = $folderName ; Name = $file.Name }
