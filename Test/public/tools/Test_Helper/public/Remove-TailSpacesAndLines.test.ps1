@@ -14,7 +14,7 @@ Line with no trailing spaces
     $content = @"
 
     Line with spaces
-   
+
           Line with tabs
 
 Line with no trailing spaces

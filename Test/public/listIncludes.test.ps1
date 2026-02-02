@@ -5,8 +5,8 @@ function Test_GetIncludeFile{
 
     $includelist =@()
 
-    $expectedList = @("Include","TestInclude","Helper","TestHelper") 
-    
+    $expectedList = @("Include","TestInclude","Helper","TestHelper")
+
     $expectedList| ForEach-Object{
         $includelist += Get-ModuleFolder -FolderName $_ | Get-ChildItem -File
     }
@@ -62,15 +62,15 @@ function Test_GetIncludeSystemFiles {
         # @{ FolderName = "GitHub" ;           Name = "copilot-commit-message-instructions.md"            }
         # @{ FolderName = "GitHub" ;           Name = "copilot-instructions.md"                           }
         # @{ FolderName = "GitHub" ;           Name = "copilot-pull-request-description-instructions.md"  }
-        
+
         # @{ FolderName = "TestHelperRoot" ;   Name = "Test_Helper.psd1"                                  }
         # @{ FolderName = "TestHelperRoot" ;   Name = "Test_Helper.psm1"                                  }
-        
+
         # @{ FolderName = "TestHelperPublic" ; Name = "Get-RequiredModule.ps1"                            }
         # @{ FolderName = "TestHelperPublic" ; Name = "Import-RequiredModule.ps1"                         }
         # @{ FolderName = "TestHelperPublic" ; Name = "testname.ps1"                                      }
         # @{ FolderName = "TestHelperPublic" ; Name = "testResults.ps1"                                   }
-        
+
         # @{ FolderName = "VsCode" ;           Name = "settings.json"                                     }
         # @{ FolderName = "VsCode" ;           Name = "launch.json"                                       }
 
@@ -105,7 +105,7 @@ function Test_GetIncludeSystemFiles {
     # Add files from foldes that more files
     foreach($folderName in $systemFolders){
         $folder = Get-ModuleFolder -FolderName $folderName
-        
+
         # Skipp if folder does not exist
         if(-not $($folder | Test-Path)){ continue }
 

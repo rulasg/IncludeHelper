@@ -27,7 +27,7 @@ function Invoke-ModuleNameGetTraceInvokeFilePath{
     $filePath = $testRootPath | Join-Path -ChildPath "traceInvoke.log"
 
     return $filePath
-} 
+}
 Copy-Item -path Function:Invoke-ModuleNameGetTraceInvokeFilePath -Destination Function:"Invoke-$($MODULE_NAME)GetTraceInvokeFilePath"
 Export-ModuleMember -Function "Invoke-$($MODULE_NAME)GetTraceInvokeFilePath"
 InvokeHelper\Set-InvokeCommandAlias -Alias $TraceInvokeFilePathCommand -Command "Invoke-$($MODULE_NAME)GetTraceInvokeFilePath" -Tag $MODULE_INVOKATION_TEST_TAG
