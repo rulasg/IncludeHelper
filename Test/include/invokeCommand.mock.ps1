@@ -3,8 +3,8 @@
 #
 # This includes help commands to mock invokes in a test module
 #
-# Set $env:TraceInvokeMockFilePath to trave Invoke dependencies
-# "traceInvoke.log" | %{touch $_ ;  $env:TraceInvokeMockFilePath = $_ | Resolve-Path}
+# Set $env:TraceInvokeMock to trave Invoke dependencies
+# "traceInvoke.log" | %{touch $_ ;  $env:TraceInvokeMock = $_ | Resolve-Path}
 #
 # THIS INCLUDE REQURED module.helper.ps1
 if(-not $MODULE_NAME){ throw "Missing MODULE_NAME varaible initialization. Check for module.helerp.ps1 file." }
@@ -15,7 +15,22 @@ $testRootPath = $MODULE_ROOT_PATH | Join-Path -ChildPath 'Test'
 $MOCK_PATH = $testRootPath | Join-Path -ChildPath 'private' -AdditionalChildPath 'mocks'
 
 $MODULE_INVOKATION_TAG = "$($MODULE_NAME)Module"
+$MODULE_INVOKATION_TEST_TAG = "$($MODULE_NAME)TestModule"
 $MODULE_INVOKATION_TAG_MOCK = "$($MODULE_INVOKATION_TAG)_Mock"
+
+$TraceInvokeFilePathCommand = "Get-$($MODULE_NAME)TraceInvokeFilePath"
+
+function Invoke-ModuleNameGetTraceInvokeFilePath{
+    [CmdletBinding()]
+    param()
+
+    $filePath = $testRootPath | Join-Path -ChildPath "traceInvoke.log"
+
+    return $filePath
+} 
+Copy-Item -path Function:Invoke-ModuleNameGetTraceInvokeFilePath -Destination Function:"Invoke-$($MODULE_NAME)GetTraceInvokeFilePath"
+Export-ModuleMember -Function "Invoke-$($MODULE_NAME)GetTraceInvokeFilePath"
+InvokeHelper\Set-InvokeCommandAlias -Alias $TraceInvokeFilePathCommand -Command "Invoke-$($MODULE_NAME)GetTraceInvokeFilePath" -Tag $MODULE_INVOKATION_TEST_TAG
 
 function Trace-InvokeCommandAlias{
     [CmdletBinding()]
@@ -23,9 +38,7 @@ function Trace-InvokeCommandAlias{
         [Parameter(Mandatory,Position=0)][string]$Alias
     )
 
-    $filePath = $env:TraceInvokeMockFilePath
-
-    if(! $filePath){ return }
+    $filePath = Invoke-MyCommand -Command $TraceInvokeFilePathCommand
 
     if(! (Test-Path $filePath)) {return}
 
@@ -35,7 +48,7 @@ function Trace-InvokeCommandAlias{
 
     if($content.Contains($Alias)) { return}
 
-    $alias | Out-File $filePath -Append
+    $alias | Out-File $filePath -Append -Force
 
 }
 
@@ -81,6 +94,8 @@ function MockCall{
 
     Assert-MockFileNotfound $fileName
 
+    Trace-MockCommandFile -Command $command -Filename $filename
+
     Set-InvokeCommandMock -Alias $command -Command "Get-MockFileContent -filename $filename"
 }
 
@@ -91,6 +106,8 @@ function MockCallAsync{
     )
 
     Assert-MockFileNotfound $fileName
+
+    Trace-MockCommandFile -Command $command -Filename $filename
 
     $moduleTest = $PSScriptRoot | Split-Path -Parent | Convert-Path
 
@@ -106,6 +123,9 @@ function MockCallJson{
     )
 
     Assert-MockFileNotfound $fileName
+
+    Trace-MockCommandFile -Command $command -Filename $filename
+
     $asHashTableString = $AsHashtable ? '$true' : '$false'
 
     $commandstr ='Get-MockFileContentJson -filename {filename} -AsHashtable:{asHashTableString}'
@@ -123,6 +143,8 @@ function MockCallJsonAsync{
     )
 
     Assert-MockFileNotfound $fileName
+
+    Trace-MockCommandFile -Command $command -Filename $filename
 
     $moduleTest = $PSScriptRoot | Split-Path -Parent | Convert-Path
 
