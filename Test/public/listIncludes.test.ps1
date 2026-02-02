@@ -5,7 +5,7 @@ function Test_GetIncludeFile{
 
     $includelist =@()
 
-    @("github","Include","TestInclude","Helper","TestHelper") | ForEach-Object{
+    @("Include","TestInclude","Helper","TestHelper") | ForEach-Object{
         $includelist += Get-ModuleFolder -FolderName $_ | Get-ChildItem -File
     }
 
@@ -32,23 +32,55 @@ function Test_GetIncludeFile{
 
 function Test_GetIncludeSystemFiles {
     # Test for IncludeSystemFiles
-    $name = "deploy.ps1"
-    $folderName = "Root"
+
+    $expectedList = @(
+        @{ FolderName = "Root" ;             Name = "{modulename}.psm1"                                 }
+        @{ FolderName = "Root" ;             Name = "deploy.ps1"                                        }
+        @{ FolderName = "Root" ;             Name = "LICENSE"                                           }
+        @{ FolderName = "Root" ;             Name = "release.ps1"                                       }
+        @{ FolderName = "Root" ;             Name = "sync.ps1"                                          }
+        @{ FolderName = "Root" ;             Name = "test.ps1"                                          }
+        @{ FolderName = "DevContainer" ;     Name = "devcontainer.json"                                 }
+        @{ FolderName = "GitHub" ;           Name = "copilot-commit-message-instructions.md"            }
+        @{ FolderName = "GitHub" ;           Name = "copilot-instructions.md"                           }
+        @{ FolderName = "GitHub" ;           Name = "copilot-pull-request-description-instructions.md"  }
+        @{ FolderName = "TestHelperRoot" ;   Name = "Test_Helper.psd1"                                  }
+        @{ FolderName = "TestHelperRoot" ;   Name = "Test_Helper.psm1"                                  }
+        @{ FolderName = "TestHelperPublic" ; Name = "Get-RequiredModule.ps1"                            }
+        @{ FolderName = "TestHelperPublic" ; Name = "Import-RequiredModule.ps1"                         }
+        @{ FolderName = "TestHelperPublic" ; Name = "testname.ps1"                                      }
+        @{ FolderName = "TestHelperPublic" ; Name = "testResults.ps1"                                   }
+        @{ FolderName = "Tools" ;            Name = "deploy.Helper.ps1"                                 }
+        @{ FolderName = "Tools" ;            Name = "sync.Helper.ps1"                                   }
+        @{ FolderName = "TestRoot" ;         Name = "Test.psm1"                                         }
+        @{ FolderName = "WorkFlows" ;        Name = "deploy_module_on_release.yml"                      }
+        @{ FolderName = "WorkFlows" ;        Name = "powershell.yml"                                    }
+        @{ FolderName = "WorkFlows" ;        Name = "test_with_TestingHelper.yml"                       }
+        @{ FolderName = "VsCode" ;           Name = "settings.json"                                     }
+        @{ FolderName = "VsCode" ;           Name = "launch.json"                                      }
+
+    )
 
     # Act
     $result = Get-IncludeSystemFiles
 
-    Assert-Count -Expected 15 -Presented $result
-
     # Assert
-    $item = $result | Where-Object {$_.Name -eq $name}
-    Assert-Count -Expected 1 -Presented $Item
-    Assert-AreEqual -Expected $folderName -Presented $item.FolderName
+    Assert-Count -Expected $expectedList.Count -Presented $result
 
-    # Filtered
-    $result = Get-IncludeSystemFiles -Filter "testing"
-    Assert-Count -Expected 1 -Presented $result
-    $item = $result | Where-Object {$_.Name -eq "test_with_TestingHelper.yml"}
-    Assert-AreEqual -Expected "WorkFlows" -Presented $item.FolderName
+    foreach($Item in $expectedList){
+        Assert-IncludeFile -Name $Item.Name -FolderName $Item.FolderName -IncludesList $result
+    }
+
 }
 
+function Assert-IncludeFile{
+    param(
+        [Parameter(Mandatory)][string]$Name,
+        [Parameter(Mandatory)][string]$FolderName,
+        [Parameter(Mandatory)][array]$IncludesList
+    )
+
+    $item = $IncludesList | Where-Object {$_.Name -eq $Name}
+    Assert-Count -Expected 1 -Presented $item
+    Assert-AreEqual -Expected $FolderName -Presented $item.FolderName -Comment "Include File $Name should be in folder $FolderName"
+}

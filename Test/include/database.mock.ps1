@@ -1,4 +1,4 @@
-# DATABASE MOCK 
+# DATABASE MOCK
 #
 # This file is used to mock the database path and the database file
 # for the tests. It creates a mock database path and a mock database file

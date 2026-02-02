@@ -25,9 +25,9 @@ function Get-DaysBetweenDates {
 
     $start = [DateTime]::ParseExact($StartDate, 'yyyy-MM-dd', $null)
     $end = [DateTime]::ParseExact($EndDate, 'yyyy-MM-dd', $null)
-    
+
     $timeSpan = $end - $start
-    
+
     return [Math]::Abs($timeSpan.Days)
 }
 
@@ -35,11 +35,11 @@ function Get-EpochTime {
     [CmdletBinding()]
     [OutputType([long])]
     param()
-    
+
     $epoch = [datetime]::UnixEpoch
     $now = Invoke-MyCommand -Command GetUtcNow
     $timeSpan = $now - $epoch
-    
+
     return [long]$timeSpan.TotalSeconds
 }
 
@@ -50,10 +50,10 @@ function ConvertFrom-EpochTime {
         [Parameter(Mandatory, Position = 0)]
         [long]$EpochTime
     )
-    
+
     $epoch = [datetime]::UnixEpoch
     $dateTime = $epoch.AddSeconds($EpochTime)
-    
+
     return $dateTime
 }
 
@@ -64,9 +64,9 @@ function ConvertTo-EpochTime {
         [Parameter(Mandatory, Position = 0)]
         [datetime]$DateTime
     )
-    
+
     $epoch = [datetime]::UnixEpoch
     $timeSpan = $DateTime.ToUniversalTime() - $epoch
-    
+
     return [long]$timeSpan.TotalSeconds
 }

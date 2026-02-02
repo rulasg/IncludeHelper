@@ -64,7 +64,7 @@ function Test_GetDaysBetweenDates_DefaultStartDate {
         $futureDate = (Get-Date).AddDays(10) | Get-Date -Format 'yyyy-MM-dd'
 
         $result = Get-DaysBetweenDates -EndDate $futureDate
-        
+
         # Result should be approximately 10 days (allowing for same-day test execution)
         Assert-AreEqual -Expected 10 -Presented $result
     }
@@ -181,7 +181,7 @@ function Test_ConvertToEpochTime_BeforeEpoch {
         $dateTime = [datetime]::UnixEpoch.AddDays(-1)
 
         $result = ConvertTo-EpochTime -DateTime $dateTime
-     
+
 
         # Assert
         Assert-AreEqual -Expected -86400 -Presented $result

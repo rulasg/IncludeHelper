@@ -47,4 +47,3 @@ function Reset-MyInvokeCommandAlias{
 
 # Reset all aliases for this module on each refresh
 Reset-MyInvokeCommandAlias
-

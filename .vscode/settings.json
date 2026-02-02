@@ -1,0 +1,9 @@
+{
+  "terminal.integrated.profiles.osx": {
+        "pwsh": {
+            "path": "pwsh",
+            "icon": "terminal-powershell",
+            "args": ["-NoExit", "-Command", "if (Test-Path './tools/Test_Helper') { Import-Module './tools/Test_Helper' -Force }"]
+        }
+  }
+}
