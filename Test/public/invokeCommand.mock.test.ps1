@@ -89,14 +89,14 @@ function Test_MockCallExpression{
 
 function Test_TraceInvokeCOmmandAlias{
 
-
     $fileName = "traceInvoke.log"
     Assert-ItemNotExist -Path $fileName
 
+    $fileNamePath = Resolve-Path -Path "." | Join-Path -ChildPath $fileName
+    MockCallToString -Command "Invoke-IncludeHelperGetTraceInvokeFilePath" -OutString $fileNamePath
+
     # Set flag
     touch $fileName
-    $fileNamePath = $fileName | Resolve-Path
-    $env:TraceInvokeMockFilePath = $fileNamePath
     Assert-ItemExist -Path $fileNamePath
 
     # Act record invoke alias

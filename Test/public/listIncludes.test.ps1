@@ -5,7 +5,9 @@ function Test_GetIncludeFile{
 
     $includelist =@()
 
-    @("Include","TestInclude","Helper","TestHelper") | ForEach-Object{
+    $expectedList = @("Include","TestInclude","Helper","TestHelper")
+
+    $expectedList| ForEach-Object{
         $includelist += Get-ModuleFolder -FolderName $_ | Get-ChildItem -File
     }
 
@@ -34,32 +36,85 @@ function Test_GetIncludeSystemFiles {
     # Test for IncludeSystemFiles
 
     $expectedList = @(
+
+        # Root
         @{ FolderName = "Root" ;             Name = "{modulename}.psm1"                                 }
         @{ FolderName = "Root" ;             Name = "deploy.ps1"                                        }
         @{ FolderName = "Root" ;             Name = "LICENSE"                                           }
         @{ FolderName = "Root" ;             Name = "release.ps1"                                       }
         @{ FolderName = "Root" ;             Name = "sync.ps1"                                          }
         @{ FolderName = "Root" ;             Name = "test.ps1"                                          }
-        @{ FolderName = "DevContainer" ;     Name = "devcontainer.json"                                 }
-        @{ FolderName = "GitHub" ;           Name = "copilot-commit-message-instructions.md"            }
-        @{ FolderName = "GitHub" ;           Name = "copilot-instructions.md"                           }
-        @{ FolderName = "GitHub" ;           Name = "copilot-pull-request-description-instructions.md"  }
-        @{ FolderName = "TestHelperRoot" ;   Name = "Test_Helper.psd1"                                  }
-        @{ FolderName = "TestHelperRoot" ;   Name = "Test_Helper.psm1"                                  }
-        @{ FolderName = "TestHelperPublic" ; Name = "Get-RequiredModule.ps1"                            }
-        @{ FolderName = "TestHelperPublic" ; Name = "Import-RequiredModule.ps1"                         }
-        @{ FolderName = "TestHelperPublic" ; Name = "testname.ps1"                                      }
-        @{ FolderName = "TestHelperPublic" ; Name = "testResults.ps1"                                   }
+
+        # Tools
         @{ FolderName = "Tools" ;            Name = "deploy.Helper.ps1"                                 }
         @{ FolderName = "Tools" ;            Name = "sync.Helper.ps1"                                   }
+
+        # TestRoot
         @{ FolderName = "TestRoot" ;         Name = "Test.psm1"                                         }
+
+        # Workflows
         @{ FolderName = "WorkFlows" ;        Name = "deploy_module_on_release.yml"                      }
         @{ FolderName = "WorkFlows" ;        Name = "powershell.yml"                                    }
         @{ FolderName = "WorkFlows" ;        Name = "test_with_TestingHelper.yml"                       }
-        @{ FolderName = "VsCode" ;           Name = "settings.json"                                     }
-        @{ FolderName = "VsCode" ;           Name = "launch.json"                                      }
+
+        # @{ FolderName = "DevContainer" ;     Name = "devcontainer.json"                                 }
+
+        # @{ FolderName = "GitHub" ;           Name = "copilot-commit-message-instructions.md"            }
+        # @{ FolderName = "GitHub" ;           Name = "copilot-instructions.md"                           }
+        # @{ FolderName = "GitHub" ;           Name = "copilot-pull-request-description-instructions.md"  }
+
+        # @{ FolderName = "TestHelperRoot" ;   Name = "Test_Helper.psd1"                                  }
+        # @{ FolderName = "TestHelperRoot" ;   Name = "Test_Helper.psm1"                                  }
+
+        # @{ FolderName = "TestHelperPublic" ; Name = "Get-RequiredModule.ps1"                            }
+        # @{ FolderName = "TestHelperPublic" ; Name = "Import-RequiredModule.ps1"                         }
+        # @{ FolderName = "TestHelperPublic" ; Name = "testname.ps1"                                      }
+        # @{ FolderName = "TestHelperPublic" ; Name = "testResults.ps1"                                   }
+
+        # @{ FolderName = "VsCode" ;           Name = "settings.json"                                     }
+        # @{ FolderName = "VsCode" ;           Name = "launch.json"                                       }
 
     )
+
+    $systemFolders = @(
+        # 'Root',
+        # 'Include',
+        'DevContainer',
+        # 'WorkFlows',
+        'GitHub',
+        # 'Config',
+        # 'Helper',
+        # 'Private',
+        # 'Public',
+        # 'Tools',
+
+        # 'TestRoot',
+        # 'TestConfig'
+        # 'TestInclude',
+        # 'TestHelper',
+        # 'TestPrivate',
+        # 'TestPublic',
+
+        # "TestHelperRoot",
+        "TestHelperPrivate",
+        "TestHelperPublic",
+
+        "VsCode"
+    )
+
+    # Add files from foldes that more files
+    foreach($folderName in $systemFolders){
+        $folder = Get-ModuleFolder -FolderName $folderName
+
+        # Skipp if folder does not exist
+        if(-not $($folder | Test-Path)){ continue }
+
+        # Add files that exist in the folder
+        $files = $folder | Get-ChildItem -File
+        foreach($file in $files){
+            $expectedList += @{ FolderName = $folderName ; Name = $file.Name }
+        }
+    }
 
     # Act
     $result = Get-IncludeSystemFiles

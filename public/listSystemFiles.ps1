@@ -26,12 +26,11 @@ function Get-IncludeSystemFiles{
         # 'TestPrivate',
         # 'TestPublic',
 
-        "TestHelperRoot",
+        # "TestHelperRoot",
         "TestHelperPrivate",
         "TestHelperPublic",
 
         "VsCode"
-
     )
 
     $includeItems = @()
@@ -40,6 +39,7 @@ function Get-IncludeSystemFiles{
     $includeItems += Get-IncludeFile -Folders $systemFolders -Local:$Local
 
     # Root
+    $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'Root') ; Name = '{modulename}.psm1' }
     $includeItems += Get-IncludeFile -Local:$Local -Folders "Root" -Filter 'deploy.ps1'
     $includeItems += Get-IncludeFile -Local:$Local -Folders "Root" -Filter 'LICENSE'
     $includeItems += Get-IncludeFile -Local:$Local -Folders "Root" -Filter 'release.ps1'
@@ -59,22 +59,6 @@ function Get-IncludeSystemFiles{
     $includeItems += Get-IncludeFile -Local:$Local -Folders "WorkFlows" -Filter 'powershell.yml'
     $includeItems += Get-IncludeFile -Local:$Local -Folders "WorkFlows" -Filter 'test_with_TestingHelper.yml'
 
-    # Root
-    # $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'Root') ; Name = 'deploy.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'Root') ; Name = 'LICENSE' }
-    # $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'Root') ; Name = '{modulename}.psd1' }
-    $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'Root') ; Name = '{modulename}.psm1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'Root') ; Name = 'release.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'Root') ; Name = 'sync.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'Root') ; Name = 'test.ps1' }
-
-    # # Tools
-    # $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'Tools') ; Name = 'deploy.Helper.ps1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'Tools') ; Name = 'sync.Helper.ps1' }
-
-    # TestRoot
-    # #$includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'TestRoot') ; Name = 'Test.psd1' }
-    # $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'TestRoot') ; Name = 'Test.psm1' }
 
     # # TestHelperRoot
     # $includeItems += [PSCustomObject]@{ FolderName = $(Get-Folder 'TestHelperRoot') ; Name = 'Test_Helper.psd1' }

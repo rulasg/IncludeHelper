@@ -1,28 +1,28 @@
 function Test_RemoveTrailingWhitespace {
 
     Import-Test_Helper
+    # Build expected content line by line to avoid trailing whitespace being stripped
+    $expectedLines = @(
+        ""
+        "    Line with spaces"
+        ""
+        "          Line with tabs"
+        ""
+        "Line with no trailing spaces"
+    )
+    $Expected = $expectedLines -join "`n"
 
-    $Expected = @"
-
-    Line with spaces
-
-          Line with tabs
-
-Line with no trailing spaces
-"@
-
-    $content = @"
-
-    Line with spaces
-   
-          Line with tabs
-
-Line with no trailing spaces
-
-
-
-"@
-
+    $contentLines = @(
+        "    "
+        "    Line with spaces"
+        "       "
+        "          Line with tabs"
+        "   "
+        "Line with no trailing spaces"
+        ""
+        "  "
+    )
+    $content = $contentLines -join "`n"
 
     $presentedFile = New-TestingFile -Content $content -PassThru
     Assert-IsTrue -Condition (Test-TailEmptyLines -Path $presentedFile.FullName)
