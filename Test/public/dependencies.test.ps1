@@ -272,13 +272,19 @@ function Mock_GetMyModuleRootPath{
         [Parameter(Mandatory,Position=2)][string]$Folder
     )
 
-    # Mock GetMyModuleRootPath on SideBySide
-    # Check that happens before ImportFromModuleManager
-    # that we are testing here
+    # Mock "$($MODULE_NAME)RootPath" on SideBySide
+    
+    # Module path that pretends to be me
     $modulePath = "$Folder/$Name"
+    
+    # Ceate the fake me module
     New-ModuleV3 -Name $Name -Path $folder
+
+    # Resolve the absolute path
     $path = Convert-Path -Path $modulePath
-    MockCallToString -Command 'GetMyModuleRootPath' -OutString "$path"
+    
+    # As we are testing this code in IncludeHelper module this is the command "Invoke-$($MODULE_NAME)RootPath"
+    MockCallToString -Command 'Invoke-IncludeHelperRootPath' -OutString "$path"
 }
 
 # Set-MyInvokeCommandAlias -Alias "TestGitHubRepo" -Command 'Invoke-WebRequest -Uri "{url}" -Method Head -ErrorAction SilentlyContinue | ForEach-Object { $_.StatusCode -eq 200 }'
