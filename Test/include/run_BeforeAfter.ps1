@@ -5,21 +5,23 @@
 # - After each test
 # - Before all tests
 # - After all tests
+#
+# Copy this file to Test Private to avoid being replaced by updates
 
-function Run_BeforeAll{
-    Write-Verbose "Run_BeforeAll"
-}
+# function Run_BeforeAll{
+#     Write-Verbose "Run_BeforeAll"
+# }
 
-function Run_AfterAll{
-    Write-Verbose "Run_AfterAll"
-}
+# function Run_AfterAll{
+#     Write-Verbose "Run_AfterAll"
+# }
 
-function Run_BeforeEach{
-    Write-Verbose "Run_BeforeEach"
-}
+# function Run_BeforeEach{
+#     Write-Verbose "Run_BeforeEach"
+# }
 
-function Run_AfterEach{
-    Write-Verbose "Run_AfterEach"
-}
+# function Run_AfterEach{
+#     Write-Verbose "Run_AfterEach"
+# }
 
 Export-ModuleMember -Function Run_*
