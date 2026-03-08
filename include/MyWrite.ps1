@@ -211,18 +211,17 @@ function Test-MyDebug {
     return $trace
 }
 
-
 function Enable-ModuleNameDebug{
     param(
         [Parameter(Position = 0)][string[]]$Sections,
+        [Parameter()][string[]]$AddSections,
         [Parameter()][string]$LoggingFilePath
     )
 
     # Check if logging file path is provided
     if( -Not ( [string]::IsNullOrWhiteSpace( $LoggingFilePath )) ) {
         if(Test-Path -Path $LoggingFilePath -PathType Leaf){
-            $moduleDEbugLoggingVarName = $MODULE_NAME + "_DEBUG_LOGGING_FILEPATH"
-            [System.Environment]::SetEnvironmentVariable($moduleDEbugLoggingVarName, $LoggingFilePath)
+            set-LogFile $LoggingFilePath
         } else {
             Write-Error "Logging file path '$LoggingFilePath' does not exist. Debug logging will not be enabled."
             return
@@ -230,14 +229,22 @@ function Enable-ModuleNameDebug{
     }
 
     $flagsString = $sections -join " "
+    $addedFlagsString = $AddSections -join " "
 
-    # Check section value
-    if( [string]::IsNullOrWhiteSpace( $flagsString )) {
-        $flagsString = "all"
+    # if no section get value from env and is still mepty set to all
+    if([string]::IsNullOrWhiteSpace( $flagsString )) {
+        $flagsString = get-Sections
+        if( [string]::IsNullOrWhiteSpace( $flagsString )) {
+            $flagsString = "all"
+        }
+    }
+    
+    # Add added to flagsString if provided
+    if(-Not [string]::IsNullOrWhiteSpace( $addedFlagsString )) {
+        $flagsString += " " + $addedFlagsString
     }
 
-    $moduleDebugVarName = $MODULE_NAME + "_DEBUG"
-    [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $flagsString)
+    set-Sections $flagsString
 
 }
 Copy-Item -path Function:Enable-ModuleNameDebug -Destination Function:"Enable-$($MODULE_NAME)Debug"
@@ -276,6 +283,18 @@ function Disable-ModuleNameDebug {
 Copy-Item -path Function:Disable-ModuleNameDebug -Destination Function:"Disable-$($MODULE_NAME)Debug"
 Export-ModuleMember -Function "Disable-$($MODULE_NAME)Debug"
 
+function Get-ModuleNameDebug {
+    [cmdletbinding()]
+    param()
+
+    return @{
+        Sections = get-Sections
+        LoggingFilePath = get-LogFile
+    }
+}
+Copy-Item -path Function:Get-ModuleNameDebug -Destination Function:"Get-$($MODULE_NAME)Debug"
+Export-ModuleMember -Function "Get-$($MODULE_NAME)Debug"
+
 function Get-ObjetString {
     param(
         [Parameter(ValueFromPipeline, Position = 0)][object]$Object
@@ -293,4 +312,28 @@ function Get-ObjetString {
 
         return $Object | ConvertTo-Json -Depth 10 -ErrorAction SilentlyContinue
     }
+}
+
+function get-Sections(){
+    $moduleDebugVarName = $MODULE_NAME + "_DEBUG"
+    $sections = [System.Environment]::GetEnvironmentVariable($moduleDebugVarName)
+
+    return $sections
+}
+
+function set-Sections($sections){
+    $moduleDebugVarName = $MODULE_NAME + "_DEBUG"
+    [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $sections)
+}
+
+function get-LogFile(){
+    $moduleDEbugLoggingVarName = $MODULE_NAME + "_DEBUG_LOGGING_FILEPATH"
+    $logfile = [System.Environment]::GetEnvironmentVariable($moduleDEbugLoggingVarName)
+
+    return $logfile
+}
+
+function set-LogFile($logFilePath){
+    $moduleDEbugLoggingVarName = $MODULE_NAME + "_DEBUG_LOGGING_FILEPATH"
+    [System.Environment]::SetEnvironmentVariable($moduleDEbugLoggingVarName, $logFilePath)
 }

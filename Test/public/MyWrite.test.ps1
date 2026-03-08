@@ -72,14 +72,29 @@ function Test_EnableMyDebug_Set{
     # Assert
     Assert-DebugEnv "all" $logfilename
 
+    #arrange 
+    Disable-IncludeHelperDebug
+    Enable-IncludeHelperDebug -Sections "section0","section1"
+    # Act
+    Enable-IncludeHelperDebug -AddSections "-section2","section3"
+    # Assert
+    Assert-DebugEnv "section0 section1 -section2 section3" ""
+}
+
+function Test_EnableMyDebug_GetDebug{
+    
+    touch kk.txt
+    Enable-IncludeHelperDebug -Sections "section0","section1" -LoggingFilePath "kk.txt"
+
+    $result = Get-IncludeHelperDebug
+
+    Assert-AreEqual -Expected "section0 section1" -Presented $result.Sections
+    Assert-AreEqual -Expected "kk.txt" -Presented $result.LoggingFilePath
 }
 
 function Test_EnableMyDebug_All{
 
     Enable-IncludeHelperDebug
-
-    $result = [System.Environment]::GetEnvironmentVariable("IncludeHelper_DEBUG")
-    Assert-AreEqual -Expected "all" -Presented $result
 
     $text0 = "Debug message 0"
     $text1 = "Debug message 1"
@@ -132,9 +147,6 @@ function Test_EnableMyDebug_Sections{
 
     Enable-IncludeHelperDebug -Sections "section0","section2"
 
-    $result = [System.Environment]::GetEnvironmentVariable("IncludeHelper_DEBUG")
-    Assert-AreEqual -Expected "section0 section2" -Presented $result
-
     $text0 = "Debug message 0"
     $text1 = "Debug message 1"
     $text2 = "Debug message 2"
@@ -161,9 +173,6 @@ function Test_EnableMyDebug_All_Filter{
 
     Enable-IncludeHelperDebug -Sections "-section1-tofilter"
 
-    $result = [System.Environment]::GetEnvironmentVariable("IncludeHelper_DEBUG")
-    Assert-AreEqual -Expected "-section1-tofilter" -Presented $result
-
     $text0 = "Debug message 0"
     $text1 = "Debug message 1"
     $text2 = "Debug message 2"
@@ -189,9 +198,6 @@ function Test_EnableMyDebug_All_Filter{
 function Test_EnableMyDebug_All_Filter_morethanone{
 
     Enable-IncludeHelperDebug -Sections "-section1-tofilter -section2ToFilter"
-
-    $result = [System.Environment]::GetEnvironmentVariable("IncludeHelper_DEBUG")
-    Assert-AreEqual -Expected "-section1-tofilter -section2ToFilter" -Presented $result
 
     $text0 = "Debug message 0"
     $text1 = "Debug message 1"
