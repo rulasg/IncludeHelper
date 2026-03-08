@@ -16,8 +16,10 @@
 $MODULE_ROOT_PATH = $PSScriptRoot | split-path -Parent
 $MODULE_NAME = (Get-ChildItem -Path $MODULE_ROOT_PATH -Filter *.psd1 | Select-Object -First 1).BaseName
 
+$rootPathCommandName = "$($MODULE_NAME)RootPath"
+
 # SET MY INVOKE COMMAND ALIAS
-Set-MyInvokeCommandAlias -Alias "GetMyModuleRootPath"    -Command "Invoke-$($MODULE_NAME)RootPath"
+Set-MyInvokeCommandAlias -Alias $rootPathCommandName     -Command "Invoke-$($MODULE_NAME)RootPath"
 Set-MyInvokeCommandAlias -Alias "CloneRepo"              -Command 'git clone {url} {folder}'
 Set-MyInvokeCommandAlias -Alias "TestGitHubRepo"         -Command 'Invoke-WebRequest -Uri "{url}" -Method Head -ErrorAction SilentlyContinue | ForEach-Object { $_.StatusCode -eq 200 }'
 Set-MyInvokeCommandAlias -Alias "FindModule"             -Command 'Find-Module -Name {name} -AllowPrerelease -ErrorAction SilentlyContinue'
@@ -25,26 +27,6 @@ Set-MyInvokeCommandAlias -Alias "InstallModule"          -Command 'Install-Modul
 Set-MyInvokeCommandAlias -Alias "GetModule"              -Command 'Get-Module -Name {name}'
 Set-MyInvokeCommandAlias -Alias "GetModuleListAvailable" -Command 'Get-Module -Name {name} -ListAvailable'
 Set-MyInvokeCommandAlias -Alias "ImportModule"           -Command 'Import-Module -Name {name} -Scope Global -Verbose:$false -PassThru'
-
-# This function will be renamed to avoid collision with other modules
-# function Invoke-MyModuleRootPath{
-#     [CmdletBinding()]
-#     param()
-
-#     # We will asume that this include file will be on a public,private or include folder.
-#     $root = $PSScriptRoot | split-path -Parent
-
-#     # confirm that in root folder we have a psd1 file
-#     $psd1 = Get-ChildItem -Path $root -Filter *.psd1 -Recurse -ErrorAction SilentlyContinue
-
-#     if(-Not $psd1){
-#         throw "Wrong root folder. Not PSD1 file found in [$root]. Modify Invoke-GetMyModuleRootPath to adjust location"
-#     }
-
-#     return $root
-# }
-# Copy-Item -path Function:Invoke-MyModuleRootPath -Destination Function:"Invoke-$($MODULE_NAME)RootPath"
-# Export-ModuleMember -Function "Invoke-$($MODULE_NAME)RootPath"
 
 function Import-Dependency{
     [CmdletBinding(SupportsShouldProcess,ConfirmImpact = 'High')]
@@ -67,7 +49,7 @@ function Import-Dependency{
         }
 
         #2. import from side by side path
-        $meModuleRootPath = Invoke-MyCommand -Command 'GetMyModuleRootPath'
+        $meModuleRootPath = Get-ModuleNameRootPath
         $modulePath = $meModuleRootPath | split-path -Parent | Join-Path -ChildPath $Name
 
         if(Test-Path -Path $modulePath){
@@ -127,7 +109,7 @@ function Import-Dependency{
 
         if ($testUrl -eq $true) {
             # Clone side by side this module
-            $local = Invoke-MyCommand -Command 'GetMyModuleRootPath'
+            $local = Invoke-MyCommand -Command $rootPathCommandName
             $modulePath = $local | split-path -Parent | Join-Path -ChildPath $Name
 
             if ($PSCmdlet.ShouldProcess("Cloning module $name", "Do you want to clone [$url] to [$modulePath]?")) {
@@ -179,3 +161,21 @@ function Import-MyModule{
 
     }
 }
+
+# We need to allow to mock this calls to allow testig on IncludeHelper module
+function Get-ModuleNameRootPath{
+    [CmdletBinding()]
+    param()
+
+    return Invoke-MyCommand -Command "$($MODULE_NAME)RootPath"
+} 
+
+# This function will be renamed to avoid collision with other modules
+function Invoke-ModuleNameRootPath{
+    [CmdletBinding()]
+    param()
+
+    return $MODULE_ROOT_PATH
+}
+Copy-Item -path Function:Invoke-ModuleNameRootPath -Destination Function:"Invoke-$($MODULE_NAME)RootPath"
+Export-ModuleMember -Function "Invoke-$($MODULE_NAME)RootPath"

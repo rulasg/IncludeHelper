@@ -1,54 +1,54 @@
 
-$MockCommandFile = $testRootPath | Join-Path -ChildPath "mockfiles.log"
+# $MockCommandFile = $testRootPath | Join-Path -ChildPath "mockfiles.log"
 
-function Trace-MockCommandFile{
-    [CmdletBinding()]
-    param(
-        [string] $Command,
-        [string] $FileName
-    )
+# function Trace-MockCommandFile{
+#     [CmdletBinding()]
+#     param(
+#         [string] $Command,
+#         [string] $FileName
+#     )
 
-    # read content
-    $content = readMockCommandFile
+#     # read content
+#     $content = readMockCommandFile
 
-    # Check that the entry is already there
-    $result = $content | Where-Object{$_.command -eq $command}
-    if($null -ne $result) {return}
+#     # Check that the entry is already there
+#     $result = $content | Where-Object{$_.command -eq $command}
+#     if($null -ne $result) {return}
 
-    # add entry
-    $new = @{
-        Command = $command
-        FileName = $fileName
-    }
+#     # add entry
+#     $new = @{
+#         Command = $command
+#         FileName = $fileName
+#     }
 
-    $ret = @()
-    $ret += $content
-    $ret += $new
+#     $ret = @()
+#     $ret += $content
+#     $ret += $new
 
-    # Save list
-    writeMockCommandFile -Content $ret
-}
+#     # Save list
+#     writeMockCommandFile -Content $ret
+# }
 
-function readMockCommandFile{
+# function readMockCommandFile{
 
-    # Return empty list if the file does not exist
-    if(-not (Test-Path -Path $MockCommandFile)){
-        return @()
-    }
+#     # Return empty list if the file does not exist
+#     if(-not (Test-Path -Path $MockCommandFile)){
+#         return @()
+#     }
 
-    $ret = Get-Content -Path $MockCommandFile | ConvertFrom-Json
+#     $ret = Get-Content -Path $MockCommandFile | ConvertFrom-Json
 
-    # return an empty aray if content does not exists
-    $ret = $ret ?? @()
+#     # return an empty aray if content does not exists
+#     $ret = $ret ?? @()
 
-    return $ret
-}
+#     return $ret
+# }
 
-function writeMockCommandFile($Content){
+# function writeMockCommandFile($Content){
 
-    $list = $Content | ConvertTo-Json
+#     $list = $Content | ConvertTo-Json
 
-    $sorted = $list | Sort-Object fileName
+#     $sorted = $list | Sort-Object fileName
 
-    $sorted | Out-File -FilePath $MockCommandFile
-}
+#     $sorted | Out-File -FilePath $MockCommandFile
+# }
