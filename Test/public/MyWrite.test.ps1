@@ -260,8 +260,10 @@ function Assert-DbgMsg($Presented,$Section,$Message){
 
 function Assert-DebugEnv($SectionString,$LoggingFile){
     $result = [System.Environment]::GetEnvironmentVariable("IncludeHelper_DEBUG")
+    $result = $result ?? ""
     Assert-AreEqual -Expected $SectionString -Presented $result
 
     $result = [System.Environment]::GetEnvironmentVariable("IncludeHelper_DEBUG_LOGGING_FILEPATH")
+    $result = $result ?? ""
     Assert-AreEqual -Expected $LoggingFile -Presented $result
 }
