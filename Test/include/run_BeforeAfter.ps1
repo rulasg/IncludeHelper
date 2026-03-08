@@ -16,9 +16,11 @@
 #     Write-Verbose "Run_AfterAll"
 # }
 
-# function Run_BeforeEach{
-#     Write-Verbose "Run_BeforeEach"
-# }
+function Run_BeforeEach{
+    # Write-Verbose "Run_BeforeEach"
+    Disable-IncludeHelperDebug
+
+}
 
 # function Run_AfterEach{
 #     Write-Verbose "Run_AfterEach"
