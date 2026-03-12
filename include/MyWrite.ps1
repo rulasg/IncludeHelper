@@ -280,7 +280,8 @@ function getSectionsFromSectionsString($sectionsString){
 function Disable-ModuleNameDebug {
     param()
 
-    set-VerboseSections $null
+    set-DebugSections $null
+    set-LogFile $null
 }
 Copy-Item -path Function:Disable-ModuleNameDebug -Destination Function:"Disable-$($MODULE_NAME)Debug"
 Export-ModuleMember -Function "Disable-$($MODULE_NAME)Debug"

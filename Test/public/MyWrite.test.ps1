@@ -104,7 +104,7 @@ function Test_EnableMyDebug_All{
      Invoke-PrivateContext {
         param($Arguments)
         
-        Write-MyDebug -Message $Arguments[0] 
+        Write-MyDebug -Message $Arguments[0]
         Write-MyDebug -Message $Arguments[1]
 
      } -Arguments $text0,$text1
@@ -261,7 +261,7 @@ function Test_EnableMyDebug_All_LoggingFilePath{
 
 function Assert-DbgMsg($Presented,$Section,$Message){
     
-    Assert-IsTrue -Condition ($Presented -match "^\[\d{2}:\d{2}:\d{2}\.\d{3}\]\[D\]\[$Section\] $Message$")
+    Assert-IsTrue -Condition ($Presented -match "^\[\d{2}:\d{2}:\d{2}\.\d{3}\]\[IncludeHelper\]\[D\]\[$Section\] $Message$")
 }
 
 function Assert-DebugEnv($SectionString,$LoggingFile){
