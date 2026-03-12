@@ -72,7 +72,6 @@ function Write-MyDebug {
     [Alias("Write-Debug")]
     param(
         [Parameter(Position = 0)][string]$section = "none",
-        [Parameter(Position = 0)][string]$section = "none",
         [Parameter(Position = 1, ValueFromPipeline)][string]$Message,
         [Parameter(Position = 2)][object]$Object
     )
