@@ -72,6 +72,7 @@ function Write-MyDebug {
     [Alias("Write-Debug")]
     param(
         [Parameter(Position = 0)][string]$section = "none",
+        [Parameter(Position = 0)][string]$section = "none",
         [Parameter(Position = 1, ValueFromPipeline)][string]$Message,
         [Parameter(Position = 2)][object]$Object
     )
@@ -314,6 +315,30 @@ function Get-ObjetString {
 
         return $Object | ConvertTo-Json -Depth 10 -ErrorAction SilentlyContinue
     }
+}
+
+function get-Sections(){
+    $moduleDebugVarName = $MODULE_NAME + "_DEBUG"
+    $sections = [System.Environment]::GetEnvironmentVariable($moduleDebugVarName)
+
+    return $sections
+}
+
+function set-Sections($sections){
+    $moduleDebugVarName = $MODULE_NAME + "_DEBUG"
+    [System.Environment]::SetEnvironmentVariable($moduleDebugVarName, $sections)
+}
+
+function get-LogFile(){
+    $moduleDEbugLoggingVarName = $MODULE_NAME + "_DEBUG_LOGGING_FILEPATH"
+    $logfile = [System.Environment]::GetEnvironmentVariable($moduleDEbugLoggingVarName)
+
+    return $logfile
+}
+
+function set-LogFile($logFilePath){
+    $moduleDEbugLoggingVarName = $MODULE_NAME + "_DEBUG_LOGGING_FILEPATH"
+    [System.Environment]::SetEnvironmentVariable($moduleDEbugLoggingVarName, $logFilePath)
 }
 
 function get-DebugSections(){

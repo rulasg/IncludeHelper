@@ -35,7 +35,7 @@ References:
 - https://seesparkbox.com/foundry/semantic_commit_messages
 - http://karma-runner.github.io/1.0/dev/git-commit-msg.html
 
-## Pull Reques description
+## Pull Request description
 
-- Add a summery of the intention of the PR. Use the title and the messages of the commits to create a summary.
-- Add a list with all the commit messages in the PR.
+- Add a summary of the intention of the PR. Use the title and the messages of the commits to create a summary.
+- Add a bullet list with all the commit messages in the PR commits.
