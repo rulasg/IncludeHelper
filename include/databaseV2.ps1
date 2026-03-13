@@ -102,7 +102,8 @@ function Get-DatabaseKey{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory, Position = 0)][string]$Key,
-        [Parameter(Position = 1)][ValidateSet("JSON","XML","TXT")][string]$DBFormat = "JSON"
+        [Parameter(Position = 1)][ValidateSet("JSON","XML","TXT")][string]$DBFormat = "JSON",
+        [Parameter()][switch]$AsHashtable
     )
 
     if(-Not (Test-DatabaseKey $Key -DBFormat $DBFormat)){
@@ -112,7 +113,7 @@ function Get-DatabaseKey{
     $path =  GetDatabaseFile $Key -DBFormat $DBFormat
 
     switch ($DBFormat) {
-        "JSON" { $ret = Get-Content $path | ConvertFrom-Json ; Break }
+        "JSON" { $ret = Get-Content $path | ConvertFrom-Json -AsHashtable:$AsHashtable ; Break }
         "XML"  { $ret = Import-Clixml -Path $path ; Break }
         "TXT"  { $ret = Get-Content $path ; Break }
         default { throw "Unsupported database format $DbFormat" }
