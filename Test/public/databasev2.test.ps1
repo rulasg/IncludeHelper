@@ -91,6 +91,46 @@ function Test_Database_JSON{
     Assert-IsFalse -Condition $result
 }
 
+function Test_Database_JSON_ComplexObject{
+
+    Reset-InvokeCommandMock
+    Mock_Database -ResetDatabase
+
+    # Load include files needed to test database
+    . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include" -ModuleRootPath $MODULE_ROOT_PATH)
+
+    $complexObject = @{
+        Name = "Test Object"
+        Value = 123
+        Nested = @{
+            Property1 = "Value1"
+            Property2 = "Value2"
+        }
+        List = @(1, 2, 3, 4, 5)
+    }
+
+    # Save complex object to database
+    Save-DatabaseKey -Key "testComplex" -Value $complexObject -DBFormat "JSON"
+
+    # Get complex object from database
+    $result = Get-DatabaseKey -Key "testComplex" -DBFormat "JSON"
+    Assert-AreEqual -Expected "PSCustomObject" -Presented $result.GetType().Name
+    Assert-AreEqual -Expected $complexObject.Name -Presented $result.Name
+    Assert-AreEqual -Expected $complexObject.Value -Presented $result.Value
+    Assert-AreEqual -Expected $complexObject.Nested.Property1 -Presented $result.Nested.Property1
+    Assert-AreEqual -Expected $complexObject.Nested.Property2 -Presented $result.Nested.Property2
+    Assert-AreEqual -Expected $complexObject.List.Count -Presented $result.List.Count
+
+    # get complex object as hashtable AsHashtable
+    $resultHashtable = Get-DatabaseKey -Key "testComplex" -DBFormat "JSON" -AsHashtable
+    Assert-AreEqual -Expected "OrderedHashtable" -Presented $resultHashtable.GetType().Name
+    Assert-AreEqual -Expected $complexObject.Name -Presented $resultHashtable["Name"]
+    Assert-AreEqual -Expected $complexObject.Value -Presented $resultHashtable["Value"]
+    Assert-AreEqual -Expected $complexObject.Nested.Property1 -Presented $resultHashtable["Nested"]["Property1"]
+    Assert-AreEqual -Expected $complexObject.Nested.Property2 -Presented $resultHashtable["Nested"]["Property2"]
+    Assert-AreEqual -Expected $complexObject.List.Count -Presented $resultHashtable["List"].Count
+}
+
 function Test_Database_XML{
 
     Reset-InvokeCommandMock
