@@ -1,8 +1,3 @@
-# Base64
-#
-# function that convert from and to base64 string using powershell standard libraries,
-
-
 function ConvertTo-Base64 {
     [CmdletBinding()]
     param (
