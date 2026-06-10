@@ -1,0 +1,69 @@
+# Register-ArgumentCompleter
+#
+# To control the parametrs autofil we can register a scriptblock variable with a function to manage 
+# the parametrs. this function should return the possible values.
+# Use ConvertTo-CompleteResults to generate the output objects from a list of valid strings
+#
+# Sample code:
+#
+# Register-ArgumentCompleter -CommandName <CommandName> -ParameterName <ParameterName> -ScriptBlock $ValidParameterValues
+#
+# $ValidParameterValues = {
+#      param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+#
+#     $list = @(
+#         "Value1",
+#         "Value2",
+#         "Value3"
+#     )
+#
+#     $list | ConvertTo-CompleteResults -wordToComplete $wordToComplete
+# }
+
+function ConvertTo-CompleteResults{
+    param(
+        [parameter(Mandatory, ValueFromPipeline,Position=0)][string[]]$Values,
+        [string]$wordToComplete,
+        [switch]$StartWith
+    )
+
+    begin {
+        $pattern = $StartWith.IsPresent ? "$wordToComplete*" : "*$wordToComplete*"
+
+        $list = @()
+    }
+
+    process{
+        $list += $Values
+    }
+
+    end{
+
+        "Processing $($list.Count) values for completion with pattern '$pattern'" | Write-Mydebug -Section "ArgumentCompleter"
+
+        $ret = $list | Where-Object { $_ -like $pattern } | Select-Object -Unique
+        
+        "Returning $($ret.Count) values matching '$pattern'" | Write-Mydebug -Section "ArgumentCompleter" -object $ret
+
+        $ret = $ret | addQuotesIfSpaces
+
+        $ret | ForEach-Object { [System.Management.Automation.CompletionResult]::new( $_, $_, 'ParameterValue', $_) }
+    }
+}
+
+function addQuotesIfSpaces {
+    param(
+        [parameter(Mandatory, ValueFromPipeline,Position=0)][string]$Value
+    )
+
+    process{
+
+        if($Value -like "* *"){
+            "Adding quotes to value '$Value'" | Write-Mydebug -Section "ArgumentCompleter"
+            return "`"$Value`""
+        }
+        else{
+            return $Value
+        }
+    }
+}
