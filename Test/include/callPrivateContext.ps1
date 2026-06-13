@@ -16,7 +16,7 @@ function Invoke-PrivateContext {
         [Parameter(Mandatory, Position = 0)]
         [scriptblock]$ScriptBlock,
         [string]$ModulePath,
-        [string[]]$Arguments
+        [object[]]$Arguments
     )
 
     if ([string]::IsNullOrEmpty($ModulePath)) {
