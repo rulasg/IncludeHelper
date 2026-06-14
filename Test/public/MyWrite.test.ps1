@@ -6,7 +6,7 @@ function Test_WriteMyHost_Singleline {
         Write-MyHost -Message "This is a test transcript."
     }
 
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
 
     Assert-AreEqual -Expected "This is a test transcript." -Presented $result
 
@@ -20,7 +20,7 @@ function Test_WriteMyHost_Multiline {
         Write-MyHost -Message "This is a test transcript 0"
         Write-MyHost -Message "This is a test transcript 1"
     }
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
 
     Assert-Count -Expected 2 -Presented $result
     Assert-AreEqual -Expected "This is a test transcript 0" -Presented $result[0]
@@ -109,15 +109,13 @@ function Test_EnableMyDebug_All{
 
      } -Arguments $text0,$text1
 
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
 
     Assert-Count -Expected 2 -Presented $result
     Assert-DbgMsg $result[0] "none" $text0
     Assert-DbgMsg $result[1] "none" $text1
 
 }
-
-
 
 function Test_EnableMyDebug_All_Sections{
 
@@ -136,7 +134,7 @@ function Test_EnableMyDebug_All_Sections{
 
     } -Arguments $text0,$text1
 
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
 
     Assert-Count -Expected 2 -Presented $result
     Assert-DbgMsg $result[0] "section0" $text0
@@ -162,7 +160,7 @@ function Test_EnableMyDebug_Sections{
 
         } -Arguments $text0,$text1,$text2   
 
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
 
     Assert-Count -Expected 2 -Presented $result
     Assert-DbgMsg $result[0] "section0" $text0
@@ -188,7 +186,7 @@ function Test_EnableMyDebug_All_Filter{
 
         } -Arguments $text0,$text1,$text2   
 
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
 
     Assert-Count -Expected 2 -Presented $result
     Assert-DbgMsg $result[0] "section0" $text0
@@ -216,7 +214,7 @@ function Test_EnableMyDebug_All_Filter_morethanone{
 
         } -Arguments $text0,$text1,$text2 ,$text3
 
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
 
     Assert-Count -Expected 2 -Presented $result
     Assert-DbgMsg $result[0] "section0" $text0
@@ -247,7 +245,7 @@ function Test_EnableMyDebug_All_LoggingFilePath{
 
         } -Arguments $text0,$text1,$text2 ,$text3
 
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
 
     Assert-Count -Expected 4 -Presented $result
 
@@ -257,6 +255,62 @@ function Test_EnableMyDebug_All_LoggingFilePath{
     Assert-DbgMsg $result[1] "section1-tofilter" $text1
     Assert-DbgMsg $result[2] "section2ToFilter" $text2
     Assert-DbgMsg $result[3] "section3" $text3
+}
+
+function Test_EnableMyDebug_SectionWithAll{
+
+    Enable-IncludeHelperDebug -Sections "algoconall"
+
+    $text0 = "Debug message 0"
+    $text1 = "Debug message 1"
+    $text2 = "Debug message 2"
+    $text3 = "Debug message 3"
+
+    Start-MyTranscript
+
+        Invoke-PrivateContext {
+        param($Arguments)
+        
+        Write-MyDebug -Message $Arguments[0] -Section "section0"
+        Write-MyDebug -Message $Arguments[1] -Section "section1"
+        Write-MyDebug -Message $Arguments[2] -Section "algoconall"
+        Write-MyDebug -Message $Arguments[3] -Section "section3"
+
+        } -Arguments $text0,$text1,$text2 ,$text3
+
+    $result = @(Stop-MyTranscript)
+
+    Assert-Count -Expected 1 -Presented $result
+    Assert-DbgMsg $result[0] "algoconall" $text2
+}
+
+function Test_EnableMyDebug_SectionUpperCase{
+
+    Enable-IncludeHelperDebug -Sections "alGocOnall"
+
+    $text0 = "Debug message 0"
+    $text1 = "Debug message 1"
+    $text2 = "Debug message 2"
+    $text3 = "Debug message 3"
+
+    Start-MyTranscript
+
+        Invoke-PrivateContext {
+        param($Arguments)
+        
+        Write-MyDebug -Message $Arguments[0] -Section "section0"
+        Write-MyDebug -Message $Arguments[1] -Section "section1"
+        Write-MyDebug -Message $Arguments[2] -Section "alGocOnall"
+        Write-MyDebug -Message $Arguments[3] -Section "algoconall"
+        Write-MyDebug -Message $Arguments[3] -Section "section3"
+
+        } -Arguments $text0,$text1,$text2 ,$text3
+
+    $result = @(Stop-MyTranscript)
+
+    Assert-Count -Expected 2 -Presented $result
+    Assert-DbgMsg $result[0] "algoconall" $text2
+    Assert-DbgMsg $result[1] "algoconall" $text3
 }
 
 function Assert-DbgMsg($Presented,$Section,$Message){
