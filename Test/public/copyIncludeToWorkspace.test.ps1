@@ -4,7 +4,7 @@ function Test_CopyIncludeToWorkspace{
     New-ModuleV3 -Name TestModule
 
     # Test for Include
-    $name = "sync.Helper.ps1"
+    $name = "deploy.Helper.ps1"
     $folderPath = "tools"
     $destinationModulePath = "TestModule"
 
