@@ -1,3 +1,5 @@
+# {"Version":"v1.0.0","Date":"2026-06-14"}
+#
 # Helper for module variables
 
 function Find-ModuleRootPath{
@@ -7,15 +9,27 @@ function Find-ModuleRootPath{
         [string]$Path
     )
 
-    $path = Convert-Path -Path $Path
+    $path = Resolve-Path -Path $Path
 
     while (-not [string]::IsNullOrWhiteSpace($Path)){
         $psd1 = Get-ChildItem -Path $Path -Filter *.psd1 | Select-Object -First 1
 
         if ($psd1 | Test-Path) {
 
+            # Skip if module found is Test
             if($psd1.BaseName -eq "Test"){
                 #foudn testing module. Continue
+                $path = $path | Split-Path -Parent
+                continue
+            }
+
+            # It can happen that on a parent folder of a folder there is a lost psd1 file.
+            # Confirm that the psd1 file name equals the folder name
+            # Found this bug because on the test machine there was a psd1 on a tempo folder parent of the testing folder.
+            # This may break modules where the psd1 does not match the folder name
+            $folderName = Split-Path -Path $path -Leaf
+            if ($psd1.BaseName -ne $folderName) {
+                # psd1 file no on folder name
                 $path = $path | Split-Path -Parent
                 continue
             }
