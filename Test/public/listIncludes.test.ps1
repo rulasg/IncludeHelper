@@ -42,12 +42,12 @@ function Test_GetIncludeSystemFiles {
         @{ FolderName = "Root" ;             Name = "deploy.ps1"                                        }
         @{ FolderName = "Root" ;             Name = "LICENSE"                                           }
         @{ FolderName = "Root" ;             Name = "release.ps1"                                       }
-        @{ FolderName = "Root" ;             Name = "sync.ps1"                                          }
+        # @{ FolderName = "Root" ;             Name = "sync.ps1"                                          }
         @{ FolderName = "Root" ;             Name = "test.ps1"                                          }
 
         # Tools
         @{ FolderName = "Tools" ;            Name = "deploy.Helper.ps1"                                 }
-        @{ FolderName = "Tools" ;            Name = "sync.Helper.ps1"                                   }
+        # @{ FolderName = "Tools" ;            Name = "sync.Helper.ps1"                                   }
 
         # TestRoot
         @{ FolderName = "TestRoot" ;         Name = "Test.psm1"                                         }
