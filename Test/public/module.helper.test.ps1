@@ -80,28 +80,30 @@ function Test_FindModuleRootPath{
     New-TestingFolder -Path "$moduleName/Test/include/kk1/kk2"
     New-testingFolder -Path "kk1/kk2/kk3"
 
-    $moduleRootPath = $moduleName | Convert-Path
-
+    # Act
+    # All this paths should return $ModuleRootPath they are folders and child folders of the module
     @(
         "$moduleName",
         "$moduleName/Test",
-        "$moduleName//include/kk1/kk2",
+        "$moduleName/include/kk1/kk2",
         "$moduleName/Test/include/kk1/kk2"
-    ) | foreach{
-        $path = $_
-        $result = Find-ModuleRootPath -Path $path
-        Assert-AreEqual -Expected $moduleRootPath -Presented $result
+    ) | ForEach-Object{
+            $path = $_
+            $result = Find-ModuleRootPath -Path $path
+            Assert-AreEqualPath -Expected $moduleName -Presented $result
     }
 
+    # Act
+    # All this paths should return null they are not folders or child folders of the module
     @(
         ".",
         "kk1",
         "kk1/kk2",
         "kk1/kk2/kk3"
 
-    ) | foreach{
-        $path = $_
-        $result = Find-ModuleRootPath -Path $path
-        Assert-IsNull -Object $result
+    ) | ForEach-Object{
+            $path = $_
+            $result = Find-ModuleRootPath -Path $path
+            Assert-IsNull -Object $result
     }
 }
