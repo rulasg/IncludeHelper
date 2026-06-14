@@ -12,7 +12,7 @@ function Test_transcript{
     # }
     # catch {}
 
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
 
     Assert-Contains -Expected "This is a test transcript." -Presented $result
     Assert-Contains -Expected "WARNING: This is a warning message." -Presented $result
@@ -28,7 +28,7 @@ function Test_ExportTranscriptLines{
     Write-Host "Line 2"
     Write-Host "Line 3"
 
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
 
     # Assert
     $expectedLines = @(
