@@ -214,14 +214,18 @@ function Test-MyDebug {
         [Parameter()][switch]$Logging
     )
 
-    function testSection($section,$flags){
+    function testSection{
+        param(
+            [array]$flags,
+            [string]$section
+        )
         if($flags.Count -eq 0){
             return $false
         }
-        $flags = $flags.ToLower()
+
         $section = $section.ToLower()
 
-        return ($flags.Contains("all")) -or ( $flags -eq $section)
+        return ($flags.Contains("all")) -or ( $flags.Contains($section) )
     }
 
 
@@ -265,9 +269,23 @@ function Enable-ModuleNameDebug{
         }
     }
 
-    $sectionsString = $sections -join " "
-    $addedFlagsString = $AddSections -join " "
+    #Sections
+    if(-not [string]::IsNullOrWhiteSpace( $Sections )) {
+        $sections = $sections.ToLower()
+        $sectionsString = $Sections -join " "
+    } else{
+        # If no section addd to existing sections
+        $sectionsString = get-DebugSections
+    }
 
+    # Add Section
+    if(-not [string]::IsNullOrWhiteSpace( $AddSections )) {
+        $addSections = $addSections | ForEach-Object { $_.ToLower() }
+        $addedFlagsString = $AddSections -join " "
+        $sectionsString += " " + $addedFlagsString
+    }
+
+    # Add all if sectionsString and actual still null
     # if no section get value from env and is still mepty set to all
     if([string]::IsNullOrWhiteSpace( $sectionsString )) {
         $sectionsString = get-DebugSections
@@ -275,12 +293,8 @@ function Enable-ModuleNameDebug{
             $sectionsString = "all"
         }
     }
-    
-    # Add added to sectionsString if provided
-    if(-Not [string]::IsNullOrWhiteSpace( $addedFlagsString )) {
-        $sectionsString += " " + $addedFlagsString
-    }
 
+    # Save configuration
     set-DebugSections $sectionsString
 
 }
