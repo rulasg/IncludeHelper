@@ -37,5 +37,4 @@ References:
 
 ## Pull Request description
 
-- Add a summary of the intention of the PR. Use the title and the messages of the commits to create a summary.
-- Add a bullet list with all the commit messages in the PR commits.
+- Add a bullet list with all the commit messages in the PR commits. Use the full commit message. Do not remove the Semantic header.
