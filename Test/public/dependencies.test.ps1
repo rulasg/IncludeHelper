@@ -80,7 +80,7 @@ function Test_ImportDepepency_Import_From_Module_Manager{
     Enable-IncludeHelperVerbose
     Start-MyTranscript
     $output = Import-Dependency -Name $name -Verbose -Confirm:$false
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
     Disable-IncludeHelperVerbose
 
     #Assert verbose message
@@ -122,7 +122,7 @@ function Test_ImportDepepency_Install_From_Gallery{
     Enable-IncludeHelperVerbose
     Start-MyTranscript
     $output = Import-Dependency -Name $name -Verbose -Confirm:$false
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
     Disable-IncludeHelperVerbose
 
     #Assert verbose message
@@ -157,7 +157,7 @@ function Test_ImportDependency_Clone_From_GitHub{
     Enable-IncludeHelperVerbose
     Start-MyTranscript
     $output = Import-Dependency -Name $name -Verbose -Confirm:$false
-    $result = Stop-MyTranscript
+    $result = @(Stop-MyTranscript)
     Disable-IncludeHelperVerbose
 
     #Assert verbose message
