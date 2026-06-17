@@ -253,11 +253,6 @@ function MockCallExpression{
         [Parameter(Position=1)][string] $expression
     )
 
-    $mockCommand = @'
-    Invoke-Expression -Command '{expression}'
-'@
-    $mockCommand = $mockCommand -replace "{expression}", $expression
-
     Set-InvokeCommandMock -Alias $command -Command $expression
 }
 
