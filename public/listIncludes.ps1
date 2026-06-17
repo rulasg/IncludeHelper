@@ -70,11 +70,15 @@ function Get-IncludeFile{
 
         $items = Get-ChildItem -Path $path -Filter "*$Filter*" -File  -ErrorAction SilentlyContinue | ForEach-Object {
 
+            $version = Get-IncludeFileVersion -Path $_.FullName
+
             [PSCustomObject]@{
                 Name       = Compress-FileNameTransformation -FileName $_.Name -SourceModulePath $ModuleRootPath
                 FolderName = $FolderName
                 ModuleName = $moduleName
                 Path       = $_.FullName
+                Version    = $version.Version
+                Date       = $version.Date
             }
         }
         if ($items.Count -ne 0) {
