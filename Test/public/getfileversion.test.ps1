@@ -27,7 +27,7 @@ function Test_GetFileVersion_OnlyVersion{
     $headerversion = 1
     $version = "1.0.0"
     $date = "1975-02-18"
-    $json = Build-TestVersionHeaderJson $Version $Date $headerversion
+    $json = Build-TestFileVersionJson $Version $Date $headerversion
     New-Testingfile -Name "TestFile.ps1" -Content $("# $json")
     Assert-FileVersion -Path "TestFile.ps1" -Version $version -Date $date
 
