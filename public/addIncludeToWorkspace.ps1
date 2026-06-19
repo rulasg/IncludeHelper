@@ -110,15 +110,34 @@ function Add-IncludeToWorkspace {
         }
 
         if ($PSCmdlet.ShouldProcess("$sourceFile", "copy to $destinationFile")) {
-            # TODO: Add version info header to each file.
+            # Add version info header to each file.
             # The header will contain a do not modify this file manually message
             # Avoid using Set-Content as it adds an empty tail line at the end of the file
             # Implement a Get-ModuleInfo function on module.helper.ps1 to get module name and version
             # This function will read the psd1 file that has the same name as the folder name. This will allow having more than one psd1 file in the same folder
             #
-            Copy-Item -Path $sourceFile -Destination $destinationFile -Force
-            # Set-Content -Path $destinationFile -Value $content -Force
-            Write-Output $destinationFile
+            $content = Get-Content -Path $sourceFile
+            $version = Get-VersionHeader $content
+            # Find the name of the source module for leater adding to version header
+            $sourceModuleRootPath = Find-ModuleRootPath -Path $sourcePath | split-path -Leaf
+
+            if($version){
+
+                # If version header exists, update the version header with the new module name and version
+                $newVersionHeader = Build-VersionHeader -Version $version.Version -Source $sourceModuleRootPath
+                $content = Remove-VersionHeader -content $content
+            } else {
+                $newVersionHeader = Build-VersionHeader -Version "1.0.0" -Source $sourceModuleRootPath
+            }
+            
+            # Build new content
+            $content = @($newVersionHeader) + $content
+
+            # write fto file
+            $finalContent = $content -join "`n"
+            $finalContent | Out-File -Path $destinationFile -NoNewline -Force
+
+            return $destinationFile
         }
     }
 

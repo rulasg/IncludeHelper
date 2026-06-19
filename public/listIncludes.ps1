@@ -70,7 +70,16 @@ function Get-IncludeFile{
 
         $items = Get-ChildItem -Path $path -Filter "*$Filter*" -File  -ErrorAction SilentlyContinue | ForEach-Object {
 
-            $version = Get-IncludeFileVersion -Path $_.FullName
+            $content = Get-Content -Path $_.FullName
+            $version = Get-VersionHeader -content $content
+            if($version){
+                $body = Remove-VersionHeader -content $content
+            } else {
+                $body = $content
+            }
+
+            $sha = $body | Out-String | Get-HashCode
+            $gitStatus = $(Test-RepoFileChanged -Path $_.FullName )? "Modified" : "Unmodified"
 
             [PSCustomObject]@{
                 Name       = Compress-FileNameTransformation -FileName $_.Name -SourceModulePath $ModuleRootPath
@@ -79,6 +88,8 @@ function Get-IncludeFile{
                 Path       = $_.FullName
                 Version    = $version.Version
                 Date       = $version.Date
+                Sha        = $sha
+                GitStatus  = $gitStatus
             }
         }
         if ($items.Count -ne 0) {
