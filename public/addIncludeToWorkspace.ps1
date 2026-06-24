@@ -26,6 +26,7 @@ Add-IncludeToWorkspace -Name "TestInclude.txt" -FolderName "TestInclude"
 #>
 function Add-IncludeToWorkspace {
     [CmdletBinding(SupportsShouldProcess)]
+    [Alias("aif")]
     param (
         [Parameter(Mandatory,ValueFromPipelineByPropertyName,Position=0)][string]$Name,
         [Parameter(Mandatory,ValueFromPipelineByPropertyName, Position = 1)]
@@ -145,7 +146,7 @@ function Add-IncludeToWorkspace {
         #"<< Add-IncludeToWorkspace" | Write-MyDebug
     }
 
-} Export-ModuleMember -Function Add-IncludeToWorkspace
+} Export-ModuleMember -Function Add-IncludeToWorkspace -Alias "aif"
 
 function Resolve-SourceDestinationPath{
     [CmdletBinding()]

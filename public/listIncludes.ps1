@@ -32,6 +32,7 @@ Displays the available includes.
 #>
 function Get-IncludeFile{
     [CmdletBinding()]
+    [Alias("gif")]
     param(
         #add filter pattern
         [Parameter( Position = 0 )] [string]$Filter = '*',
@@ -99,7 +100,7 @@ function Get-IncludeFile{
 
     return $ret
 
-} Export-ModuleMember -Function Get-IncludeFile
+} Export-ModuleMember -Function Get-IncludeFile -Alias "gif"
 
 <#
 .SYNOPSIS
