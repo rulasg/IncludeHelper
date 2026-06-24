@@ -2,10 +2,10 @@ function Set-IncludeFileVersion{
     [CmdletBinding()]
     [outputtype([bool])]
      param(
-        [string]$Path,
-        [string]$Version,
-        [string]$Date,
-        [string]$Source
+        [parameter(Mandatory,ValueFromPipelineByPropertyName)][string]$Path,
+        [parameter(Mandatory)][string]$Version,
+        [parameter()][string]$Date,
+        [parameter()][string]$Source
      )
 
      # Return of file does not exist
@@ -34,11 +34,13 @@ function Set-IncludeFileVersion{
         $content = Remove-VersionHeader -content $content
     }
 
-    # Get Module Name from path
-    $sourceModuleRootPath = Find-ModuleRootPath -Path $Path | split-path -Leaf
+    # If source not specified, get the source from the path
+    if([string]::IsNullOrEmpty($Source)){
+        $source = Find-ModuleRootPath -Path $Path | split-path -Leaf
+    }
 
     # Build Target version line
-     $tragetFirstLine = Build-VersionHeader -Version $Version -Date $Date -Source $sourceModuleRootPath
+     $tragetFirstLine = Build-VersionHeader -Version $Version -Date $Date -Source $source
 
     # Add the new version header as the first line of the file
     $newContent = @($tragetFirstLine) + $content
