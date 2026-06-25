@@ -164,8 +164,6 @@ function Test_AddIncludeToWorkspace_WithoutSource_WithoutDestination{
 
 function Test_AddIncludeToWorkspace_FromSourceToDestination{
 
-    Reset-InvokeCommandMock
-
     $TargetModuleName = "TargetModule"
     $SourceModuleName = "SourceModule"
 
