@@ -72,7 +72,7 @@ function Get-IncludeFile{
         $items = Get-ChildItem -Path $path -Filter "*$Filter*" -File  -ErrorAction SilentlyContinue | ForEach-Object {
 
             $content = Get-Content -Path $_.FullName
-            $version = Get-VersionHeader -content $content
+            $version = Get-VersionFromHeader -content $content
             if($version){
                 $body = Remove-VersionHeader -content $content
             } else {

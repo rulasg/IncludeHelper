@@ -118,7 +118,7 @@ function Add-IncludeToWorkspace {
             # This function will read the psd1 file that has the same name as the folder name. This will allow having more than one psd1 file in the same folder
             #
             $content = Get-Content -Path $sourceFile
-            $version = Get-VersionHeader $content
+            $version = Get-VersionFromHeader $content
             # Find the name of the source module for leater adding to version header
             $sourceModuleRootPath = Find-ModuleRootPath -Path $sourcePath | split-path -Leaf
 

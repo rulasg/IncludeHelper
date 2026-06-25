@@ -20,7 +20,7 @@ function Set-IncludeFileVersion{
     $content = Get-Content -Path $Path
 
     # Get actual version
-    $actualVersion = $null -eq $content ? $null : $(Get-VersionHeader -content $content)
+    $actualVersion = $null -eq $content ? $null : $(Get-VersionFromHeader -content $content)
 
     # if($actualVersion){
     #     # Check if actual version is the same as the new version, if so return true
@@ -85,7 +85,7 @@ function Remove-VersionHeader($content){
     $headerSizeV0 = 1
     $headersSizeV1 = $script:HEADER_V1.Count
 
-    $version = Get-VersionHeader -content $content
+    $version = Get-VersionFromHeader -content $content
 
     if(-not $version){
         throw "No version header found in content"
@@ -107,7 +107,7 @@ function Remove-VersionHeader($content){
     return $content
 } Export-ModuleMember -Function Remove-VersionHeader
 
-function Get-VersionHeader($content){
+function Get-VersionFromHeader($content){
 
     # So far the version json is always on the first line
 
@@ -125,5 +125,5 @@ function Get-VersionHeader($content){
     try { $version = $json | ConvertFrom-Json } catch { return $null }
 
     return $version
-} export-ModuleMember -Function Get-VersionHeader
+} export-ModuleMember -Function Get-VersionFromHeader
 

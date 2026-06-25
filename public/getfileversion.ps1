@@ -16,7 +16,7 @@ function Get-IncludeFileVersion{
         return $null
     }
 
-    $version = Get-VersionHeader -content $content
+    $version = Get-VersionFromHeader -content $content
 
     if($version){
         $ret = [PsCustomObject]@{
