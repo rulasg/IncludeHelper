@@ -44,6 +44,9 @@ function Test_MockCallToObject{
 
 function Test_MockCallToObject_ResetMockObject{
 
+    # Reset again toremove the preset dates variables
+    Reset-InvokeCommandMock
+
     MockCallToObject -Command  'kk1' -OutObject 'Testkk1'
     MockCallToObject -Command  'kk2' -OutObject 'Testkk2'
     MockCallToObject -Command  'kk3' -OutObject 'Testkk3'

@@ -99,18 +99,28 @@ function Test_AddIncludeToWorkspace_IfExists{
     #Act
     $includefiles | Add-IncludeToWorkspace -DestinationModulePath $moduleName -IfExists
 
-    #Assert
+    #Assert check that existing files were updatated
     $filesDest1 = Get-ChildItem -Path $destFolder1
     Assert-Count -Expected 1 -Presented $filesDest1
-    $contentFile1 = Get-Content -Path $filesDest1.FullName | Out-String
-    $sourceFile1  = $header + (Get-Content -Path $include1.Path) | Out-String
-    Assert-AreEqual -Expected $sourceFile1.Trim() -Presented $contentFile1.Trim()
+    $targetFile1 = Get-Content -Path $filesDest1.FullName
+    $sourceFile1  = (Get-Content -Path $include1.Path)
+
+    # Remove the header as they may be different due to the versioning and date of the file
+    $targetFile1 = Remove-VersionHeader -Content $targetFile1 | Out-String
+    $sourceFile1 = Remove-VersionHeader -Content $sourceFile1 | Out-String
+
+    Assert-AreEqual -Expected $sourceFile1.Trim() -Presented $targetFile1.Trim()
 
     $filesDest2 = Get-ChildItem -Path $destFolder2
     Assert-Count -Expected 1 -Presented $filesDest2
-    $contentFile2 = Get-Content -Path $filesDest2.FullName | Out-String
-    $sourceFile2  = $header + (Get-Content -Path $include2.Path) | Out-String
-    Assert-AreEqual -Expected $sourceFile2.Trim() -Presented $contentFile2.Trim()
+    $targetFile2 = Get-Content -Path $filesDest2.FullName
+    $sourceFile2  = $header + (Get-Content -Path $include2.Path)
+
+    # Remove the header as they may be different due to the versioning and date of the file
+    $targetFile2 = Remove-VersionHeader -Content $targetFile2 | Out-String
+    $sourceFile2 = Remove-VersionHeader -Content $sourceFile2 | Out-String
+
+    Assert-AreEqual -Expected $sourceFile2.Trim() -Presented $targetFile2.Trim()
 }
 
 function Test_AddIncludeToWorkspace_PipeParameters{
