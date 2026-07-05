@@ -82,6 +82,8 @@ function Test_AddIncludeToWorkspace_IfExists{
     $moduleName = "TestModule"
     Import-Module -Name TestingHelper
 
+    $header = Build-VersionHeader -Version "1.0.0" -Source "IncludeHelper"
+
     # Test for Include
     $includefiles = Get-IncludeFile
     $include1 = $includefiles | Where-Object { $_.FolderName -eq "Helper" } | Select-Object -First 1
@@ -101,13 +103,13 @@ function Test_AddIncludeToWorkspace_IfExists{
     $filesDest1 = Get-ChildItem -Path $destFolder1
     Assert-Count -Expected 1 -Presented $filesDest1
     $contentFile1 = Get-Content -Path $filesDest1.FullName | Out-String
-    $sourceFile1  = Get-Content -Path $include1.Path | Out-String
+    $sourceFile1  = $header + (Get-Content -Path $include1.Path) | Out-String
     Assert-AreEqual -Expected $sourceFile1.Trim() -Presented $contentFile1.Trim()
 
     $filesDest2 = Get-ChildItem -Path $destFolder2
     Assert-Count -Expected 1 -Presented $filesDest2
     $contentFile2 = Get-Content -Path $filesDest2.FullName | Out-String
-    $sourceFile2  = Get-Content -Path $include2.Path | Out-String
+    $sourceFile2  = $header + (Get-Content -Path $include2.Path) | Out-String
     Assert-AreEqual -Expected $sourceFile2.Trim() -Presented $contentFile2.Trim()
 }
 
@@ -134,12 +136,9 @@ function Test_AddIncludeToWorkspace_PipeParameters{
     $folderNamePath = get-Modulefolder -FolderName "TestInclude" -ModuleRootPath $destinationModulePath
     $path = $folderNamePath | Join-Path -ChildPath "config.mock.ps1"
     Assert-ItemExist -path $path
-
 }
 
 function Test_AddIncludeToWorkspace_WithoutSource_WithoutDestination{
-
-    Reset-InvokeCommandMock
 
     Import-Module -Name TestingHelper
     New-ModuleV3 -Name TestModule
@@ -149,7 +148,6 @@ function Test_AddIncludeToWorkspace_WithoutSource_WithoutDestination{
     $destinationPath = Get-ModuleFolder -FolderName $fileInfo.FolderName -ModuleRootPath "TestModule"
     $destinationFilePath = $destinationPath | Join-Path -ChildPath $destinationName
     Remove-Item -Path $destinationFilePath -ErrorAction SilentlyContinue
-
 
     # Act
     Assert-itemNotExist -path $destinationFilePath
@@ -195,8 +193,6 @@ function Test_AddIncludeToWorkspace_FromSourceToDestination{
 
 # With soruce not destination
 function Test_AddIncludeToWorkspace_FromSourceToDestination_WithoutDestination{
-
-    Reset-InvokeCommandMock
 
     $FileName1 = "MyInclude1.ps1"
     $FileName2 = "MyInclude2.ps1"
