@@ -146,3 +146,76 @@ function Open-IncludeFile{
     }
 
 } Export-ModuleMember -Function Open-IncludeFile
+
+function Compare-IncludeFile{
+        [CmdletBinding()]
+    [Alias("cif")]
+    param(
+        #add filter pattern
+        [Parameter( Position = 0 )] [string]$Filter = '*',
+        [Parameter()][string[]]$Folders,
+        [Parameter()][string]$ModuleRootPath,
+        [Parameter()][switch]$PassThru,
+        [Parameter()][switch]$All
+    )
+
+    # If not ModuleRootPath specified, use local
+    if([string]::IsNullOrWhiteSpace($ModuleRootPath)){ $local = $true }
+
+    $allLocal = Get-IncludeFile -Filter $Filter -Folders $Folders -ModuleRootPath:$ModuleRootPath -Local:$Local
+    $allRemote = Get-IncludeFile -Filter $Filter -Folders $Folders -ModuleRootPath $ModuleRootPath
+
+    $allLocal =$allLocal ?? @()
+    $allRemote =$allRemote ?? @()
+    
+    "Found $($allLocal.Count) local and $($allRemote.Count) remote include files for filter [$Filter] in folders [$($Folders -join ', ')]" | Write-MyDebug -Section "cif"
+    
+    $ret = @()
+    $done = @()
+
+    # Compare existing files
+    $allItems = $All ? $($allLocal + $allRemote) : $alllocal
+
+    $allItems | ForEach-Object {
+        # Check if done
+        $filetag = "$($_.FolderName)_$($_.Name)"
+        
+        if($done -notcontains $filetag){ 
+        
+            $done += $filetag
+            
+            $local = $allLocal | Where-Object { "$($_.FolderName)_$($_.Name)" -eq $filetag }
+            $remote = $allRemote | Where-Object { "$($_.FolderName)_$($_.Name)" -eq $filetag }
+            "Local  : $($local.Name) $($local.FolderName) $($local.Version) $($local.Date) $($local.Sha) $($local.GitStatus)" | Write-MyDebug -Section "cif"
+            "Remote : $($remote.Name) $($remote.FolderName) $($remote.Version) $($remote.Date) $($remote.Sha) $($remote.GitStatus)" | Write-MyDebug -Section "cif"
+
+            $areEqual = $local.Sha -eq $remote.Sha
+            
+            $item = [PsCustomObject]@{
+                Name = $_.Name
+                FolderName = $_.FolderName
+                
+                AreEqual = $areEqual
+
+                LocalVersion = $local.Version
+                LocalDate = $local.Date
+                LocalGitStatus = $local.GitStatus
+                
+                RemoteVersion = $remote.Version
+                RemoteDate = $remote.Date
+                RemoteGitStatus = $remote.GitStatus
+            }
+            $ret += $item
+        }
+    }
+
+    $ret = $ret |sort-object -Property AreEqual,FolderName, Name
+
+    if($PassThru){
+        return $ret
+    } else {
+        $ret | Format-Table -AutoSize
+    }
+        
+} Export-ModuleMember -Function Compare-IncludeFile -Alias "cif"
+
