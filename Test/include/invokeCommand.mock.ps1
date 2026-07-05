@@ -173,7 +173,7 @@ function Get-MockFileContent{
 
     $filePath = Get-MockFileFullPath -fileName $fileName
 
-    $content = Get-Content -Path $filePath | Out-String
+    $content = (Get-Content -Path $filePath) -join "`n"
 
     return $content
 } Export-ModuleMember -Function Get-MockFileContent

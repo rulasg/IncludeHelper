@@ -79,7 +79,7 @@ function Get-IncludeFile{
                 $body = $content
             }
 
-            $sha = $body | Out-String | Get-HashCode
+            $sha = $body -join "`n" | Get-HashCode
             $gitStatus = $(Test-RepoFileChanged -Path $_.FullName )? "Modified" : "Unmodified"
 
             [PSCustomObject]@{

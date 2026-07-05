@@ -106,8 +106,8 @@ function Test_AddIncludeToWorkspace_IfExists{
     $sourceFile1  = (Get-Content -Path $include1.Path)
 
     # Remove the header as they may be different due to the versioning and date of the file
-    $targetFile1 = Remove-VersionHeader -Content $targetFile1 | Out-String
-    $sourceFile1 = Remove-VersionHeader -Content $sourceFile1 | Out-String
+    $targetFile1 = (Remove-VersionHeader -Content $targetFile1) -join "`n"
+    $sourceFile1 = (Remove-VersionHeader -Content $sourceFile1) -join "`n"
 
     Assert-AreEqual -Expected $sourceFile1.Trim() -Presented $targetFile1.Trim()
 
@@ -117,8 +117,8 @@ function Test_AddIncludeToWorkspace_IfExists{
     $sourceFile2  = $header + (Get-Content -Path $include2.Path)
 
     # Remove the header as they may be different due to the versioning and date of the file
-    $targetFile2 = Remove-VersionHeader -Content $targetFile2 | Out-String
-    $sourceFile2 = Remove-VersionHeader -Content $sourceFile2 | Out-String
+    $targetFile2 = (Remove-VersionHeader -Content $targetFile2) -join "`n"
+    $sourceFile2 = (Remove-VersionHeader -Content $sourceFile2) -join "`n"
 
     Assert-AreEqual -Expected $sourceFile2.Trim() -Presented $targetFile2.Trim()
 }

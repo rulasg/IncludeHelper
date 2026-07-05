@@ -51,7 +51,7 @@ function Test_GetFileVersion_VersionAndBody{
     $source = "IncludeHelper"
     $header = Build-TestVersionHeader $Version $Date $source $headerversion
     $body = $FILE_FACKE_CONTENT
-    $content = $header + $body | Out-String
+    $content = ($header + $body) -join "`n"
     New-Testingfile -Name "TestFile.ps1" -Content $content
     Assert-FileVersion -Path "TestFile.ps1" -Version $version -Date $date -Body $body 
 
