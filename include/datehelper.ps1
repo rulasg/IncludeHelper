@@ -15,7 +15,6 @@ Set-MyInvokeCommandAlias -Alias GetNowString -Command "Get-Date -Format 'yyyy-MM
 Set-MyInvokeCommandAlias -Alias GetUtcNow -Command "Get-Date -AsUTC"
 Set-MyInvokeCommandAlias -Alias GetNow -Command "Get-Date"
 
-
 function Get-DateString{
     [CmdletBinding()]
     param(

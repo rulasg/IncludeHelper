@@ -23,8 +23,7 @@ function Run_BeforeEach{
     Reset-InvokeCommandMock
 
     # Mock get the now date
-    Set-InvokeCommandMock -Alias "Get-Date" -Command "Get-Date"
-
+    MockCall_DateHelper
 }
 
 # function Run_AfterEach{

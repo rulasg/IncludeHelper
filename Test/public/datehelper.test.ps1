@@ -53,21 +53,23 @@ function Test_GetDaysBetweenDates_OneYear {
 }
 
 function Test_GetDaysBetweenDates_DefaultStartDate {
+    
     # Arrange
-    Reset-InvokeCommandMock
-
     $now = Get-Date -Format 'yyyy-MM-dd'
     MockCallToObject -Command "GetNow" -OutObject $now
+    $futureDate = (Mock_GetToday).AddDays(10) 
+    $futureDateString = $futureDate | Get-Date -Format 'yyyy-MM-dd'
 
-    # Act & Assert
-    Invoke-PrivateContext {
-        $futureDate = (Get-Date).AddDays(10) | Get-Date -Format 'yyyy-MM-dd'
+    # Act
+    $result = Invoke-PrivateContext {
+        param($Arguments)
+        
+        Get-DaysBetweenDates -EndDate $Arguments[0]
 
-        $result = Get-DaysBetweenDates -EndDate $futureDate
-
-        # Result should be approximately 10 days (allowing for same-day test execution)
-        Assert-AreEqual -Expected 10 -Presented $result
-    }
+    } -Arguments $futureDateString
+    
+    # Result should be approximately 10 days (allowing for same-day test execution)
+    Assert-AreEqual -Expected 10 -Presented $result
 }
 
 function Test_ConvertFromEpochTime_OneDay {
