@@ -1,7 +1,7 @@
 function Test_CallAPI_RESTAPI_Withpagination_1{
 
     Assert-SkipTest "This test is not implemented"
-    Reset-InvokeCommandMock
+    
     Enable-InvokeCommandAliasModule
 
     # Act
@@ -20,7 +20,6 @@ function Test_CallAPI_RESTAPI_Withpagination_2{
 
     Assert-SkipTest "This test is not implemented"
 
-    Reset-InvokeCommandMock
     Enable-InvokeCommandAliasModule
 
     # Act
@@ -34,7 +33,6 @@ function Test_Call_API_GraphQL{
 
     Assert-SkipTest "This test is not implemented"
 
-    Reset-InvokeCommandMock
     Enable-InvokeCommandAliasModule
 
     $query = @'
@@ -54,7 +52,6 @@ function Test_Call_API_GraphQL_outfile{
 
     Assert-SkipTest "This test is not implemented"
 
-    Reset-InvokeCommandMock
     Enable-InvokeCommandAliasModule
 
     $file = "outfile.json"

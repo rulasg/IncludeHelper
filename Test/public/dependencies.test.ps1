@@ -2,7 +2,6 @@
 function Test_ImportDepepency_Already_loaded{
 
     $name = "TargetModule" ; $modulesFolder = "ModulesFolder"
-    Reset-InvokeCommandMock
     New-moduleV3 -Name $name -Path $modulesFolder
 
 
@@ -27,7 +26,6 @@ function Test_ImportDepepency_Already_loaded{
 function Test_ImportDepepency_SideBySide{
 
     $name = "TargetModule" ; $modulesFolder = "ModulesFolder"
-    Reset-InvokeCommandMock
 
     # Create new module on test folder
     New-moduleV3 -Name $name -Path $modulesFolder
@@ -58,8 +56,6 @@ function Test_ImportDepepency_SideBySide{
 function Test_ImportDepepency_Import_From_Module_Manager{
 
     $name = "TargetModule" ; $modulesFolder = "ModulesFolder"
-
-    Reset-InvokeCommandMock
 
     New-ModuleV3 -Name $name -Path $modulesFolder
 
@@ -92,7 +88,6 @@ function Test_ImportDepepency_Import_From_Module_Manager{
 function Test_ImportDepepency_Install_From_Gallery{
 
     $name = "TargetModule" ; $modulesFolder = "ModulesFolder"
-    Reset-InvokeCommandMock
     New-ModuleV3 -Name $name -Path $modulesFolder
 
     # Mock Get-Module to Null
@@ -134,7 +129,6 @@ function Test_ImportDependency_Clone_From_GitHub{
 
     $name = "TargetModule" ; $modulesFolder = "ModulesFolder"
     $owner = "rulasg"
-    Reset-InvokeCommandMock
 
     # Mock Get-Module to Null
     Mock_GetModule_Null -Name $name

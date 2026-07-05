@@ -1,8 +1,6 @@
 
 function Test_MockCallJson{
 
-    Reset-InvokeCommandMock
-
     $fileName = 'test.json'
 
     MockCallJson -Command 'Test-Command' -filename $fileName
@@ -15,8 +13,6 @@ function Test_MockCallJson{
 }
 
 function Test_MockCallJson_AsHashtable{
-
-    Reset-InvokeCommandMock
 
     $fileName = 'test.json'
 
@@ -33,8 +29,6 @@ function Test_MockCallJson_AsHashtable{
 
 function Test_MockCallToObject{
 
-    Reset-InvokeCommandMock
-
     $data = @{
         Name = 'Test'
         Value = 42
@@ -49,8 +43,6 @@ function Test_MockCallToObject{
 }
 
 function Test_MockCallToObject_ResetMockObject{
-
-    Reset-InvokeCommandMock
 
     MockCallToObject -Command  'kk1' -OutObject 'Testkk1'
     MockCallToObject -Command  'kk2' -OutObject 'Testkk2'
@@ -70,8 +62,6 @@ function Test_MockCallToObject_ResetMockObject{
  }
 
 function Test_MockCallExpression{
-
-    Reset-InvokeCommandMock
 
     $expression = @'
     echo "new string from mock 2"
