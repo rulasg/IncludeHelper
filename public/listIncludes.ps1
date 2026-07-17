@@ -156,7 +156,9 @@ function Compare-IncludeFile{
         [Parameter()][string[]]$Folders,
         [Parameter()][string]$ModuleRootPath,
         [Parameter()][switch]$PassThru,
-        [Parameter()][switch]$All
+        [Parameter()][switch]$All,
+        [Parameter()][switch]$Opendiff
+
     )
 
     # If not ModuleRootPath specified, use local
@@ -200,10 +202,12 @@ function Compare-IncludeFile{
                 LocalVersion = $local.Version
                 LocalDate = $local.Date
                 LocalGitStatus = $local.GitStatus
+                LocalPath = $local.Path
                 
                 RemoteVersion = $remote.Version
                 RemoteDate = $remote.Date
                 RemoteGitStatus = $remote.GitStatus
+                RemotePath = $remote.Path
             }
             $ret += $item
         }
@@ -211,11 +215,21 @@ function Compare-IncludeFile{
 
     $ret = $ret |sort-object -Property AreEqual,FolderName, Name
 
+    if($OpenDiff){
+        $ret | foreach-object{
+            if(-not $_.AreEqual){
+                Write-MyDebug "Opening diff for $($_.Name) in folder $($_.FolderName)" -Section "cif"
+                code --diff $($_.LocalPath) $($_.RemotePath)
+            } else {
+                Write-MyDebug "Skipping diff for $($_.Name) in folder $($_.FolderName) as they are equal" -Section "cif"
+            }
+        }
+    }
+
     if($PassThru){
         return $ret
     } else {
-        $ret | Format-Table -AutoSize
+        $ret | Format-Table -Property Name,FolderName,AreEqual,LocalVersion,LocalDate,LocalGitStatus,RemoteVersion,RemoteDate,RemoteGitStatus -AutoSize
     }
         
 } Export-ModuleMember -Function Compare-IncludeFile -Alias "cif"
-
