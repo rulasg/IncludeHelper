@@ -1,5 +1,7 @@
 function Test_TestRepoFileChanged_Changed{
 
+    git config --global user.email "you@example.com"
+    git config --global user.name "Your Name"
     
     $repo = "reponame"
     New-TestingFolder -Path $repo
