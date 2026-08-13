@@ -16,18 +16,9 @@ function Get-IncludeFileVersion{
         return $null
     }
 
-    $version = Get-VersionHeader -content $content
+    $version = Get-VersionFromHeader -content $content
 
-    if($version){
-        $ret = [PsCustomObject]@{
-            Version = $version.Version
-            Date = $version.Date
-        }
-    } else {
-        $ret = $null
-    }
-
-    return $ret
+    return $version
 
 } Export-ModuleMember -Function Get-IncludeFileVersion
 

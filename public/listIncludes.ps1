@@ -32,6 +32,7 @@ Displays the available includes.
 #>
 function Get-IncludeFile{
     [CmdletBinding()]
+    [Alias("gif")]
     param(
         #add filter pattern
         [Parameter( Position = 0 )] [string]$Filter = '*',
@@ -70,11 +71,26 @@ function Get-IncludeFile{
 
         $items = Get-ChildItem -Path $path -Filter "*$Filter*" -File  -ErrorAction SilentlyContinue | ForEach-Object {
 
+            $content = Get-Content -Path $_.FullName
+            $version = Get-VersionFromHeader -content $content
+            if($version){
+                $body = Remove-VersionHeader -content $content
+            } else {
+                $body = $content
+            }
+
+            $sha = $body -join "`n" | Get-HashCode
+            $gitStatus = $(Test-RepoFileChanged -Path $_.FullName )? "Modified" : "Unmodified"
+
             [PSCustomObject]@{
                 Name       = Compress-FileNameTransformation -FileName $_.Name -SourceModulePath $ModuleRootPath
                 FolderName = $FolderName
                 ModuleName = $moduleName
                 Path       = $_.FullName
+                Version    = $version.Version
+                Date       = $version.Date
+                Sha        = $sha
+                GitStatus  = $gitStatus
             }
         }
         if ($items.Count -ne 0) {
@@ -84,7 +100,7 @@ function Get-IncludeFile{
 
     return $ret
 
-} Export-ModuleMember -Function Get-IncludeFile
+} Export-ModuleMember -Function Get-IncludeFile -Alias "gif"
 
 <#
 .SYNOPSIS
@@ -130,3 +146,90 @@ function Open-IncludeFile{
     }
 
 } Export-ModuleMember -Function Open-IncludeFile
+
+function Compare-IncludeFile{
+        [CmdletBinding()]
+    [Alias("cif")]
+    param(
+        #add filter pattern
+        [Parameter( Position = 0 )] [string]$Filter = '*',
+        [Parameter()][string[]]$Folders,
+        [Parameter()][string]$ModuleRootPath,
+        [Parameter()][switch]$PassThru,
+        [Parameter()][switch]$All,
+        [Parameter()][switch]$Opendiff
+
+    )
+
+    # If not ModuleRootPath specified, use local
+    if([string]::IsNullOrWhiteSpace($ModuleRootPath)){ $local = $true }
+
+    $allLocal = Get-IncludeFile -Filter $Filter -Folders $Folders -ModuleRootPath:$ModuleRootPath -Local:$Local
+    $allRemote = Get-IncludeFile -Filter $Filter -Folders $Folders -ModuleRootPath $ModuleRootPath
+
+    $allLocal =$allLocal ?? @()
+    $allRemote =$allRemote ?? @()
+    
+    "Found $($allLocal.Count) local and $($allRemote.Count) remote include files for filter [$Filter] in folders [$($Folders -join ', ')]" | Write-MyDebug -Section "cif"
+    
+    $ret = @()
+    $done = @()
+
+    # Compare existing files
+    $allItems = $All ? $($allLocal + $allRemote) : $alllocal
+
+    $allItems | ForEach-Object {
+        # Check if done
+        $filetag = "$($_.FolderName)_$($_.Name)"
+        
+        if($done -notcontains $filetag){ 
+        
+            $done += $filetag
+            
+            $local = $allLocal | Where-Object { "$($_.FolderName)_$($_.Name)" -eq $filetag }
+            $remote = $allRemote | Where-Object { "$($_.FolderName)_$($_.Name)" -eq $filetag }
+            "Local  : $($local.Name) $($local.FolderName) $($local.Version) $($local.Date) $($local.Sha) $($local.GitStatus)" | Write-MyDebug -Section "cif"
+            "Remote : $($remote.Name) $($remote.FolderName) $($remote.Version) $($remote.Date) $($remote.Sha) $($remote.GitStatus)" | Write-MyDebug -Section "cif"
+
+            $areEqual = $local.Sha -eq $remote.Sha
+            
+            $item = [PsCustomObject]@{
+                Name = $_.Name
+                FolderName = $_.FolderName
+                
+                AreEqual = $areEqual
+
+                LocalVersion = $local.Version
+                LocalDate = $local.Date
+                LocalGitStatus = $local.GitStatus
+                LocalPath = $local.Path
+                
+                RemoteVersion = $remote.Version
+                RemoteDate = $remote.Date
+                RemoteGitStatus = $remote.GitStatus
+                RemotePath = $remote.Path
+            }
+            $ret += $item
+        }
+    }
+
+    $ret = $ret |sort-object -Property AreEqual,FolderName, Name
+
+    if($OpenDiff){
+        $ret | foreach-object{
+            if(-not $_.AreEqual){
+                Write-MyDebug "Opening diff for $($_.Name) in folder $($_.FolderName)" -Section "cif"
+                code --diff $($_.LocalPath) $($_.RemotePath)
+            } else {
+                Write-MyDebug "Skipping diff for $($_.Name) in folder $($_.FolderName) as they are equal" -Section "cif"
+            }
+        }
+    }
+
+    if($PassThru){
+        return $ret
+    } else {
+        $ret | Format-Table -Property Name,FolderName,AreEqual,LocalVersion,LocalDate,LocalGitStatus,RemoteVersion,RemoteDate,RemoteGitStatus -AutoSize
+    }
+        
+} Export-ModuleMember -Function Compare-IncludeFile -Alias "cif"

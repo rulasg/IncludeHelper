@@ -1,29 +1,31 @@
 function Test_SetFileVersion_EmptyFile{
 
     $version = "1.0.0"
+    $source = "kk"
 
     touch "TestFile.ps1"
 
     # Act
-    $result = Set-IncludeFileVersion -Path "TestFile.ps1" -Version $version
+    $result = Set-IncludeFileVersion -Path "TestFile.ps1" -Version $version -Source $source
 
     # Assert
     Assert-IsTrue -Condition $result
-    Assert-FileVersion -Path "TestFile.ps1" -Version $version
+    Assert-FileVersion -Path "TestFile.ps1" -Version $version -source $source
 }
 
 function Test_SetFileVersion_NoVersion{
 
     $version = "1.0.0"
+    $source = "kk"
 
     New-Testingfile -Name "TestFile.ps1" -Content $FILE_FACKE_CONTENT
 
     # Act
-    $result = Set-IncludeFileVersion -Path "TestFile.ps1" -Version $version
+    $result = Set-IncludeFileVersion -Path "TestFile.ps1" -Version $version -Source $source
 
     # Assert
     Assert-IsTrue -Condition $result
-    Assert-FileVersion -Path "TestFile.ps1" -Version $version -Body $FILE_FACKE_CONTENT
+    Assert-FileVersion -Path "TestFile.ps1" -Version $version -Body $FILE_FACKE_CONTENT -Source $source
 }
 
 
@@ -35,37 +37,39 @@ function Test_SetFileVersion_OnlyVersion{
     $headerversion = 1
     $version = "1.0.0"
     $date = "1975-02-18"
-    $json = Build-TestFileVersionJson $Version $Date $headerversion
+    $source = "kk"
+    $json = Build-TestFileVersionJson $Version $Date $source $headerversion
     New-Testingfile -Name "TestFile.ps1" -Content $("# $json")
-    Assert-FileVersion -Path "TestFile.ps1" -Version $version -Date $date
+    Assert-FileVersion -Path "TestFile.ps1" -Version $version -Date $date -Source $source
 
     # Act
-    $result = Set-IncludeFileVersion -Path "TestFile.ps1" -Version $version
+    $result = Set-IncludeFileVersion -Path "TestFile.ps1" -Version $version -Source $source
 
     # Assert
     Assert-IsTrue -Condition $result
-    Assert-FileVersion -Path "TestFile.ps1" -Version $version
+    Assert-FileVersion -Path "TestFile.ps1" -Version $version -Source $source
 }
 
 function Test_SetFileVersion_VersionAndBody{
 
     $version = "3.2.1"
+    $source = "kk"
 
     # Arrange version in file
     $headerversion = 1
     $version = "1.0.0"
     $date = "1975-02-18"
-    $json = Build-TestFileVersionJson $Version $Date $headerversion
+    $json = Build-TestFileVersionJson $Version $Date $source $headerversion
     New-Testingfile -Name "TestFile.ps1" -Content $("# $json")
-    Assert-FileVersion -Path "TestFile.ps1" -Version $version -Date $date
+    Assert-FileVersion -Path "TestFile.ps1" -Version $version -Date $date -Source $source
 
     # Act
-    $result = Set-IncludeFileVersion -Path "TestFile.ps1" -Version $version
+    $result = Set-IncludeFileVersion -Path "TestFile.ps1" -Version $version -Source $source
 
     # Assert
     Assert-IsTrue -Condition $result
     Enable-IncludeHelperDebug -Section "Assert-FileVersion"
-    Assert-FileVersion -Path "TestFile.ps1" -Version $version -Body $body
+    Assert-FileVersion -Path "TestFile.ps1" -Version $version -Body $body -Source $source
     Disable-IncludeHelperDebug
 }
 
@@ -82,14 +86,15 @@ function Assert-FileVersion{
         [string]$Path,
         [string]$Version,
         [string]$Date = (Get-Date -Format "yyyy-MM-dd"),
-        [string]$Body
+        [string]$Body,
+        [string]$Source = "IncludeHelper"
     )
 
     $headerversion = 1
     $headeersizeinlines = $script:TEST_HEADER_V1.Count
 
-    $content = Get-Content -Path $Path | Out-String
-    $json = Build-TestFileVersionJson $Version $Date $headerversion
+    $content = (Get-Content -Path $Path) -join  "`n"
+    $json = Build-TestFileVersionJson $Version $Date $Source $headerversion
     $expected = "# $json"
 
     $content = @(Get-Content -Path $Path)
@@ -101,23 +106,23 @@ function Assert-FileVersion{
     # Assert content if provided
     if(-not [string]::IsNullOrWhiteSpace($Body)){
         # "Comparing body" | Write-MyDebug -Section "Assert-FileVersion"
-        # Remove the first line from content
+        
+        # Remove header from content to compare with body
         $rest = $content | Select-Object -Skip $headeersizeinlines
-        # join string[] to string
         $rest = $rest -join "`n"
-        # "Body presented:" | Write-MyDebug -Section "Assert-FileVersion" -Object $Body
-        # "Rest Content :" | Write-MyDebug -Section "Assert-FileVersion" -Object $rest
-        Assert-AreEqual -Expected $Body -Presented $rest -Comment "Rest of the file content should be the same"
+
+        Assert-AreEqual -Expected $Body -Presented $rest 
     }
 }
 
-function Build-TestFileVersionJson($Version, $Date, $Headerversion){
+function Build-TestFileVersionJson($Version, $Date, $Source, $Headerversion){
 
     # Need to create the full object to control the order of members for mocking
     if(-not [string]::IsNullOrWhiteSpace($Headerversion)){
         $json = [pscustomobject]@{
             Version = $Version
             Date = $Date
+            Source = $Source
             HeaderVersion = $Headerversion
         }
     } else {
@@ -133,11 +138,11 @@ function Build-TestFileVersionJson($Version, $Date, $Headerversion){
 }
 
 $script:TEST_HEADER_V1 = @(
-    '# {"Version":"{version}","Date":"{date}","HeaderVersion":{headerversion}}',
+    '# {"Version":"{version}","Date":"{date}","Source":"{source}","HeaderVersion":{headerversion}}',
     "# DO NOT MODIFY THIS FILE MANUALLY. IT IS GENERATED BY THE IncludeHelper MODULE."
 )
 
-function Build-TestVersionHeader($version, $Date, $headerversion){
+function Build-TestVersionHeader($version, $Date, $source,$headerversion){
     # Sync this code with Build-VersionHeader at public/setfileversion.ps1
 
     $headerversion = $headerversion
@@ -146,6 +151,7 @@ function Build-TestVersionHeader($version, $Date, $headerversion){
     # replace the {json} placeholder with the actual json
 
     $header = $header | ForEach-Object { $_ -replace "{headerversion}", "$headerversion" }
+    $header = $header | ForEach-Object { $_ -replace "{source}", "IncludeHelper" }
     $header = $header | ForEach-Object { $_ -replace "{version}", $Version }
     $header = $header | ForEach-Object { $_ -replace "{date}", $Date }
 

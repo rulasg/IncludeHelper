@@ -1,7 +1,6 @@
 
 function Test_Database{
 
-    Reset-InvokeCommandMock
     Mock_Database -ResetDatabase
 
     # Load include files needed to test database
@@ -47,7 +46,6 @@ function Test_Database{
 
 function Test_Database_JSON{
 
-    Reset-InvokeCommandMock
     Mock_Database -ResetDatabase
 
     # Load include files needed to test database
@@ -93,7 +91,6 @@ function Test_Database_JSON{
 
 function Test_Database_JSON_ComplexObject{
 
-    Reset-InvokeCommandMock
     Mock_Database -ResetDatabase
 
     # Load include files needed to test database
@@ -133,7 +130,6 @@ function Test_Database_JSON_ComplexObject{
 
 function Test_Database_XML{
 
-    Reset-InvokeCommandMock
     Mock_Database -ResetDatabase
 
     # Load include files needed to test database
@@ -179,7 +175,6 @@ function Test_Database_XML{
 
 function Test_Database_TXT{
 
-    Reset-InvokeCommandMock
     Mock_Database -ResetDatabase
 
     # Load include files needed to test database
@@ -225,7 +220,6 @@ function Test_Database_TXT{
 
 function Test_Database_MultyKey{
 
-    Reset-InvokeCommandMock
     Mock_Database -ResetDatabase
 
     . $(Get-Ps1FullPath -Name "databaseV2.ps1" -FolderName "Include" -ModuleRootPath $MODULE_ROOT_PATH)

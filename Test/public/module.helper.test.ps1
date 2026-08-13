@@ -15,9 +15,8 @@ function Test_ModuleHelper_AreEqual_InModule_And_TestModule{
         $filePath[$_]= $path | Join-Path -ChildPath $files[$_].Name
     }
 
-    $content1 = Get-Content -Path $filePath[0] | Out-String
-    $content2 = Get-Content -Path $filePath[1] | Out-String
-
+    $content1 = (Get-Content -Path $filePath[0]) -join "`n"
+    $content2 = (Get-Content -Path $filePath[1]) -join "`n"
     Assert-AreEqual -Expected $content1 -Presented $content2
 
 }

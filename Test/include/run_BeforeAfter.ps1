@@ -20,6 +20,10 @@ function Run_BeforeEach{
     # Write-Verbose "Run_BeforeEach"
     Disable-IncludeHelperDebug
 
+    Reset-InvokeCommandMock
+
+    # Mock get the now date
+    MockCall_DateHelper
 }
 
 # function Run_AfterEach{

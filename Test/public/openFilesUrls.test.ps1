@@ -5,7 +5,6 @@
 
 function Test_OpenUrl_SingleUrl {
     # Arrange
-    Reset-InvokeCommandMock
     $url = "https://github.com"
     $tag = New-Guid
 
@@ -28,7 +27,6 @@ function Test_OpenUrl_SingleUrl {
 
 function Test_OpenUrl_MultipleUrls_Pipeline {
     # Arrange
-    Reset-InvokeCommandMock
     $url1 = "https://github.com"
     $url2 = "https://google.com"
     $url3 = "https://microsoft.com"
