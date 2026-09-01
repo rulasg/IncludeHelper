@@ -54,6 +54,8 @@ function Write-MyVerbose {
 
     if (Test-MyVerbose) {
         Write-ToConsole $message -Color $VERBOSE_COLOR
+    } else {
+        Write-MyDebug -Section "Verbose" -Message $Message
     }
 }
 
