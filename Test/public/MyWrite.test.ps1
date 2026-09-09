@@ -327,3 +327,40 @@ function Assert-DebugEnv($SectionString,$LoggingFile){
     $result = $result ?? ""
     Assert-AreEqual -Expected $LoggingFile -Presented $result
 }
+
+function Test_WriteMyDot_NoDebug{
+
+    Start-MyTranscript
+
+        Invoke-PrivateContext {
+            param($Arguments)
+
+            Write-MyDot -Message $Arguments[0]
+
+        } -Arguments "Test dot message"
+
+    $result = @(Stop-MyTranscript)
+
+    Assert-Count -Expected 1 -Presented $result
+    Assert-AreEqual -Expected "." -Presented $result
+
+}
+
+function Test_WriteMyDot_WithDebug{
+
+    Enable-IncludeHelperDebug -Sections "dot"
+
+    Start-MyTranscript
+
+        Invoke-PrivateContext {
+            param($Arguments)
+
+            Write-MyDot -Message $Arguments[0]
+
+        } -Arguments "Test dot message"
+
+    $result = @(Stop-MyTranscript)
+
+    Assert-Count -Expected 1 -Presented $result
+    Assert-DbgMsg $result[0] "dot" "Test dot message"
+}
