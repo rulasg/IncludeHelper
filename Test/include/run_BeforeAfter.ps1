@@ -22,6 +22,9 @@ function Run_BeforeEach{
 
     Reset-InvokeCommandMock
 
+    # Mock the config
+    Mock_Config
+
     # Mock get the now date
     MockCall_DateHelper
 }

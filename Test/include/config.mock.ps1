@@ -23,7 +23,7 @@ function Mock_Config{
 
     # Remove mock config path if exists
     if(Test-Path $MockPath){
-        Remove-Item -Path $fullpath -ErrorAction SilentlyContinue -Recurse -Force
+        Remove-Item -Path $MockPath -ErrorAction SilentlyContinue -Recurse -Force
     }
 
     # create mock config path

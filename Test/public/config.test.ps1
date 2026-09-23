@@ -1,6 +1,7 @@
 function Test_ConfigInclude{
 
-    Mock_Config
+    # Mock_Config already called from Run_BeforeEach
+    # Mock_Config
 
     Set-IncludeHelperConfigValue -Name "config_name" -Value "test_config_value"
 
