@@ -1,3 +1,37 @@
+function Test_FormatTagString{
+
+    Invoke-PrivateContext{
+
+        # Empty string
+        $string = "" | Format-TagString
+        Assert-AreEqual -Expected "" -Presented $string
+
+        # String without tags
+        $string = "Your string here" | Format-TagString
+        Assert-AreEqual -Expected "Your string here" -Presented $string
+
+        # Normalize a tag list at the front and its separator from the text
+        $string = "[tag1]  [tag2]   Your string here" | Format-TagString
+        Assert-AreEqual -Expected "[tag1][tag2] Your string here" -Presented $string
+
+        # Normalize a tag list in the middle and its separators
+        $string = "Your  string [tag1]  [tag2]   with more text" | Format-TagString
+        Assert-AreEqual -Expected "Your  string [tag1][tag2] with more text" -Presented $string
+
+        # Normalize a tag list at the end and its separator from the text
+        $string = "Your string here   [tag1]  [tag2]  " | Format-TagString
+        Assert-AreEqual -Expected "Your string here [tag1][tag2]" -Presented $string
+
+        # Add a separator when text touches a tag list
+        $string = "Your string[tag1][tag2]more text" | Format-TagString
+        Assert-AreEqual -Expected "Your string [tag1][tag2] more text" -Presented $string
+
+        # Normalize several tag lists in one string
+        $string = "[front1] [front2] text [middle1]  [middle2] text [end1] [end2]" | Format-TagString
+        Assert-AreEqual -Expected "[front1][front2] text [middle1][middle2] text [end1][end2]" -Presented $string
+    }
+}
+
 function Test_AddTagToString{
 
     Invoke-PrivateContext{
@@ -35,7 +69,7 @@ function Test_AddTagToString{
     }
 }
 
-function Test_AddTagString_Already_Exists{
+function Test_AddTagString_Already_Exists_KeepStringTheSame{
 
     Invoke-PrivateContext{
 
@@ -46,18 +80,79 @@ function Test_AddTagString_Already_Exists{
 
         # Act - Add a tag that already exists not on front
         $startString = "[tag2][tag1] Your string here [other tag to ignore] and after more text"
-        $string = $startString | Add-TagToString "tag1"
+        $string = $startString | Add-TagToString "tag2"
         Assert-AreEqual -Expected $startString -Presented $string
 
         #Act - add a tag that already exists at the end
         $startString = "[tag2] Your string here [other tag to ignore] and after more text [tag1]"
-        $string = $startString | Add-TagToString "tag1"
+        $string = $startString | Add-TagToString "tag1" -end
         Assert-AreEqual -Expected $startString -Presented $string
 
-        # Act - Add a tag that already exists in the middle
-        $startString = "[tag2][tag3] Your string here [other tag to ignore][tag1] and after more text"
-        $string = $startString | Add-TagToString "tag1"
+        #Act - add a tag that already exists on front in position
+        $startString = "[tag1][tag2][tag3] Your string here [other tag to ignore] and after more text [tat4][tag5][tag6]"
+        $string = $startString | Add-TagToString "tag2" -Position 1
         Assert-AreEqual -Expected $startString -Presented $string
+
+        #Act - add a tag that already exists on end in position
+        $startString = "[tat1][tag2][tag3] Your string here [other tag to ignore] and after more text [tat4][tag5][tag6]"
+        $string = $startString | Add-TagToString "tag5" -Position 1 -end
+        Assert-AreEqual -Expected $startString -Presented $string
+
+    }
+}
+
+function Test_AddTagString_Already_Exists_UpdateString{
+    
+    Invoke-PrivateContext{
+
+        # Act - Add a tag that already exists on front with Spaces
+        $startString = "[tag1] [tag2] Your string here [other tag to ignore] and after more text"
+        $expectedString = "[tag1][tag2] Your string here [other tag to ignore] and after more text"
+        $string = $startString | Add-TagToString "tag1"
+        Assert-AreEqual -Expected $expectedString -Presented $string
+
+        # Act - Add a tag that already exists on front with Spaces
+        $startString = "[tag1][tag2]Your string here [other tag to ignore] and after more text"
+        $expectedString = "[tag1][tag2] Your string here [other tag to ignore] and after more text"
+        $string = $startString | Add-TagToString "tag1"
+        Assert-AreEqual -Expected $expectedString -Presented $string
+
+        # Act - Add a tag that already exists on front
+        $startString = "[tag1][tag2] Your string here [other tag to ignore] and after more text"
+        $expectedString = "[tag1][tag2] Your string here [other tag to ignore] and after more text"
+        $string = $startString | Add-TagToString "tag1"
+        Assert-AreEqual -Expected $expectedString -Presented $string
+
+        # Act - Add a tag that already exists not on front
+        $startString = "[tag2][tag1] Your string here [other tag to ignore] and after more text"
+        $expectedString = "[tag2][tag1] Your string here [other tag to ignore] and after more text"
+        $string = $startString | Add-TagToString "tag1"
+        Assert-AreEqual -Expected $expectedString -Presented $string
+
+        #Act - add a tag that already exists at the end
+        $startString = "[tag2] Your string here [other tag to ignore] and after more text [tag1]"
+        $expectedString = "[tag2] Your string here [other tag to ignore] and after more text [tag1]"
+        $string = $startString | Add-TagToString "tag1"
+        Assert-AreEqual -Expected $expectedString -Presented $string
+
+        # Act - Add a tag that already exists in the middle
+        $startString    = "[tag2][tag3] Your string here [other tag to ignore][tag1] and after more text"
+        $expectedString = "[tag1][tag2][tag3] Your string here [other tag to ignore] and after more text"
+        $string = $startString | Add-TagToString "tag1"
+        Assert-AreEqual -Expected $expectedString -Presented $string
+
+        # Act - Add a tag that already exists in the middle
+        $startString    = "[tag2][tag3] Your string here [other tag to ignore][tag1] and after more text"
+        $expectedString = "[tag2][tag1][tag3] Your string here [other tag to ignore] and after more text"
+        $string = $startString | Add-TagToString "tag1" -Position 1
+        Assert-AreEqual -Expected $expectedString -Presented $string
+
+        # Act - Add a tag that already exists in the middle
+        $startString       = "[tag2][tag3] Your string here [other tag to ignore][tag1] and after more text [tat4][tag5][tag6]"
+        $expectedString    = "[tag2][tag3] Your string here [other tag to ignore] and after more text [tat4][tag1][tag5][tag6]"
+        $string = $startString | Add-TagToString "tag1" -Position 1 -End
+        Assert-AreEqual -Expected $expectedString -Presented $string
+
     }
 }
 
